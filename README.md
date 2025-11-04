@@ -1,9 +1,9 @@
-# ThinkCity Dashboard v3 - Verbesserte Version
+# ThinkCity Dashboard v3
 
 **Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge**  
 **Raspberry Pi 4B + HDMI-Touchscreen + MCP2515 CAN**
 
-Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Diese Version behebt die Probleme der ChatGPT-Implementierung und fügt fehlende Features hinzu.
+Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Entwickelt unter zuhilefename von Claude Sonnet 3.5 für präzise CAN-Bus-Dekodierung und professionelle UI-Gestaltung.
 
 ## ⚠️ Disclaimer
 
@@ -13,85 +13,75 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 
 
-![Dashboard Status](https://img.shields.io/badge/status-production%20ready-brightgreen)---
-
+![Dashboard Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.9+-blue)
+![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%204B-red)
 
-![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%204B-red)## ⚡ Hauptverbesserungen
+---
 
-
-
----### 1. **Display-Kompatibilität**
-
-- ✅ Unterstützung für HDMI-Touchscreens
-
-## ✨ Features- ✅ Fallback-Optionen für verschiedene Qt-Backends
-
-- ✅ Automatische Display-Erkennung
+## ✨ Features
 
 ### 📊 **5 Hauptscreens**
 
-- **Haupt**: Geschwindigkeit, Power-Gauge, Range, Verbrauch, Fahrmodus (P/N/R/D/E)### 2. **Robustes CAN-Interface**
-
-- **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags- ✅ Zuverlässige Initialisierung mit Retry-Logik
-
-- **Zellen**: Detaillierte Ansicht aller 88 Zellspannungen mit Bargraphen- ✅ Automatisches Recovery bei CAN-Bus-Fehlern
-
-- **Laden**: Ladestatus, AC/DC-Werte, Zeitschätzungen- ✅ Verbesserte Error-Behandlung
-
+- **Haupt**: Geschwindigkeit, Power-Gauge, Range, Verbrauch, Fahrmodus (P/R/N/D/E)
+- **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags
+- **Zellen**: Detaillierte Ansicht aller 88 Zellspannungen mit Bargraphen
+- **Laden**: Ladestatus, AC/DC-Werte, Zeitschätzungen
 - **Rohdaten**: Live CAN-Terminal + ID-Referenztabelle
 
-### 3. **Erweiterte Features**
+### 🎛️ **Power-Gauge mit logarithmischer Skalierung**
 
-### 🎛️ **Power-Gauge mit logarithmischer Skalierung**- ✅ **Range-Berechnung** (km basierend auf SOC + Durchschnittsverbrauch)
+- Bereich: -50 kW (Rekuperation) bis +200 kW (Voller Schub)
+- Pseudo-logarithmische Skalierung für bessere Auflösung im Normalbereich (0-30 kW)
+- Statische Farbsegmente: Grün (Reku) → Gelb → Orange → Rot (Vollgas)
+- Skala-Striche mit Zahlenbeschriftung
 
-- Bereich: -50 kW (Rekuperation) bis +200 kW (Vollgas)- ✅ **Trip-Computer** (kWh/100km aktuell + Trip + Gesamt)
+### 🚨 **Intelligentes Warn-System**
 
-- Pseudo-logarithmische Skalierung für bessere Auflösung im Normalbereich (0-30 kW)- ✅ **SOH-Anzeige** (State of Health)
-
-- Statische Farbsegmente: Grün (Reku) → Gelb → Orange → Rot (Vollgas)- ✅ **Touch-Navigation** zwischen Screens
-
-- Skala-Striche mit Zahlenbeschriftung- ✅ **Settings-Screen** mit Kalibrierung
-
-
-
-### 🚨 **Intelligentes Warn-System**### 4. **Besseres Datenlogging**
-
-- **Status-Bar** auf allen Screens mit Datum, Uhrzeit, Außentemperatur- ✅ SQLite auf SSD mit Auto-Mount-Check
-
-- **Kritische Fehler-Warnung**: Rote Umrandung + blinkende Meldung bei:- ✅ Trip-Tracking (Start/Stop-Erkennung)
-
-  - Isolationsfehler (⚠ ISOLATION)- ✅ WLAN-Detection für Auto-Sync
-
+- **Status-Bar** auf allen Screens mit Datum, Uhrzeit, Außentemperatur
+- **Kritische Fehler-Warnung**: Rote Umrandung + blinkende Meldung bei:
+  - Isolationsfehler (⚠ ISOLATION)
   - Emergency/Notfall (⚠ NOTFALL)
+  - Zell-Überladen >4.25V (⚡ ÜBERLADEN)
+  - Zell-Tiefentladen <2.5V (🔋 TIEFENTLADEN)
+  - Temperatur-Fehler (🌡 TEMP HOCH/❄ TEMP TIEF)
+- **Frostwarnung**: Außentemperatur <3°C wird rot markiert
 
-  - Zell-Überladen >4.25V (⚡ ÜBERLADEN)### 5. **Performance**
-
-  - Zell-Tiefentladen <2.5V (🔋 TIEFENTLADEN)- ✅ Selektives UI-Update (nur geänderte Werte)
-
-  - Temperatur-Fehler (🌡 TEMP HOCH/❄ TEMP TIEF)- ✅ Optimiertes Rendering
-
-- **Frostwarnung**: Außentemperatur <3°C wird rot markiert- ✅ Reduzierte CPU-Last
-
-
-
-### 🔋 **Zellspannungs-Monitoring**---
+### 🔋 **Zellspannungs-Monitoring**
 
 - Alle 88 Zellen einzeln dargestellt (4 Reihen × 22 Zellen)
-
-- Vertikale Bargraphen mit Farbcodierung:## 📦 Installation
-
+- Vertikale Bargraphen mit Farbcodierung:
   - Rot: >4.2V (kritisch hoch)
+  - Orange: <3.0V (kritisch niedrig)
+  - Grün: 3.5-4.1V (optimal)
+  - Gelb: Grenzbereich
+- Dicke rote Umrandung bei kritischen Zellen
+- Min/Max/Durchschnitt/Delta-Anzeige
 
-  - Orange: <3.0V (kritisch niedrig)### Voraussetzungen
+### 📡 **Robuste CAN-Bus Integration**
 
-  - Grün: 3.5-4.1V (optimal)- Raspberry Pi 4B
+- Zuverlässige Initialisierung mit Retry-Logik
+- Automatisches Recovery bei CAN-Bus-Fehlern
+- Vollständige Dekodierung aller bekannten ThinkCity CAN-IDs
+- Testmodus mit vcan0 für Entwicklung ohne Hardware
 
-  - Gelb: Grenzbereich- USB-SSD (empfohlen für schnelles Booten)
+### 💾 **Datenlogging & Performance**
 
-- Dicke rote Umrandung bei kritischen Zellen- HDMI-Touchscreen (7")
+- SQLite-Datenbank auf SSD mit Auto-Mount-Check
+- Trip-Tracking (Start/Stop-Erkennung)
+- Selektives UI-Update (nur geänderte Werte)
+- Optimiertes Rendering für geringe CPU-Last
 
-- Min/Max/Durchschnitt/Delta-Anzeige- MCP2515 CAN-Modul (SPI)
+---
+
+## 📦 Installation
+
+### Voraussetzungen
+
+- Raspberry Pi 4B
+- USB-SSD (empfohlen für schnelles Booten)
+- HDMI-Touchscreen (getestet mit SunFounder 10" 1280x800)
+- MCP2515 CAN-Modul (SPI)
 
 
 
