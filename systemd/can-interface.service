@@ -1,0 +1,16 @@
+[Unit]
+Description=CAN Interface Setup (can0)
+After=network.target
+Before=thinkcity-dashboard.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/ip link set can0 type can bitrate 500000
+ExecStart=/sbin/ip link set can0 up
+ExecStop=/sbin/ip link set can0 down
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

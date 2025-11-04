@@ -1,0 +1,27 @@
+[Unit]
+Description=ThinkCity Dashboard v3
+After=network.target can-interface.service
+Wants=can-interface.service
+ConditionPathExists=/sys/class/net/can0
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/thinkcity-dashboard-v3
+Environment="QT_QPA_PLATFORM=xcb"
+Environment="DISPLAY=:0"
+Environment="TC_FULLSCREEN=1"
+Environment="TC_HIDE_CURSOR=1"
+Environment="TC_CAN_CHANNEL=can0"
+Environment="TC_DB_PATH=/mnt/usbssd/thinkcity.db"
+Environment="TC_BATTERY_CAPACITY_KWH=24.0"
+ExecStartPre=/bin/sleep 2
+ExecStart=/usr/bin/python3 /home/pi/thinkcity-dashboard-v3/dashboard.py
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

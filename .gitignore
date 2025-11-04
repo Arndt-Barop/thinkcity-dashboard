@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+nohup.out
+
+# Trace-Dateien (zu groß für Git)
+traces/*.log
+traces/*.trc
+!traces/README.md
+
+# Backup-Dateien
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# Temp-Dateien
+tmp/
+temp/
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config-Backups (können sensible Daten enthalten)
+config-backup/
+
+# Private Notizen
+NOTES.md
+TODO.md
+PRIVATE.md
