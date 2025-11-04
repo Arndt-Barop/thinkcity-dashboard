@@ -282,16 +282,23 @@ class CANDecoder:
         """0x264: Gangwahl."""
         hex_str = "".join(f"{b:02X}" for b in d)
         
-        # Dekodierung nach Original-BASIC
+        # Dekodierung nach Live-Trace-Analyse
+        # Format: 01 00 00 4X YY ZZ 00 00
+        #                   ^^ ^^ ^^
+        # Bytes 3-5 enthalten die Gang-Information
+        # Byte 3 variiert zwischen 40 und 41 (vermutlich Status-Flag)
+        gear_bytes = f"{d[4]:02X}{d[5]:02X}"
+        
         gear_map = {
-            "1004011000": "P",
-            "1004042100": "R",
-            "10040104100": "N",
-            "10040406100": "D",
-            "10041081000": "E",  # Eco-Mode
+            "0401": "P",  # Park      
+            "0421": "R",  # Reverse   
+            "1004": "N",  # Neutral   
+            "4006": "D",  # Drive     
+            "0081": "E",  # Eco-Mode  (live: 01 00 00 41 00 81 00 00)
+            "1008": "E",  # Eco-Mode  (trace: 01 00 00 40 10 08 00 00)
         }
         
-        gear = gear_map.get(hex_str, "?")
+        gear = gear_map.get(gear_bytes, "?")
         
         return {
             "shifter_hex": hex_str,
