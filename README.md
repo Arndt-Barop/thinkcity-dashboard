@@ -3,7 +3,7 @@
 **Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge**  
 **Raspberry Pi 4B + HDMI-Touchscreen + MCP2515 CAN**
 
-Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Entwickelt unter zuhilefename von Claude Sonnet 3.5 für präzise CAN-Bus-Dekodierung und professionelle UI-Gestaltung.
+Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Entwickelt mit Claude Sonnet 3.5 für präzise CAN-Bus-Dekodierung und professionelle UI-Gestaltung.
 
 ## ⚠️ Disclaimer
 
@@ -11,7 +11,31 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 **This project is not affiliated with or authorized by Think Global AS, Electric Mobility Solutions AS, or any manufacturer of the Think City vehicle.** "Think City" refers solely to the electric vehicle model. This dashboard was developed as a community project for Think City vehicle owners.
 
+---
 
+## 📸 Screenshots
+
+### Hauptscreen
+![Main Screen](docs/images/screen1-main.png)
+*Geschwindigkeit, Power-Gauge (-50 bis +200 kW), Range, Verbrauch, Fahrmodus*
+
+### Batterie-Übersicht
+![Battery Screen](docs/images/screen2-battery.png)
+*Spannungen, Ströme, Temperaturen, SOC, SOH, Status-Flags*
+
+### Zellspannungen
+![Cell Voltages Screen](docs/images/screen3-cells.png)
+*Alle 88 Zellen einzeln mit Bargraphen und Farbcodierung*
+
+### Ladestatus
+![Charge Screen](docs/images/screen4-charge.png)
+*AC/DC-Werte, Ladestrom, geschätzte Ladezeit*
+
+### CAN-Rohdaten
+![Raw Data Screen](docs/images/screen5-rawdata.png)
+*Live CAN-Traffic mit ID-Referenztabelle*
+
+---
 
 ![Dashboard Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.9+-blue)
@@ -23,7 +47,7 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 ### 📊 **5 Hauptscreens**
 
-- **Haupt**: Geschwindigkeit, Power-Gauge, Range, Verbrauch, Fahrmodus (P/R/N/D/E)
+- **Haupt**: Geschwindigkeit, Power-Gauge, Range, Verbrauch, Fahrmodus (P/N/R/D/E)
 - **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags
 - **Zellen**: Detaillierte Ansicht aller 88 Zellspannungen mit Bargraphen
 - **Laden**: Ladestatus, AC/DC-Werte, Zeitschätzungen
@@ -31,7 +55,7 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 ### 🎛️ **Power-Gauge mit logarithmischer Skalierung**
 
-- Bereich: -50 kW (Rekuperation) bis +200 kW (Voller Schub)
+- Bereich: -50 kW (Rekuperation) bis +200 kW (Vollgas)
 - Pseudo-logarithmische Skalierung für bessere Auflösung im Normalbereich (0-30 kW)
 - Statische Farbsegmente: Grün (Reku) → Gelb → Orange → Rot (Vollgas)
 - Skala-Striche mit Zahlenbeschriftung
@@ -83,29 +107,18 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 - HDMI-Touchscreen (getestet mit SunFounder 10" 1280x800)
 - MCP2515 CAN-Modul (SPI)
 
+### Schnellstart
 
-
-### 📡 **CAN-Bus Integration**### Schnellstart
-
-- Vollständige Dekodierung aller bekannten ThinkCity CAN-IDs```bash
-
-- Unterstützung für MCP2515 (can0) und Virtual CAN (vcan0)cd /home/pi
-
-- Automatisches Recovery bei Bus-Fehlerngit clone <repo> thinkcity-dashboard-v3  # oder kopiere den Ordner
-
-- Live CAN-Traffic Anzeigecd thinkcity-dashboard-v3
-
+```bash
+cd /home/pi
+git clone <repo> thinkcity-dashboard-v3  # oder kopiere den Ordner
+cd thinkcity-dashboard-v3
 chmod +x setup.sh
+./setup.sh
+sudo reboot
+```
 
-### 🎨 **Optimierte UI**./setup.sh
-
-- Touch-freundliche Bedienung (1280×800 optimiert)sudo reboot
-
-- Dunkles Theme (reduzierte Blendung bei Nachtfahrten)```
-
-- 60 FPS Update-Rate
-
-- Keine Cursor-Anzeige (vt.global_cursor_default=0)Das Setup-Skript:
+Das Setup-Skript:
 
 1. Installiert alle Abhängigkeiten
 
