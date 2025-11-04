@@ -1,12 +1,15 @@
-# ThinkCity Dashboard v3# ThinkCity Dashboard v3 - Verbesserte Version
+# ThinkCity Dashboard v3 - Verbesserte Version
 
+**Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge**  
+**Raspberry Pi 4B + HDMI-Touchscreen + MCP2515 CAN**
 
+Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Diese Version behebt die Probleme der ChatGPT-Implementierung und fügt fehlende Features hinzu.
 
-**Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge****Raspberry Pi 4B + HDMI-Touchscreen + MCP2515 CAN**
+## ⚠️ Disclaimer
 
+**Dieses Projekt ist nicht mit Think Global AS, Electric Mobility Solutions AS oder anderen Herstellern des Think City Fahrzeugs verbunden oder von diesen autorisiert.** "Think City" bezieht sich ausschließlich auf das Elektrofahrzeugmodell. Dieses Dashboard wurde als Community-Projekt für Besitzer von Think City Fahrzeugen entwickelt.
 
-
-Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface.Diese Version behebt die Probleme der ChatGPT-Implementierung und fügt fehlende Features hinzu.
+**This project is not affiliated with or authorized by Think Global AS, Electric Mobility Solutions AS, or any manufacturer of the Think City vehicle.** "Think City" refers solely to the electric vehicle model. This dashboard was developed as a community project for Think City vehicle owners.
 
 
 
