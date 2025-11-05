@@ -86,7 +86,7 @@ class SettingsScreen(QWidget):
         title_layout.setContentsMargins(20, 20, 20, 10)
         
         # Titel
-        title = QLabel("⚙️ Einstellungen")
+        title = QLabel("Einstellungen")
         title.setFont(QFont("Arial", 28, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         title_layout.addWidget(title)
@@ -152,7 +152,7 @@ class SettingsScreen(QWidget):
         button_column.setContentsMargins(10, 0, 0, 0)
         
         # Speichern Button
-        save_btn = QPushButton("💾\nSpeichern")
+        save_btn = QPushButton("Speichern")
         save_btn.setFont(QFont("Arial", 18, QFont.Bold))
         save_btn.setMinimumSize(150, 100)
         save_btn.clicked.connect(self.on_save)
@@ -170,7 +170,7 @@ class SettingsScreen(QWidget):
         button_column.addWidget(save_btn)
         
         # Abbrechen Button
-        cancel_btn = QPushButton("❌\nAbbrechen")
+        cancel_btn = QPushButton("Abbrechen")
         cancel_btn.setFont(QFont("Arial", 18, QFont.Bold))
         cancel_btn.setMinimumSize(150, 100)
         cancel_btn.clicked.connect(self.on_cancel)
@@ -190,7 +190,7 @@ class SettingsScreen(QWidget):
         button_column.addStretch()
         
         # Neustart Button
-        reboot_btn = QPushButton("🔄\nNeustart")
+        reboot_btn = QPushButton("Neustart")
         reboot_btn.setFont(QFont("Arial", 16, QFont.Bold))
         reboot_btn.setMinimumSize(150, 90)
         reboot_btn.clicked.connect(self.on_reboot)
@@ -208,7 +208,7 @@ class SettingsScreen(QWidget):
         button_column.addWidget(reboot_btn)
         
         # Herunterfahren Button
-        shutdown_btn = QPushButton("⏻\nHerunter-\nfahren")
+        shutdown_btn = QPushButton("Herunter-\nfahren")
         shutdown_btn.setFont(QFont("Arial", 16, QFont.Bold))
         shutdown_btn.setMinimumSize(150, 90)
         shutdown_btn.clicked.connect(self.on_shutdown)
@@ -276,7 +276,7 @@ class SettingsScreen(QWidget):
     
     def create_can_group(self):
         """CAN-Interface Settings."""
-        group = QGroupBox("🔌 CAN-Interface")
+        group = QGroupBox("CAN-Interface")
         layout = QVBoxLayout()
         
         # Interface Auswahl
@@ -299,7 +299,7 @@ class SettingsScreen(QWidget):
     
     def create_wifi_group(self):
         """WLAN Settings."""
-        group = QGroupBox("📶 WLAN")
+        group = QGroupBox("WLAN")
         layout = QVBoxLayout()
         
         # Home SSID
@@ -315,7 +315,7 @@ class SettingsScreen(QWidget):
         self.wifi_only_checkbox.setChecked(self.settings["sync_on_wifi_only"])
         layout.addWidget(self.wifi_only_checkbox)
         
-        info = QLabel("ℹ️ Sync erfolgt nur wenn mit diesem WLAN verbunden")
+        info = QLabel("Info: Sync erfolgt nur wenn mit diesem WLAN verbunden")
         info.setStyleSheet("color: #95a5a6; font-size: 12px;")
         layout.addWidget(info)
         
@@ -324,7 +324,7 @@ class SettingsScreen(QWidget):
     
     def create_nas_group(self):
         """NAS Sync Settings."""
-        group = QGroupBox("💾 NAS Synchronisation")
+        group = QGroupBox("NAS Synchronisation")
         layout = QVBoxLayout()
         
         # Enable Sync
@@ -356,7 +356,7 @@ class SettingsScreen(QWidget):
         user_layout.addWidget(self.nas_user)
         layout.addLayout(user_layout)
         
-        info = QLabel("ℹ️ Datenbank wird nach jeder Fahrt automatisch synchronisiert")
+        info = QLabel("Info: Datenbank wird nach jeder Fahrt automatisch synchronisiert")
         info.setStyleSheet("color: #95a5a6; font-size: 12px;")
         layout.addWidget(info)
         
@@ -364,8 +364,8 @@ class SettingsScreen(QWidget):
         return group
     
     def create_db_group(self):
-        """Datenbank Settings."""
-        group = QGroupBox("🗄️ Datenbank")
+        """Database Settings."""
+        group = QGroupBox("Datenbank")
         layout = QVBoxLayout()
         
         # DB Path
@@ -375,7 +375,7 @@ class SettingsScreen(QWidget):
         path_layout.addWidget(self.db_path)
         layout.addLayout(path_layout)
         
-        info = QLabel("ℹ️ Standard: /home/pi/thinkcity-dashboard-v3/thinkcity.db")
+        info = QLabel("Info: Standard: /home/pi/thinkcity-dashboard-v3/thinkcity.db")
         info.setStyleSheet("color: #95a5a6; font-size: 12px;")
         layout.addWidget(info)
         
@@ -386,7 +386,7 @@ class SettingsScreen(QWidget):
         """Logging Settings."""
         from PyQt5.QtWidgets import QSlider, QGridLayout
         
-        group = QGroupBox("📊 Daten-Logging")
+        group = QGroupBox("Daten-Logging")
         layout = QVBoxLayout()
         
         # Logging aktivieren
@@ -414,7 +414,7 @@ class SettingsScreen(QWidget):
         self.logging_interval_slider.valueChanged.connect(update_interval_label)
         interval_layout.addWidget(self.logging_interval_slider)
         
-        interval_info = QLabel("ℹ️ 1s = hohe Genauigkeit, hoher Speicher | 60s = niedrige Genauigkeit, wenig Speicher")
+        interval_info = QLabel("Info: 1s = hohe Genauigkeit, hoher Speicher | 60s = niedrige Genauigkeit, wenig Speicher")
         interval_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
         interval_info.setWordWrap(True)
         interval_layout.addWidget(interval_info)
@@ -430,16 +430,16 @@ class SettingsScreen(QWidget):
         available_fields = {
             "speed_kmh": "🚗 Geschwindigkeit",
             "soc_pct": "🔋 Ladezustand (SOC)",
-            "voltage_V": "⚡ Spannung",
-            "current_A": "⚡ Strom",
-            "power_kW": "⚡ Leistung",
-            "pack_temp_C": "🌡️ Akku-Temperatur",
-            "ambient_temp_C": "🌡️ Außentemperatur",
-            "consumption_wh_km": "📊 Verbrauch Wh/km",
-            "range_km": "📏 Reichweite",
-            "odo_km": "🛣️ Kilometerstand",
-            "latitude": "🌍 GPS Breitengrad",
-            "longitude": "🌍 GPS Längengrad"
+            "voltage_V": "Spannung",
+            "current_A": "Strom",
+            "power_kW": "Leistung",
+            "pack_temp_C": "Akku-Temperatur",
+            "ambient_temp_C": "Außentemperatur",
+            "consumption_wh_km": "Verbrauch Wh/km",
+            "range_km": "Reichweite",
+            "odo_km": "Kilometerstand",
+            "latitude": "GPS Breitengrad",
+            "longitude": "GPS Längengrad"
         }
         
         # Grid für Checkboxen (2 Spalten)
@@ -467,12 +467,12 @@ class SettingsScreen(QWidget):
         # Buttons für alle/keine
         select_layout = QHBoxLayout()
         
-        select_all_btn = QPushButton("✓ Alle")
+        select_all_btn = QPushButton("Alle")
         select_all_btn.setMaximumWidth(100)
         select_all_btn.clicked.connect(lambda: [cb.setChecked(True) for cb in self.field_checkboxes.values()])
         select_layout.addWidget(select_all_btn)
         
-        select_none_btn = QPushButton("✗ Keine")
+        select_none_btn = QPushButton("Keine")
         select_none_btn.setMaximumWidth(100)
         select_none_btn.clicked.connect(lambda: [cb.setChecked(False) for cb in self.field_checkboxes.values()])
         select_layout.addWidget(select_none_btn)
