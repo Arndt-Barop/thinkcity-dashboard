@@ -85,7 +85,25 @@ class SettingsScreen(QWidget):
         # Scroll-Bereich für Settings
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
+        scroll.setStyleSheet("""
+            QScrollArea { border: none; background: transparent; }
+            QScrollBar:vertical {
+                width: 25px;
+                background: #34495e;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical {
+                background: #95a5a6;
+                border-radius: 5px;
+                min-height: 40px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #7f8c8d;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+        """)
         
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout(scroll_content)
