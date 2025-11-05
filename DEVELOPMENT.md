@@ -39,15 +39,32 @@ Das Dashboard enthält einen **Settings-Screen** (⚙️ Button in der Navigatio
   - 🌍 GPS Breitengrad, Längengrad
 - **Alle/Keine** Buttons zum schnellen Auswählen
 
+**🔧 System-Steuerung:**
+- **🔄 Neustart**: System neu starten (mit Bestätigung)
+- **⏻ Herunterfahren**: System sauber herunterfahren (mit Bestätigung)
+- Beide Funktionen erfordern sudo-Rechte (siehe Installation)
+
 ### Verwendung
 
 1. Dashboard starten
 2. Auf **⚙️** Button klicken
 3. Einstellungen vornehmen
 4. **💾 Speichern** klicken
-5. System neu starten für CAN-Interface Änderung
+5. Optional: **🔄 Neustart** oder **⏻ Herunterfahren** für System-Steuerung
 
 Einstellungen werden in `~/thinkcity-dashboard-v3/config.json` gespeichert.
+
+### Installation der sudo-Rechte
+
+Für Shutdown/Reboot-Funktionen:
+
+```bash
+cd ~/thinkcity-dashboard-v3
+chmod +x setup_sudo_permissions.sh
+./setup_sudo_permissions.sh
+```
+
+Dies erlaubt dem `pi`-User passwortloses shutdown/reboot.
 
 ---
 

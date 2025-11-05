@@ -154,6 +154,46 @@ class SettingsScreen(QWidget):
         button_layout.addWidget(cancel_btn)
         main_layout.addLayout(button_layout)
         
+        # System-Buttons (Shutdown/Reboot)
+        system_layout = QHBoxLayout()
+        system_layout.setSpacing(10)
+        
+        reboot_btn = QPushButton("🔄 Neustart")
+        reboot_btn.setFont(QFont("Arial", 14))
+        reboot_btn.setMinimumHeight(50)
+        reboot_btn.clicked.connect(self.on_reboot)
+        reboot_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #f39c12;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:pressed {
+                background-color: #e67e22;
+            }
+        """)
+        
+        shutdown_btn = QPushButton("⏻ Herunterfahren")
+        shutdown_btn.setFont(QFont("Arial", 14))
+        shutdown_btn.setMinimumHeight(50)
+        shutdown_btn.clicked.connect(self.on_shutdown)
+        shutdown_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:pressed {
+                background-color: #c0392b;
+            }
+        """)
+        
+        system_layout.addWidget(reboot_btn)
+        system_layout.addWidget(shutdown_btn)
+        main_layout.addLayout(system_layout)
+        
         self.setStyleSheet("""
             QWidget {
                 background-color: #1e1e1e;
@@ -436,6 +476,44 @@ class SettingsScreen(QWidget):
         """Verwerfe Änderungen."""
         self.settings = self.load_settings()
         self.show_message("❌ Änderungen verworfen")
+    
+    def on_reboot(self):
+        """System neu starten."""
+        from PyQt5.QtWidgets import QMessageBox
+        
+        reply = QMessageBox.question(
+            self, 
+            'Neustart bestätigen',
+            'System wirklich neu starten?',
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.show_message("🔄 System wird neu gestartet...")
+            from PyQt5.QtCore import QTimer
+            import subprocess
+            # Warte 2 Sekunden, dann reboot
+            QTimer.singleShot(2000, lambda: subprocess.run(['sudo', 'reboot']))
+    
+    def on_shutdown(self):
+        """System herunterfahren."""
+        from PyQt5.QtWidgets import QMessageBox
+        
+        reply = QMessageBox.question(
+            self, 
+            'Herunterfahren bestätigen',
+            'System wirklich herunterfahren?',
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.show_message("⏻ System wird heruntergefahren...")
+            from PyQt5.QtCore import QTimer
+            import subprocess
+            # Warte 2 Sekunden, dann shutdown
+            QTimer.singleShot(2000, lambda: subprocess.run(['sudo', 'shutdown', '-h', 'now']))
     
     def show_message(self, text):
         """Zeige Nachricht (simpler Overlay)."""
