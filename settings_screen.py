@@ -131,86 +131,92 @@ class SettingsScreen(QWidget):
         
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
-        main_layout.addWidget(scroll)
         
-        # Buttons
-        button_layout = QHBoxLayout()
+        # Layout mit Scroll-Area links und Buttons rechts
+        content_layout = QHBoxLayout()
+        content_layout.addWidget(scroll, stretch=1)
         
-        save_btn = QPushButton("💾 Speichern")
-        save_btn.setFont(QFont("Arial", 16))
-        save_btn.setMinimumHeight(60)
+        # Button-Spalte rechts
+        button_column = QVBoxLayout()
+        button_column.setSpacing(15)
+        button_column.setContentsMargins(10, 0, 0, 0)
+        
+        # Speichern Button
+        save_btn = QPushButton("💾\nSpeichern")
+        save_btn.setFont(QFont("Arial", 18, QFont.Bold))
+        save_btn.setMinimumSize(150, 100)
         save_btn.clicked.connect(self.on_save)
         save_btn.setStyleSheet("""
             QPushButton {
                 background-color: #2ecc71;
                 color: white;
-                border-radius: 5px;
-                padding: 10px;
+                border-radius: 10px;
+                padding: 15px;
             }
             QPushButton:pressed {
                 background-color: #27ae60;
             }
         """)
+        button_column.addWidget(save_btn)
         
-        cancel_btn = QPushButton("❌ Abbrechen")
-        cancel_btn.setFont(QFont("Arial", 16))
-        cancel_btn.setMinimumHeight(60)
+        # Abbrechen Button
+        cancel_btn = QPushButton("❌\nAbbrechen")
+        cancel_btn.setFont(QFont("Arial", 18, QFont.Bold))
+        cancel_btn.setMinimumSize(150, 100)
         cancel_btn.clicked.connect(self.on_cancel)
         cancel_btn.setStyleSheet("""
             QPushButton {
                 background-color: #95a5a6;
                 color: white;
-                border-radius: 5px;
-                padding: 10px;
+                border-radius: 10px;
+                padding: 15px;
             }
             QPushButton:pressed {
                 background-color: #7f8c8d;
             }
         """)
+        button_column.addWidget(cancel_btn)
         
-        button_layout.addWidget(save_btn)
-        button_layout.addWidget(cancel_btn)
-        main_layout.addLayout(button_layout)
+        button_column.addStretch()
         
-        # System-Buttons (Shutdown/Reboot)
-        system_layout = QHBoxLayout()
-        system_layout.setSpacing(10)
-        
-        reboot_btn = QPushButton("🔄 Neustart")
-        reboot_btn.setFont(QFont("Arial", 14))
-        reboot_btn.setMinimumHeight(50)
+        # Neustart Button
+        reboot_btn = QPushButton("🔄\nNeustart")
+        reboot_btn.setFont(QFont("Arial", 16, QFont.Bold))
+        reboot_btn.setMinimumSize(150, 90)
         reboot_btn.clicked.connect(self.on_reboot)
         reboot_btn.setStyleSheet("""
             QPushButton {
                 background-color: #f39c12;
                 color: white;
-                border-radius: 5px;
-                padding: 10px;
+                border-radius: 10px;
+                padding: 15px;
             }
             QPushButton:pressed {
                 background-color: #e67e22;
             }
         """)
+        button_column.addWidget(reboot_btn)
         
-        shutdown_btn = QPushButton("⏻ Herunterfahren")
-        shutdown_btn.setFont(QFont("Arial", 14))
-        shutdown_btn.setMinimumHeight(50)
+        # Herunterfahren Button
+        shutdown_btn = QPushButton("⏻\nHerunter-\nfahren")
+        shutdown_btn.setFont(QFont("Arial", 16, QFont.Bold))
+        shutdown_btn.setMinimumSize(150, 90)
         shutdown_btn.clicked.connect(self.on_shutdown)
         shutdown_btn.setStyleSheet("""
             QPushButton {
                 background-color: #e74c3c;
                 color: white;
-                border-radius: 5px;
-                padding: 10px;
+                border-radius: 10px;
+                padding: 15px;
             }
             QPushButton:pressed {
                 background-color: #c0392b;
             }
         """)
+        button_column.addWidget(shutdown_btn)
         
-        system_layout.addWidget(reboot_btn)
-        system_layout.addWidget(shutdown_btn)
-        main_layout.addLayout(system_layout)
+        content_layout.addLayout(button_column)
+        main_layout.addLayout(content_layout)
         
         self.setStyleSheet("""
             QWidget {
