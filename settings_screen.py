@@ -77,6 +77,8 @@ class SettingsScreen(QWidget):
     
     def init_ui(self):
         """Erstelle UI."""
+        t = self.translator.get  # Shortcut for translations
+        
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
@@ -90,7 +92,7 @@ class SettingsScreen(QWidget):
         title_layout.setContentsMargins(0, 0, 0, 0)
         
         # Titel
-        title = QLabel("Einstellungen")
+        title = QLabel(t("settings"))
         title.setFont(QFont("Arial", 28, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         title_layout.addWidget(title)
@@ -156,7 +158,7 @@ class SettingsScreen(QWidget):
         button_column.setContentsMargins(10, 0, 0, 0)
         
         # Speichern Button
-        save_btn = QPushButton("Speichern")
+        save_btn = QPushButton(t("save"))
         save_btn.setFont(QFont("Arial", 18, QFont.Bold))
         save_btn.setMinimumSize(150, 100)
         save_btn.clicked.connect(self.on_save)
@@ -174,7 +176,7 @@ class SettingsScreen(QWidget):
         button_column.addWidget(save_btn)
         
         # Abbrechen Button
-        cancel_btn = QPushButton("Abbrechen")
+        cancel_btn = QPushButton(t("cancel"))
         cancel_btn.setFont(QFont("Arial", 18, QFont.Bold))
         cancel_btn.setMinimumSize(150, 100)
         cancel_btn.clicked.connect(self.on_cancel)
@@ -194,7 +196,7 @@ class SettingsScreen(QWidget):
         button_column.addStretch()
         
         # Neustart Button
-        reboot_btn = QPushButton("Neustart")
+        reboot_btn = QPushButton(t("reboot"))
         reboot_btn.setFont(QFont("Arial", 16, QFont.Bold))
         reboot_btn.setMinimumSize(150, 90)
         reboot_btn.clicked.connect(self.on_reboot)
@@ -212,7 +214,7 @@ class SettingsScreen(QWidget):
         button_column.addWidget(reboot_btn)
         
         # Herunterfahren Button
-        shutdown_btn = QPushButton("Herunter-\nfahren")
+        shutdown_btn = QPushButton(t("shutdown"))
         shutdown_btn.setFont(QFont("Arial", 16, QFont.Bold))
         shutdown_btn.setMinimumSize(150, 90)
         shutdown_btn.clicked.connect(self.on_shutdown)
@@ -280,12 +282,14 @@ class SettingsScreen(QWidget):
     
     def create_can_group(self):
         """CAN-Interface Settings."""
-        group = QGroupBox("CAN-Interface")
+        t = self.translator.get
+        
+        group = QGroupBox(t("can_interface"))
         layout = QVBoxLayout()
         
         # Interface Auswahl
         interface_layout = QHBoxLayout()
-        interface_layout.addWidget(QLabel("Interface:"))
+        interface_layout.addWidget(QLabel(t("interface") + ":"))
         
         self.can_combo = QComboBox()
         self.can_combo.addItems(["can0", "vcan0"])
@@ -294,62 +298,68 @@ class SettingsScreen(QWidget):
         layout.addLayout(interface_layout)
         
         # Simulation Mode
-        self.sim_checkbox = QCheckBox("Simulation beim Boot starten (nur vcan0)")
+        self.sim_checkbox = QCheckBox(t("simulation_mode_label"))
         self.sim_checkbox.setChecked(self.settings["simulation_mode"])
         layout.addWidget(self.sim_checkbox)
+        
+        info = QLabel(t("simulation_info"))
+        info.setStyleSheet("color: #95a5a6; font-size: 12px;")
+        layout.addWidget(info)
         
         group.setLayout(layout)
         return group
     
     def create_wifi_group(self):
         """Network Settings (WLAN only)."""
-        group = QGroupBox("Network Settings")
+        t = self.translator.get
+        
+        group = QGroupBox(t("network_settings"))
         layout = QVBoxLayout()
         
         # === WLAN Configuration ===
-        wlan_label = QLabel("WLAN Konfiguration")
+        wlan_label = QLabel(t("wlan_config"))
         wlan_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 5px;")
         layout.addWidget(wlan_label)
         
         # SSID
         ssid_layout = QHBoxLayout()
-        ssid_layout.addWidget(QLabel("SSID:"))
+        ssid_layout.addWidget(QLabel(t("ssid") + ":"))
         self.wifi_ssid = QLineEdit(self.settings.get("wifi_ssid", ""))
-        self.wifi_ssid.setPlaceholderText("WLAN Name")
+        self.wifi_ssid.setPlaceholderText(t("ssid_placeholder"))
         ssid_layout.addWidget(self.wifi_ssid)
         layout.addLayout(ssid_layout)
         
         # Password with Show/Hide
         pwd_layout = QHBoxLayout()
-        pwd_layout.addWidget(QLabel("Passwort:"))
+        pwd_layout.addWidget(QLabel(t("password") + ":"))
         self.wifi_password = QLineEdit()
         self.wifi_password.setEchoMode(QLineEdit.Password)
-        self.wifi_password.setPlaceholderText("WLAN Passwort (wird verschlüsselt)")
+        self.wifi_password.setPlaceholderText(t("password_placeholder"))
         pwd_layout.addWidget(self.wifi_password)
         
         # Show/Hide Password Button
-        self.show_pwd_btn = QPushButton("Show")
+        self.show_pwd_btn = QPushButton(t("show"))
         self.show_pwd_btn.setMaximumWidth(60)
         self.show_pwd_btn.setCheckable(True)
         self.show_pwd_btn.clicked.connect(self.toggle_password_visibility)
         pwd_layout.addWidget(self.show_pwd_btn)
         layout.addLayout(pwd_layout)
         
-        pwd_info = QLabel("Info: Passwort wird nicht in settings.json gespeichert, nur in NetworkManager")
+        pwd_info = QLabel(t("password_info"))
         pwd_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
         pwd_info.setWordWrap(True)
         layout.addWidget(pwd_info)
         
         # === IP Configuration ===
-        ip_label = QLabel("IP Konfiguration (nur WLAN)")
+        ip_label = QLabel(t("ip_config"))
         ip_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
         layout.addWidget(ip_label)
         
         # DHCP / Static
         ip_mode_layout = QHBoxLayout()
-        ip_mode_layout.addWidget(QLabel("IP-Modus:"))
+        ip_mode_layout.addWidget(QLabel(t("ip_mode") + ":"))
         self.ip_mode = QComboBox()
-        self.ip_mode.addItems(["DHCP (automatisch)", "Static (manuell)"])
+        self.ip_mode.addItems([t("dhcp_auto"), t("static_manual")])
         current_mode = self.settings.get("wlan_ip_mode", "dhcp")
         self.ip_mode.setCurrentIndex(0 if current_mode == "dhcp" else 1)
         self.ip_mode.currentIndexChanged.connect(self.on_ip_mode_changed)
