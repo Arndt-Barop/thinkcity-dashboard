@@ -363,7 +363,7 @@ class SettingsScreen(QWidget):
         """Logging Settings."""
         from PyQt5.QtWidgets import QSlider, QGridLayout
         
-        group = QGroupBox("Daten-Logging")
+        group = QGroupBox("Datenlogger")
         layout = QVBoxLayout()
         
         # Info: Logging ist immer aktiv
