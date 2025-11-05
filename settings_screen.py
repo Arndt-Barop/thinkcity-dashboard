@@ -428,8 +428,8 @@ class SettingsScreen(QWidget):
         
         # Alle verfügbaren Felder
         available_fields = {
-            "speed_kmh": "🚗 Geschwindigkeit",
-            "soc_pct": "🔋 Ladezustand (SOC)",
+            "speed_kmh": "Geschwindigkeit",
+            "soc_pct": "Ladezustand (SOC)",
             "voltage_V": "Spannung",
             "current_A": "Strom",
             "power_kW": "Leistung",
