@@ -18,6 +18,10 @@ TRANSLATIONS = {
         "DE": "Ladezustand",
         "EN": "State of Charge"
     },
+    "charge_state": {
+        "DE": "Ladezustand",
+        "EN": "Charge State"
+    },
     "range": {
         "DE": "Reichweite",
         "EN": "Range"

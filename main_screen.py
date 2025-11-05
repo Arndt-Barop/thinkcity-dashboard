@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from widgets import PowerGauge, DigitalDisplay, BatteryBar, StatusBar, GearDisplay
+from translations import get_translator
 
 
 class MainScreen(QWidget):
@@ -20,10 +21,13 @@ class MainScreen(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.translator = get_translator()
         self._init_ui()
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
+        t = self.translator.get
+        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
@@ -71,7 +75,7 @@ class MainScreen(QWidget):
         left_col = QVBoxLayout()
         left_col.setSpacing(5)
         
-        self.range_display = DigitalDisplay("Reichweite", "km")
+        self.range_display = DigitalDisplay(t("range"), "km")
         self.range_display.set_color(self._get_color("cyan"))
         self.range_display.set_decimals(0)
         left_col.addWidget(self.range_display)
@@ -80,12 +84,12 @@ class MainScreen(QWidget):
         consumption_layout = QHBoxLayout()
         consumption_layout.setSpacing(5)
         
-        self.consumption_now_display = DigitalDisplay("Verbrauch jetzt", "kWh/100km")
+        self.consumption_now_display = DigitalDisplay(t("consumption_now"), "kWh/100km")
         self.consumption_now_display.set_color(self._get_color("yellow"))
         self.consumption_now_display.set_decimals(1)
         consumption_layout.addWidget(self.consumption_now_display)
         
-        self.consumption_avg_display = DigitalDisplay("Ø Verbrauch", "kWh/100km")
+        self.consumption_avg_display = DigitalDisplay(t("consumption_avg"), "kWh/100km")
         self.consumption_avg_display.set_color(self._get_color("orange"))
         self.consumption_avg_display.set_decimals(1)
         consumption_layout.addWidget(self.consumption_avg_display)
@@ -98,7 +102,7 @@ class MainScreen(QWidget):
         right_col = QVBoxLayout()
         right_col.setSpacing(5)
         
-        soc_label = QLabel("Ladezustand")
+        soc_label = QLabel(t("charge_state"))
         soc_label.setFont(QFont("Arial", 14))
         soc_label.setStyleSheet("color: #aaaaaa;")
         soc_label.setAlignment(Qt.AlignCenter)
