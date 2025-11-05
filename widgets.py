@@ -272,6 +272,8 @@ class StatusBar(QWidget):
         super().__init__(parent)
         self.ambient_temp = None
         self.state = {}  # Speichert aktuellen State für Fehlerprüfung
+        self.wifi_connected = False  # WLAN-Status
+        self.simulation_active = False  # Simulation-Status
         self.setFixedHeight(30)  # Schmaler!
         self.setMinimumWidth(400)
     
@@ -283,6 +285,16 @@ class StatusBar(QWidget):
     def set_state(self, state: dict):
         """Setzt kompletten State für Fehlerprüfung."""
         self.state = state
+        self.update()
+    
+    def set_wifi_status(self, connected: bool):
+        """Setzt WLAN-Verbindungsstatus."""
+        self.wifi_connected = connected
+        self.update()
+    
+    def set_simulation_status(self, active: bool):
+        """Setzt Simulation-Status."""
+        self.simulation_active = active
         self.update()
     
     def _get_critical_warning(self):
@@ -381,6 +393,23 @@ class StatusBar(QWidget):
         font_time = QFont("Arial", 14, QFont.Bold)
         painter.setFont(font_time)
         painter.drawText(0, 0, w, h, Qt.AlignCenter, time_str)
+        
+        # RECHTS-MITTE: Status-Icons (WLAN, Simulation)
+        icon_x = w - 240  # Startposition für Icons
+        font_icon = QFont("Arial", 12)
+        painter.setFont(font_icon)
+        
+        # WLAN-Icon (wenn verbunden)
+        if self.wifi_connected:
+            painter.setPen(QColor(0, 255, 100))  # Grün
+            painter.drawText(icon_x, 0, 40, h, Qt.AlignCenter, "📶")
+            icon_x += 45
+        
+        # Simulation-Icon (wenn aktiv)
+        if self.simulation_active:
+            painter.setPen(QColor(255, 200, 0))  # Gelb
+            painter.drawText(icon_x, 0, 60, h, Qt.AlignCenter, "🎮 SIM")
+            icon_x += 65
         
         # RECHTS: Außentemperatur (wenn vorhanden)
         if self.ambient_temp is not None:
