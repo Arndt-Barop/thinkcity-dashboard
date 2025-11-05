@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 from widgets import DigitalDisplay, StatusBar
+from translations import get_translator
 
 
 class BatteryScreen(QWidget):
@@ -21,10 +22,13 @@ class BatteryScreen(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.translator = get_translator()
         self._init_ui()
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
+        t = self.translator.get
+        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(10)
@@ -34,7 +38,7 @@ class BatteryScreen(QWidget):
         main_layout.addWidget(self.status_bar)
         
         # ====== Titel ======
-        title = QLabel("BATTERIE-DETAILS")
+        title = QLabel(t("battery_details"))
         title.setFont(QFont("Arial", 18, QFont.Bold))
         title.setStyleSheet("color: #00ffcc;")
         title.setAlignment(Qt.AlignCenter)
@@ -45,25 +49,25 @@ class BatteryScreen(QWidget):
         grid.setSpacing(10)
         
         # Zeile 1: Voltage & Current
-        self.voltage_display = DigitalDisplay("Spannung", "V")
+        self.voltage_display = DigitalDisplay(t("voltage"), "V")
         self.voltage_display.set_decimals(1)
         grid.addWidget(self.voltage_display, 0, 0)
         
-        self.current_display = DigitalDisplay("Strom", "A")
+        self.current_display = DigitalDisplay(t("current"), "A")
         self.current_display.set_decimals(1)
         grid.addWidget(self.current_display, 0, 1)
         
-        self.power_display = DigitalDisplay("Leistung", "kW")
+        self.power_display = DigitalDisplay(t("power"), "kW")
         self.power_display.set_decimals(2)
         grid.addWidget(self.power_display, 0, 2)
         
         # Zeile 2: Temperaturen
-        self.pack_temp_display = DigitalDisplay("Pack Temp", "°C")
+        self.pack_temp_display = DigitalDisplay(t("pack_temp"), "°C")
         self.pack_temp_display.set_decimals(1)
         self.pack_temp_display.set_color(QColor(255, 140, 0))
         grid.addWidget(self.pack_temp_display, 1, 0)
         
-        self.ambient_temp_display = DigitalDisplay("Umgebung", "°C")
+        self.ambient_temp_display = DigitalDisplay(t("ambient_temp"), "°C")
         self.ambient_temp_display.set_decimals(1)
         self.ambient_temp_display.set_color(QColor(150, 150, 255))
         grid.addWidget(self.ambient_temp_display, 1, 1)
@@ -78,7 +82,7 @@ class BatteryScreen(QWidget):
         # ====== Zellspannungen (nur bei EnerDel) ======
         cell_group = QVBoxLayout()
         
-        cell_title = QLabel("Zellspannungen (EnerDel)")
+        cell_title = QLabel(t("cell_voltages_enerdel"))
         cell_title.setFont(QFont("Arial", 14, QFont.Bold))
         cell_title.setStyleSheet("color: #aaaaaa;")
         cell_group.addWidget(cell_title)
@@ -87,7 +91,7 @@ class BatteryScreen(QWidget):
         cell_grid.setSpacing(8)
         
         # Min Cell
-        self.cell_min_label = QLabel("Min:")
+        self.cell_min_label = QLabel(t("min") + ":")
         self.cell_min_label.setFont(QFont("Arial", 12))
         self.cell_min_label.setStyleSheet("color: #888888;")
         cell_grid.addWidget(self.cell_min_label, 0, 0)
@@ -98,7 +102,7 @@ class BatteryScreen(QWidget):
         cell_grid.addWidget(self.cell_min_value, 0, 1)
         
         # Max Cell
-        self.cell_max_label = QLabel("Max:")
+        self.cell_max_label = QLabel(t("max") + ":")
         self.cell_max_label.setFont(QFont("Arial", 12))
         self.cell_max_label.setStyleSheet("color: #888888;")
         cell_grid.addWidget(self.cell_max_label, 1, 0)
@@ -109,7 +113,7 @@ class BatteryScreen(QWidget):
         cell_grid.addWidget(self.cell_max_value, 1, 1)
         
         # Avg Cell
-        self.cell_avg_label = QLabel("Avg:")
+        self.cell_avg_label = QLabel(t("avg") + ":")
         self.cell_avg_label.setFont(QFont("Arial", 12))
         self.cell_avg_label.setStyleSheet("color: #888888;")
         cell_grid.addWidget(self.cell_avg_label, 0, 2)
@@ -120,7 +124,7 @@ class BatteryScreen(QWidget):
         cell_grid.addWidget(self.cell_avg_value, 0, 3)
         
         # Delta Cell
-        self.cell_delta_label = QLabel("Delta:")
+        self.cell_delta_label = QLabel(t("delta") + ":")
         self.cell_delta_label.setFont(QFont("Arial", 12))
         self.cell_delta_label.setStyleSheet("color: #888888;")
         cell_grid.addWidget(self.cell_delta_label, 1, 2)
@@ -136,7 +140,7 @@ class BatteryScreen(QWidget):
         # ====== Status-Flags ======
         status_group = QVBoxLayout()
         
-        status_title = QLabel("Status")
+        status_title = QLabel(t("status"))
         status_title.setFont(QFont("Arial", 14, QFont.Bold))
         status_title.setStyleSheet("color: #aaaaaa;")
         status_group.addWidget(status_title)
@@ -147,12 +151,12 @@ class BatteryScreen(QWidget):
         
         self.flag_labels = {}
         flags = [
-            ("charge_en", "Laden erlaubt"),
-            ("discharge_en", "Entladen erlaubt"),
-            ("regen_en", "Rekuperation"),
-            ("dc_dc_en", "DC/DC Wandler"),
-            ("iso_error", "ISO Fehler"),
-            ("emergency", "Notfall"),
+            ("charge_en", t("charge_enabled")),
+            ("discharge_en", t("discharge_enabled")),
+            ("regen_en", t("regen_enabled")),
+            ("dc_dc_en", t("dc_dc_enabled")),
+            ("iso_error", t("iso_error")),
+            ("emergency", t("emergency")),
         ]
         
         for idx, (key, text) in enumerate(flags):
@@ -170,7 +174,7 @@ class BatteryScreen(QWidget):
         main_layout.addLayout(status_group)
         
         # ====== Batterie-Typ ======
-        self.battery_type_label = QLabel("Typ: ---")
+        self.battery_type_label = QLabel(t("type") + ": ---")
         self.battery_type_label.setFont(QFont("Arial", 12))
         self.battery_type_label.setStyleSheet("color: #888888;")
         self.battery_type_label.setAlignment(Qt.AlignCenter)
@@ -261,8 +265,9 @@ class BatteryScreen(QWidget):
         
         # Batterie-Typ
         is_enerdel = state.get("is_enerdel", False)
+        t = self.translator.get
         batt_type = "EnerDel Li-Ion" if is_enerdel else "Zebra Na-NiCl2"
-        self.battery_type_label.setText(f"Typ: {batt_type}")
+        self.battery_type_label.setText(f"{t('type')}: {batt_type}")
 
 
 # Test

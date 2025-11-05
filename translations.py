@@ -161,6 +161,64 @@ TRANSLATIONS = {
         "EN": "Description"
     },
     
+    # === Battery Screen ===
+    "battery_details": {
+        "DE": "BATTERIE-DETAILS",
+        "EN": "BATTERY DETAILS"
+    },
+    "cell_voltages_enerdel": {
+        "DE": "Zellspannungen (EnerDel)",
+        "EN": "Cell Voltages (EnerDel)"
+    },
+    "min": {
+        "DE": "Min",
+        "EN": "Min"
+    },
+    "max": {
+        "DE": "Max",
+        "EN": "Max"
+    },
+    "avg": {
+        "DE": "Avg",
+        "EN": "Avg"
+    },
+    "delta": {
+        "DE": "Delta",
+        "EN": "Delta"
+    },
+    "status": {
+        "DE": "Status",
+        "EN": "Status"
+    },
+    "charge_enabled": {
+        "DE": "Laden erlaubt",
+        "EN": "Charging Enabled"
+    },
+    "discharge_enabled": {
+        "DE": "Entladen erlaubt",
+        "EN": "Discharge Enabled"
+    },
+    "regen_enabled": {
+        "DE": "Rekuperation",
+        "EN": "Regeneration"
+    },
+    "dc_dc_enabled": {
+        "DE": "DC/DC Wandler",
+        "EN": "DC/DC Converter"
+    },
+    "iso_error": {
+        "DE": "ISO Fehler",
+        "EN": "ISO Error"
+    },
+    "emergency": {
+        "DE": "Notfall",
+        "EN": "Emergency"
+    },
+    "type": {
+        "DE": "Typ",
+        "EN": "Type"
+    },
+    
     # === Settings Screen ===
     "settings": {
         "DE": "Einstellungen",
