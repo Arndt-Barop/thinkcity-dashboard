@@ -20,6 +20,7 @@ from battery_screen import BatteryScreen
 from charge_screen import ChargeScreen
 from cell_voltages_screen import CellVoltagesScreen
 from raw_data_screen import RawDataScreen
+from settings_screen import SettingsScreen
 from widgets import TouchButton
 
 # Logging Setup
@@ -43,6 +44,9 @@ class ThinkCityDashboard(QWidget):
     
     def __init__(self):
         super().__init__()
+        
+        # Config laden
+        self.config = self._load_config()
         
         # State
         self.state: Dict[str, Any] = {}
@@ -69,10 +73,36 @@ class ThinkCityDashboard(QWidget):
         self.update_timer.timeout.connect(self._update_loop)
         self.update_timer.start(100)  # 10 Hz
         
-        # Logging-Timer (1 Hz)
+        # Logging-Timer (konfigurierbar)
         self.log_timer = QTimer()
         self.log_timer.timeout.connect(self._log_sample)
-        self.log_timer.start(1000)
+        log_interval_ms = self.config.get("logging_interval_sec", 1) * 1000
+        self.log_timer.start(log_interval_ms)
+    
+    def _load_config(self):
+        """Lädt Konfiguration aus JSON."""
+        import json
+        config_file = os.path.expanduser("~/thinkcity-dashboard-v3/config.json")
+        
+        defaults = {
+            "logging_enabled": True,
+            "logging_interval_sec": 1,
+            "logging_fields": [
+                "speed_kmh", "soc_pct", "voltage_V", "current_A", "power_kW",
+                "pack_temp_C", "ambient_temp_C", "consumption_wh_km", "range_km",
+                "odo_km", "latitude", "longitude"
+            ]
+        }
+        
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    saved = json.load(f)
+                    defaults.update(saved)
+            except Exception as e:
+                logger.warning(f"Config load error: {e}")
+        
+        return defaults
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
@@ -101,12 +131,17 @@ class ThinkCityDashboard(QWidget):
         self.charge_screen = ChargeScreen()
         self.cell_voltages_screen = CellVoltagesScreen()
         self.raw_data_screen = RawDataScreen()
+        self.settings_screen = SettingsScreen()
         
         self.screen_stack.addWidget(self.main_screen)           # Index 0
         self.screen_stack.addWidget(self.battery_screen)        # Index 1
         self.screen_stack.addWidget(self.charge_screen)         # Index 2
         self.screen_stack.addWidget(self.cell_voltages_screen)  # Index 3
         self.screen_stack.addWidget(self.raw_data_screen)       # Index 4
+        self.screen_stack.addWidget(self.settings_screen)       # Index 5
+        
+        # Settings-Signal verbinden
+        self.settings_screen.settings_changed.connect(self._on_settings_changed)
         
         main_layout.addWidget(self.screen_stack, stretch=1)
         
@@ -134,6 +169,10 @@ class ThinkCityDashboard(QWidget):
         self.btn_raw = TouchButton("Rohdaten")
         self.btn_raw.set_callback(lambda: self._switch_screen(4))
         nav_layout.addWidget(self.btn_raw)
+        
+        self.btn_settings = TouchButton("⚙️")
+        self.btn_settings.set_callback(lambda: self._switch_screen(5))
+        nav_layout.addWidget(self.btn_settings)
         
         main_layout.addLayout(nav_layout)
         
@@ -251,14 +290,48 @@ class ThinkCityDashboard(QWidget):
             self.raw_data_screen.update(self.state)
     
     def _log_sample(self):
-        """Loggt Sample in DB (1 Hz)."""
-        if len(self.state) > 5:  # Nur wenn genug Daten
-            self.db_manager.add_sample(self.state)
+        """Loggt Sample in DB (konfigurierbares Intervall)."""
+        # Prüfe ob Logging aktiviert
+        if not self.config.get("logging_enabled", True):
+            return
+        
+        # Nur wenn genug Daten
+        if len(self.state) < 5:
+            return
+        
+        # Filtere Datenpunkte basierend auf Konfiguration
+        selected_fields = self.config.get("logging_fields", [])
+        
+        if selected_fields:
+            # Nur ausgewählte Felder loggen
+            filtered_data = {
+                key: value for key, value in self.state.items()
+                if key in selected_fields or key == "odo_km"  # odo_km immer dabei
+            }
+        else:
+            # Alle Felder loggen (Fallback)
+            filtered_data = self.state
+        
+        self.db_manager.add_sample(filtered_data)
     
     def _switch_screen(self, index: int):
         """Wechselt zu anderem Screen."""
         self.screen_stack.setCurrentIndex(index)
         logger.info(f"Switched to screen {index}")
+    
+    def _on_settings_changed(self, new_config: dict):
+        """Handle Settings-Änderungen."""
+        logger.info("Settings changed, updating configuration...")
+        
+        # Config aktualisieren
+        self.config.update(new_config)
+        
+        # Logging-Timer Intervall anpassen
+        log_interval_ms = new_config.get("logging_interval_sec", 1) * 1000
+        if self.log_timer.interval() != log_interval_ms:
+            self.log_timer.stop()
+            self.log_timer.start(log_interval_ms)
+            logger.info(f"Logging interval updated to {log_interval_ms}ms")
     
     def closeEvent(self, event):
         """Cleanup beim Schließen."""
