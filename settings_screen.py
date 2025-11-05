@@ -74,17 +74,16 @@ class SettingsScreen(QWidget):
     def init_ui(self):
         """Erstelle UI."""
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.setSpacing(10)
         
         # StatusBar oben
         self.status_bar = StatusBar()
-        self.status_bar.setFixedHeight(30)  # Gleiche Höhe wie auf anderen Screens
         main_layout.addWidget(self.status_bar)
         
         # Titel-Bereich
         title_layout = QVBoxLayout()
-        title_layout.setContentsMargins(20, 20, 20, 10)
+        title_layout.setContentsMargins(0, 0, 0, 0)
         
         # Titel
         title = QLabel("Einstellungen")
