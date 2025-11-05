@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QComboBox, QScrollArea)
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
+from widgets import StatusBar
 import json
 import os
 
@@ -73,14 +74,23 @@ class SettingsScreen(QWidget):
     def init_ui(self):
         """Erstelle UI."""
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # StatusBar oben
+        self.status_bar = StatusBar()
+        main_layout.addWidget(self.status_bar)
+        
+        # Titel-Bereich
+        title_layout = QVBoxLayout()
+        title_layout.setContentsMargins(20, 20, 20, 10)
         
         # Titel
         title = QLabel("⚙️ Einstellungen")
         title.setFont(QFont("Arial", 28, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
-        main_layout.addWidget(title)
+        title_layout.addWidget(title)
+        main_layout.addLayout(title_layout)
         
         # Scroll-Bereich für Settings
         scroll = QScrollArea()
@@ -216,6 +226,8 @@ class SettingsScreen(QWidget):
         button_column.addWidget(shutdown_btn)
         
         content_layout.addLayout(button_column)
+        
+        # Content-Layout zum Haupt-Layout hinzufügen
         main_layout.addLayout(content_layout)
         
         self.setStyleSheet("""
