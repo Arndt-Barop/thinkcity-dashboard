@@ -205,6 +205,9 @@ class DBManager:
             logger.info(f"Ended trip {self.current_trip_id}: {distance_km:.2f} km")
             self.current_trip_id = None
             self.last_sample_time = None
+        
+        # Cleanup alte Trips (nur gesyncte, älter als 90 Tage)
+        self.cleanup_old_trips(days=90)
     
     def add_sample(self, data: Dict[str, Any]):
         """
@@ -328,6 +331,60 @@ class DBManager:
                 "avg_consumption_kwh_100km": row["avg_consumption"] or 0.0,
                 "total_energy_kwh": row["total_energy_kwh"] or 0.0
             }
+    
+    def cleanup_old_trips(self, days: int = 90):
+        """
+        Löscht Trips älter als X Tage (nur wenn synced).
+        
+        Args:
+            days: Alter in Tagen (Standard: 90)
+        
+        Returns:
+            Tuple[int, int]: (gelöschte Trips, gelöschte Samples)
+        """
+        from datetime import timedelta
+        
+        cutoff = datetime.now() - timedelta(days=days)
+        
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            
+            # Zähle betroffene Einträge
+            cursor.execute("""
+                SELECT COUNT(*) FROM trips 
+                WHERE synced = 1 AND end_time < ?
+            """, (cutoff.isoformat(),))
+            trips_count = cursor.fetchone()[0]
+            
+            cursor.execute("""
+                SELECT COUNT(*) FROM samples WHERE trip_id IN (
+                    SELECT trip_id FROM trips 
+                    WHERE synced = 1 AND end_time < ?
+                )
+            """, (cutoff.isoformat(),))
+            samples_count = cursor.fetchone()[0]
+            
+            # Lösche Samples zuerst (Foreign Key)
+            cursor.execute("""
+                DELETE FROM samples WHERE trip_id IN (
+                    SELECT trip_id FROM trips 
+                    WHERE synced = 1 AND end_time < ?
+                )
+            """, (cutoff.isoformat(),))
+            
+            # Lösche Trips
+            cursor.execute("""
+                DELETE FROM trips 
+                WHERE synced = 1 AND end_time < ?
+            """, (cutoff.isoformat(),))
+            
+            if trips_count > 0:
+                logger.info(
+                    f"Cleaned up {trips_count} trips and {samples_count} samples "
+                    f"older than {days} days"
+                )
+            
+            return trips_count, samples_count
     
     def vacuum(self):
         """VACUUM für Wartung."""
