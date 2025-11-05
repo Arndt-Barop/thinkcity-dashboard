@@ -571,6 +571,11 @@ class TouchButton(QWidget):
         """Setzt Click-Callback."""
         self.callback = callback
     
+    def setText(self, text: str):
+        """Ändert den Button-Text."""
+        self.text = text
+        self.update()
+    
     def mousePressEvent(self, event):
         self.pressed = True
         self.update()

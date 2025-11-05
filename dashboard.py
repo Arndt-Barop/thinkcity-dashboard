@@ -22,6 +22,7 @@ from cell_voltages_screen import CellVoltagesScreen
 from raw_data_screen import RawDataScreen
 from settings_screen import SettingsScreen
 from widgets import TouchButton
+from translations import get_translator
 
 # Logging Setup
 logging.basicConfig(
@@ -44,6 +45,9 @@ class ThinkCityDashboard(QWidget):
     
     def __init__(self):
         super().__init__()
+        
+        # Translation
+        self.translator = get_translator()
         
         # Config laden
         self.config = self._load_config()
@@ -150,23 +154,25 @@ class ThinkCityDashboard(QWidget):
         nav_layout.setSpacing(5)
         nav_layout.setContentsMargins(5, 5, 5, 5)
         
-        self.btn_main = TouchButton("Haupt")
+        t = self.translator.get
+        
+        self.btn_main = TouchButton(t("main"))
         self.btn_main.set_callback(lambda: self._switch_screen(0))
         nav_layout.addWidget(self.btn_main)
         
-        self.btn_battery = TouchButton("Batterie")
+        self.btn_battery = TouchButton(t("battery"))
         self.btn_battery.set_callback(lambda: self._switch_screen(1))
         nav_layout.addWidget(self.btn_battery)
         
-        self.btn_cells = TouchButton("Zellen")
+        self.btn_cells = TouchButton(t("cells"))
         self.btn_cells.set_callback(lambda: self._switch_screen(3))
         nav_layout.addWidget(self.btn_cells)
         
-        self.btn_charge = TouchButton("Laden")
+        self.btn_charge = TouchButton(t("charge"))
         self.btn_charge.set_callback(lambda: self._switch_screen(2))
         nav_layout.addWidget(self.btn_charge)
         
-        self.btn_raw = TouchButton("Rohdaten")
+        self.btn_raw = TouchButton(t("raw"))
         self.btn_raw.set_callback(lambda: self._switch_screen(4))
         nav_layout.addWidget(self.btn_raw)
         
@@ -370,12 +376,63 @@ class ThinkCityDashboard(QWidget):
         # Config aktualisieren
         self.config.update(new_config)
         
+        # Prüfe ob Sprache geändert wurde
+        if "language" in new_config:
+            logger.info(f"Language changed to {new_config['language']}")
+            self.translator.set_language(new_config['language'])
+            # Reload alle Screens
+            self._reload_all_screens()
+        
         # Logging-Timer Intervall anpassen
         log_interval_ms = new_config.get("logging_interval_sec", 1) * 1000
         if self.log_timer.interval() != log_interval_ms:
             self.log_timer.stop()
             self.log_timer.start(log_interval_ms)
             logger.info(f"Logging interval updated to {log_interval_ms}ms")
+    
+    def _reload_all_screens(self):
+        """Lädt alle Screens neu nach Sprachwechsel."""
+        logger.info("Reloading all screens with new language...")
+        
+        # Aktuellen Screen-Index merken
+        current_index = self.screen_stack.currentIndex()
+        
+        # Alle Screens aus Stack entfernen
+        while self.screen_stack.count() > 0:
+            widget = self.screen_stack.widget(0)
+            self.screen_stack.removeWidget(widget)
+            widget.deleteLater()
+        
+        # Screens neu erstellen
+        self.main_screen = MainScreen()
+        self.battery_screen = BatteryScreen()
+        self.charge_screen = ChargeScreen()
+        self.cell_voltages_screen = CellVoltagesScreen()
+        self.raw_data_screen = RawDataScreen()
+        self.settings_screen = SettingsScreen()
+        
+        self.screen_stack.addWidget(self.main_screen)           # Index 0
+        self.screen_stack.addWidget(self.battery_screen)        # Index 1
+        self.screen_stack.addWidget(self.charge_screen)         # Index 2
+        self.screen_stack.addWidget(self.cell_voltages_screen)  # Index 3
+        self.screen_stack.addWidget(self.raw_data_screen)       # Index 4
+        self.screen_stack.addWidget(self.settings_screen)       # Index 5
+        
+        # Settings-Signal neu verbinden
+        self.settings_screen.settings_changed.connect(self._on_settings_changed)
+        
+        # Navigation-Buttons aktualisieren
+        t = self.translator.get
+        self.btn_main.setText(t("main"))
+        self.btn_battery.setText(t("battery"))
+        self.btn_cells.setText(t("cells"))
+        self.btn_charge.setText(t("charge"))
+        self.btn_raw.setText(t("raw"))
+        
+        # Zurück zum vorherigen Screen
+        self.screen_stack.setCurrentIndex(current_index)
+        
+        logger.info("All screens reloaded successfully")
     
     def closeEvent(self, event):
         """Cleanup beim Schließen."""

@@ -5,6 +5,28 @@ Supports German (DE) and English (EN).
 """
 
 TRANSLATIONS = {
+    # === Navigation Buttons ===
+    "main": {
+        "DE": "Haupt",
+        "EN": "Main"
+    },
+    "battery": {
+        "DE": "Batterie",
+        "EN": "Battery"
+    },
+    "cells": {
+        "DE": "Zellen",
+        "EN": "Cells"
+    },
+    "charge": {
+        "DE": "Laden",
+        "EN": "Charge"
+    },
+    "raw": {
+        "DE": "Rohdaten",
+        "EN": "Raw Data"
+    },
+    
     # === Main Screen ===
     "main_screen": {
         "DE": "Hauptansicht",
