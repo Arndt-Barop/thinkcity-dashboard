@@ -509,44 +509,46 @@ class SettingsScreen(QWidget):
     
     def create_nas_group(self):
         """NAS Sync Settings."""
-        group = QGroupBox("NAS Synchronisation")
+        t = self.translator.get
+        
+        group = QGroupBox(t("nas_sync"))
         layout = QVBoxLayout()
         
         # Enable Sync
-        self.nas_enable = QCheckBox("NAS-Sync aktivieren")
+        self.nas_enable = QCheckBox(t("nas_enable"))
         self.nas_enable.setChecked(self.settings["nas_sync_enabled"])
         layout.addWidget(self.nas_enable)
         
         # NAS Host
         host_layout = QHBoxLayout()
-        host_layout.addWidget(QLabel("NAS Host/IP:"))
+        host_layout.addWidget(QLabel(t("nas_host") + ":"))
         self.nas_host = QLineEdit(self.settings["nas_host"])
-        self.nas_host.setPlaceholderText("z.B. 192.168.1.100 oder nas.local")
+        self.nas_host.setPlaceholderText(t("nas_host_placeholder"))
         host_layout.addWidget(self.nas_host)
         layout.addLayout(host_layout)
         
         # NAS Path
         path_layout = QHBoxLayout()
-        path_layout.addWidget(QLabel("NAS Pfad:"))
+        path_layout.addWidget(QLabel(t("nas_path") + ":"))
         self.nas_path = QLineEdit(self.settings["nas_path"])
-        self.nas_path.setPlaceholderText("/backup/thinkcity")
+        self.nas_path.setPlaceholderText(t("nas_path_placeholder"))
         path_layout.addWidget(self.nas_path)
         layout.addLayout(path_layout)
         
         # NAS User
         user_layout = QHBoxLayout()
-        user_layout.addWidget(QLabel("Benutzer:"))
+        user_layout.addWidget(QLabel(t("nas_user") + ":"))
         self.nas_user = QLineEdit(self.settings["nas_user"])
-        self.nas_user.setPlaceholderText("NAS Benutzername")
+        self.nas_user.setPlaceholderText(t("nas_user_placeholder"))
         user_layout.addWidget(self.nas_user)
         layout.addLayout(user_layout)
         
         # NAS Password with Show/Hide
         nas_pwd_layout = QHBoxLayout()
-        nas_pwd_layout.addWidget(QLabel("Passwort:"))
+        nas_pwd_layout.addWidget(QLabel(t("password") + ":"))
         self.nas_password = QLineEdit()
         self.nas_password.setEchoMode(QLineEdit.Password)
-        self.nas_password.setPlaceholderText("NAS Passwort (wird verschlüsselt)")
+        self.nas_password.setPlaceholderText(t("nas_password_placeholder"))
         
         # Load and decrypt existing password if available
         from crypto_utils import get_crypto
@@ -561,18 +563,18 @@ class SettingsScreen(QWidget):
         nas_pwd_layout.addWidget(self.nas_password)
         
         # Show/Hide Password Button
-        self.show_nas_pwd_btn = QPushButton("Show")
+        self.show_nas_pwd_btn = QPushButton(t("show"))
         self.show_nas_pwd_btn.setMaximumWidth(60)
         self.show_nas_pwd_btn.setCheckable(True)
         self.show_nas_pwd_btn.clicked.connect(self.toggle_nas_password_visibility)
         nas_pwd_layout.addWidget(self.show_nas_pwd_btn)
         layout.addLayout(nas_pwd_layout)
         
-        nas_pwd_info = QLabel("Info: Passwort wird verschlüsselt in settings.json gespeichert")
+        nas_pwd_info = QLabel(t("nas_password_info"))
         nas_pwd_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
         layout.addWidget(nas_pwd_info)
         
-        info = QLabel("Info: Datenbank wird nach jeder Fahrt automatisch synchronisiert")
+        info = QLabel(t("nas_sync_info"))
         info.setStyleSheet("color: #95a5a6; font-size: 12px;")
         layout.addWidget(info)
         
@@ -582,29 +584,30 @@ class SettingsScreen(QWidget):
     def create_logging_group(self):
         """Logging Settings."""
         from PyQt5.QtWidgets import QSlider, QGridLayout
+        t = self.translator.get
         
-        group = QGroupBox("Datenlogger")
+        group = QGroupBox(t("data_logger"))
         layout = QVBoxLayout()
         
         # Info: Logging ist immer aktiv
-        info_label = QLabel("Info: Daten-Logging ist dauerhaft aktiv")
+        info_label = QLabel(t("logging_always_active"))
         info_label.setStyleSheet("color: #95a5a6; font-size: 12px; font-style: italic;")
         layout.addWidget(info_label)
         
         # Datenbankpfad
         db_path_layout = QHBoxLayout()
-        db_path_layout.addWidget(QLabel("Datenbankpfad:"))
+        db_path_layout.addWidget(QLabel(t("db_path") + ":"))
         self.db_path = QLineEdit(self.settings["db_path"])
         db_path_layout.addWidget(self.db_path)
         layout.addLayout(db_path_layout)
         
-        db_info = QLabel("Info: Standard: /home/pi/thinkcity-dashboard-v3/thinkcity.db")
+        db_info = QLabel(t("db_path_info"))
         db_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
         layout.addWidget(db_info)
         
         # Intervall-Slider
         interval_layout = QVBoxLayout()
-        interval_label = QLabel(f"Log-Intervall: {self.settings['logging_interval_sec']} Sekunden")
+        interval_label = QLabel(f"{t('log_interval')}: {self.settings['logging_interval_sec']} {t('seconds')}")
         interval_label.setStyleSheet("font-size: 14px; margin-top: 10px;")
         interval_layout.addWidget(interval_label)
         
@@ -616,12 +619,12 @@ class SettingsScreen(QWidget):
         self.logging_interval_slider.setTickInterval(5)
         
         def update_interval_label(value):
-            interval_label.setText(f"Log-Intervall: {value} Sekunden")
+            interval_label.setText(f"{t('log_interval')}: {value} {t('seconds')}")
         
         self.logging_interval_slider.valueChanged.connect(update_interval_label)
         interval_layout.addWidget(self.logging_interval_slider)
         
-        interval_info = QLabel("Info: 1s = hohe Genauigkeit, hoher Speicher | 60s = niedrige Genauigkeit, wenig Speicher")
+        interval_info = QLabel(t("interval_info"))
         interval_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
         interval_info.setWordWrap(True)
         interval_layout.addWidget(interval_info)
@@ -629,29 +632,29 @@ class SettingsScreen(QWidget):
         layout.addLayout(interval_layout)
         
         # Datenpunkt-Auswahl
-        fields_label = QLabel("Zu loggende Datenpunkte:")
+        fields_label = QLabel(t("data_points") + ":")
         fields_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
         layout.addWidget(fields_label)
         
         # Dauerhaft aktive Felder (nicht abwählbar)
-        permanent_label = QLabel("Ø Durchschnittsverbrauch - Dauerhaft aktiv")
+        permanent_label = QLabel(t("avg_consumption_permanent"))
         permanent_label.setStyleSheet("font-size: 12px; color: #95a5a6; font-style: italic; margin-left: 5px;")
         layout.addWidget(permanent_label)
         
         # Alle verfügbaren Felder
         available_fields = {
-            "speed_kmh": "Geschwindigkeit",
-            "soc_pct": "Ladezustand (SOC)",
-            "voltage_V": "Spannung",
-            "current_A": "Strom",
-            "power_kW": "Leistung",
-            "pack_temp_C": "Akku-Temperatur",
-            "ambient_temp_C": "Außentemperatur",
-            "consumption_wh_km": "Verbrauch Wh/km",
-            "range_km": "Reichweite",
-            "odo_km": "Kilometerstand",
-            "latitude": "GPS Breitengrad",
-            "longitude": "GPS Längengrad"
+            "speed_kmh": t("field_speed"),
+            "soc_pct": t("field_soc"),
+            "voltage_V": t("field_voltage"),
+            "current_A": t("field_current"),
+            "power_kW": t("field_power"),
+            "pack_temp_C": t("field_pack_temp"),
+            "ambient_temp_C": t("field_ambient_temp"),
+            "consumption_wh_km": t("field_consumption"),
+            "range_km": t("field_range"),
+            "odo_km": t("field_odo"),
+            "latitude": t("field_latitude"),
+            "longitude": t("field_longitude")
         }
         
         # Grid für Checkboxen (2 Spalten)
@@ -679,12 +682,12 @@ class SettingsScreen(QWidget):
         # Buttons für alle/keine
         select_layout = QHBoxLayout()
         
-        select_all_btn = QPushButton("Alle")
+        select_all_btn = QPushButton(t("select_all"))
         select_all_btn.setMaximumWidth(100)
         select_all_btn.clicked.connect(lambda: [cb.setChecked(True) for cb in self.field_checkboxes.values()])
         select_layout.addWidget(select_all_btn)
         
-        select_none_btn = QPushButton("Keine")
+        select_none_btn = QPushButton(t("select_none"))
         select_none_btn.setMaximumWidth(100)
         select_none_btn.clicked.connect(lambda: [cb.setChecked(False) for cb in self.field_checkboxes.values()])
         select_layout.addWidget(select_none_btn)
@@ -780,7 +783,8 @@ class SettingsScreen(QWidget):
         self._apply_wlan_config()
         
         # Zeige Bestätigung
-        self.show_message("[OK] Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.")
+        t = self.translator.get
+        self.show_message(t("settings_saved"))
     
     def _apply_wlan_config(self):
         """Apply WLAN configuration via NetworkManager."""
@@ -847,31 +851,36 @@ class SettingsScreen(QWidget):
             QTimer.singleShot(2000, self.update_wlan_status)
             
         except subprocess.TimeoutExpired:
-            self.show_message("[!] WLAN-Konfiguration: Zeitüberschreitung")
+            t = self.translator.get
+            self.show_message(t("wlan_timeout"))
         except subprocess.CalledProcessError as e:
-            self.show_message(f"[!] WLAN-Konfiguration fehlgeschlagen:\n{e}")
+            t = self.translator.get
+            self.show_message(f"{t('wlan_failed')}:\n{e}")
         except Exception as e:
-            self.show_message(f"[!] Fehler bei WLAN-Konfiguration:\n{str(e)}")
+            t = self.translator.get
+            self.show_message(f"{t('wlan_error')}:\n{str(e)}")
     
     def on_cancel(self):
         """Verwerfe Änderungen."""
+        t = self.translator.get
         self.settings = self.load_settings()
-        self.show_message("[X] Änderungen verworfen")
+        self.show_message(t("changes_discarded"))
     
     def on_reboot(self):
         """System neu starten."""
         from PyQt5.QtWidgets import QMessageBox
+        t = self.translator.get
         
         reply = QMessageBox.question(
             self, 
-            'Neustart bestätigen',
-            'System wirklich neu starten?',
+            t('reboot'),
+            t('reboot_confirm'),
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
         
         if reply == QMessageBox.Yes:
-            self.show_message("🔄 System wird neu gestartet...")
+            self.show_message(t("rebooting"))
             from PyQt5.QtCore import QTimer
             import subprocess
             # Warte 2 Sekunden, dann reboot
@@ -880,17 +889,18 @@ class SettingsScreen(QWidget):
     def on_shutdown(self):
         """System herunterfahren."""
         from PyQt5.QtWidgets import QMessageBox
+        t = self.translator.get
         
         reply = QMessageBox.question(
             self, 
-            'Herunterfahren bestätigen',
-            'System wirklich herunterfahren?',
+            t('shutdown'),
+            t('shutdown_confirm'),
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
         
         if reply == QMessageBox.Yes:
-            self.show_message("⏻ System wird heruntergefahren...")
+            self.show_message(t("shutting_down"))
             from PyQt5.QtCore import QTimer
             import subprocess
             # Warte 2 Sekunden, dann shutdown
