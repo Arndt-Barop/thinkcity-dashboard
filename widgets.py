@@ -528,13 +528,14 @@ class BatteryBar(QWidget):
 class TouchButton(QWidget):
     """
     Touch-freundlicher Button mit Custom Styling.
+    Größere Version für bessere Bedienbarkeit.
     """
     
     def __init__(self, text: str, parent=None):
         super().__init__(parent)
         self.text = text
         self.pressed = False
-        self.setMinimumSize(120, 50)
+        self.setMinimumSize(140, 70)  # Größer für Touch
         self.callback = None
     
     def set_callback(self, callback):
@@ -572,8 +573,8 @@ class TouchButton(QWidget):
         painter.setPen(QPen(QColor(100, 100, 100), 2))
         painter.drawRoundedRect(self.rect().adjusted(2, 2, -2, -2), 8, 8)
         
-        # Text
-        font = QFont("Arial", 14, QFont.Bold)
+        # Text (größer)
+        font = QFont("Arial", 16, QFont.Bold)  # Größere Schrift
         painter.setFont(font)
         painter.setPen(Qt.white)
         painter.drawText(self.rect(), Qt.AlignCenter, self.text)
