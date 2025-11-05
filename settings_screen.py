@@ -425,6 +425,11 @@ class SettingsScreen(QWidget):
         fields_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
         layout.addWidget(fields_label)
         
+        # Dauerhaft aktive Felder (nicht abwählbar)
+        permanent_label = QLabel("Ø Durchschnittsverbrauch - Dauerhaft aktiv")
+        permanent_label.setStyleSheet("font-size: 12px; color: #95a5a6; font-style: italic; margin-left: 5px;")
+        layout.addWidget(permanent_label)
+        
         # Alle verfügbaren Felder
         available_fields = {
             "speed_kmh": "Geschwindigkeit",
