@@ -373,41 +373,41 @@ class SettingsScreen(QWidget):
         
         # IP Address with CIDR
         ip_layout = QHBoxLayout()
-        ip_layout.addWidget(QLabel("IP/CIDR:"))
+        ip_layout.addWidget(QLabel(t("ip_cidr") + ":"))
         self.wlan_ip = QLineEdit(self.settings.get("wlan_ip", "10.42.0.214/24"))
-        self.wlan_ip.setPlaceholderText("z.B. 192.168.1.100/24")
+        self.wlan_ip.setPlaceholderText(t("ip_placeholder"))
         ip_layout.addWidget(self.wlan_ip)
         static_layout.addLayout(ip_layout)
         
         # Gateway
         gw_layout = QHBoxLayout()
-        gw_layout.addWidget(QLabel("Gateway:"))
+        gw_layout.addWidget(QLabel(t("gateway") + ":"))
         self.wlan_gateway = QLineEdit(self.settings.get("wlan_gateway", "10.42.0.1"))
-        self.wlan_gateway.setPlaceholderText("z.B. 192.168.1.1")
+        self.wlan_gateway.setPlaceholderText(t("gateway_placeholder"))
         gw_layout.addWidget(self.wlan_gateway)
         static_layout.addLayout(gw_layout)
         
         # DNS1
         dns1_layout = QHBoxLayout()
-        dns1_layout.addWidget(QLabel("DNS 1:"))
+        dns1_layout.addWidget(QLabel(t("dns1") + ":"))
         self.wlan_dns1 = QLineEdit(self.settings.get("wlan_dns1", "8.8.8.8"))
-        self.wlan_dns1.setPlaceholderText("z.B. 8.8.8.8")
+        self.wlan_dns1.setPlaceholderText(t("dns1_placeholder"))
         dns1_layout.addWidget(self.wlan_dns1)
         static_layout.addLayout(dns1_layout)
         
         # DNS2
         dns2_layout = QHBoxLayout()
-        dns2_layout.addWidget(QLabel("DNS 2:"))
+        dns2_layout.addWidget(QLabel(t("dns2") + ":"))
         self.wlan_dns2 = QLineEdit(self.settings.get("wlan_dns2", "8.8.4.4"))
-        self.wlan_dns2.setPlaceholderText("z.B. 8.8.4.4 (optional)")
+        self.wlan_dns2.setPlaceholderText(t("dns2_placeholder"))
         dns2_layout.addWidget(self.wlan_dns2)
         static_layout.addLayout(dns2_layout)
         
         # NTP Server
         ntp_layout = QHBoxLayout()
-        ntp_layout.addWidget(QLabel("NTP:"))
+        ntp_layout.addWidget(QLabel(t("ntp") + ":"))
         self.wlan_ntp = QLineEdit(self.settings.get("wlan_ntp", "pool.ntp.org"))
-        self.wlan_ntp.setPlaceholderText("z.B. pool.ntp.org (optional)")
+        self.wlan_ntp.setPlaceholderText(t("ntp_placeholder"))
         ntp_layout.addWidget(self.wlan_ntp)
         static_layout.addLayout(ntp_layout)
         
@@ -418,11 +418,11 @@ class SettingsScreen(QWidget):
         self.on_ip_mode_changed(self.ip_mode.currentIndex())
         
         # === WLAN Status ===
-        status_label = QLabel("WLAN Status")
+        status_label = QLabel(t("wlan_status"))
         status_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
         layout.addWidget(status_label)
         
-        self.wlan_status = QLabel("Status wird beim Öffnen geladen...")
+        self.wlan_status = QLabel(t("status_loading"))
         self.wlan_status.setStyleSheet("color: #95a5a6; font-size: 12px;")
         self.wlan_status.setWordWrap(True)
         layout.addWidget(self.wlan_status)
@@ -431,7 +431,7 @@ class SettingsScreen(QWidget):
         self.update_wlan_status()
         
         # === Sync Setting ===
-        self.wifi_only_checkbox = QCheckBox("NAS-Sync nur bei WLAN-Verbindung")
+        self.wifi_only_checkbox = QCheckBox(t("sync_wifi_only"))
         self.wifi_only_checkbox.setChecked(self.settings.get("sync_on_wifi_only", True))
         self.wifi_only_checkbox.setStyleSheet("margin-top: 10px;")
         layout.addWidget(self.wifi_only_checkbox)
@@ -441,21 +441,23 @@ class SettingsScreen(QWidget):
     
     def toggle_password_visibility(self):
         """Toggle WLAN password visibility."""
+        t = self.translator.get
         if self.show_pwd_btn.isChecked():
             self.wifi_password.setEchoMode(QLineEdit.Normal)
-            self.show_pwd_btn.setText("Hide")
+            self.show_pwd_btn.setText(t("hide"))
         else:
             self.wifi_password.setEchoMode(QLineEdit.Password)
-            self.show_pwd_btn.setText("Show")
+            self.show_pwd_btn.setText(t("show"))
     
     def toggle_nas_password_visibility(self):
         """Toggle NAS password visibility."""
+        t = self.translator.get
         if self.show_nas_pwd_btn.isChecked():
             self.nas_password.setEchoMode(QLineEdit.Normal)
-            self.show_nas_pwd_btn.setText("Hide")
+            self.show_nas_pwd_btn.setText(t("hide"))
         else:
             self.nas_password.setEchoMode(QLineEdit.Password)
-            self.show_nas_pwd_btn.setText("Show")
+            self.show_nas_pwd_btn.setText(t("show"))
     
     def on_ip_mode_changed(self, index):
         """Show/Hide static IP fields based on selection."""
@@ -464,6 +466,8 @@ class SettingsScreen(QWidget):
     def update_wlan_status(self):
         """Update WLAN connection status."""
         import subprocess
+        t = self.translator.get
+        
         try:
             # Get WLAN device status
             result = subprocess.run(
@@ -471,7 +475,7 @@ class SettingsScreen(QWidget):
                 capture_output=True, text=True, timeout=2
             )
             
-            status_text = "[X] WLAN nicht verbunden"
+            status_text = t("wlan_not_connected")
             for line in result.stdout.strip().split("\n"):
                 parts = line.split(":")
                 if len(parts) >= 3 and parts[0] == "wlan0":
@@ -490,17 +494,17 @@ class SettingsScreen(QWidget):
                                 ip_addr = ip_line.split(":")[1] if ":" in ip_line else "N/A"
                                 break
                         
-                        status_text = f"[OK] Verbunden mit: {connection}\nIP: {ip_addr}"
+                        status_text = f"{t('wlan_connected')}: {connection}\nIP: {ip_addr}"
                     elif state == "disconnected":
-                        status_text = "[X] WLAN getrennt"
+                        status_text = t("wlan_disconnected")
                     else:
-                        status_text = f"[!] WLAN Status: {state}"
+                        status_text = f"[!] {t('wlan_status')}: {state}"
                     break
             
             self.wlan_status.setText(status_text)
             
         except Exception as e:
-            self.wlan_status.setText(f"[!] Status konnte nicht geladen werden: {str(e)}")
+            self.wlan_status.setText(f"[!] {t('wlan_status')}: {str(e)}")
 
     
     def create_nas_group(self):
