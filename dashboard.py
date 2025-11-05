@@ -190,6 +190,33 @@ class ThinkCityDashboard(QWidget):
             self.can_interface = None
             # Demo-Daten-Timer starten
             self._start_demo_mode()
+        else:
+            # Prüfe ob vcan (Simulation) oder echtes CAN
+            logger.info(f"Connected to {channel}")
+    
+    def _is_simulation_active(self):
+        """Prüft ob CAN-Simulation aktiv ist (vcan)."""
+        if self.can_interface is None:
+            return True  # Demo-Modus = Simulation
+        
+        channel = os.getenv("TC_CAN_CHANNEL", "can0")
+        return channel.startswith("vcan")
+    
+    def _is_wifi_connected(self):
+        """Prüft ob WLAN verbunden ist."""
+        import subprocess
+        try:
+            # Prüfe ob wlan0 eine IP hat
+            result = subprocess.run(
+                ["ip", "addr", "show", "wlan0"],
+                capture_output=True,
+                text=True,
+                timeout=1
+            )
+            # Wenn "inet " in der Ausgabe ist, dann ist WLAN verbunden
+            return "inet " in result.stdout
+        except Exception:
+            return False
     
     def _start_demo_mode(self):
         """Startet Demo-Modus mit Fake-Daten."""
@@ -278,6 +305,25 @@ class ThinkCityDashboard(QWidget):
         """Updated nur den aktuell sichtbaren Screen."""
         current_idx = self.screen_stack.currentIndex()
         
+        # WLAN- und Simulation-Status ermitteln
+        wifi_status = self._is_wifi_connected()
+        simulation_status = self._is_simulation_active()
+        
+        # Status an alle StatusBars weitergeben (nur aktueller Screen wird gerendert)
+        screens_with_statusbar = [
+            self.main_screen,
+            self.battery_screen,
+            self.charge_screen,
+            self.cell_voltages_screen,
+            self.raw_data_screen
+        ]
+        
+        for screen in screens_with_statusbar:
+            if hasattr(screen, 'status_bar'):
+                screen.status_bar.set_wifi_status(wifi_status)
+                screen.status_bar.set_simulation_status(simulation_status)
+        
+        # Screen-spezifische Updates
         if current_idx == 0:
             self.main_screen.update_data(self.state)
         elif current_idx == 1:
