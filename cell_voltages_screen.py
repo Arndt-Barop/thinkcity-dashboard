@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 from widgets import StatusBar
+from translations import get_translator
 
 
 class CellVoltageBar(QWidget):
@@ -128,11 +129,14 @@ class CellVoltagesScreen(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.translator = get_translator()
         self.cell_bars = {}
         self._init_ui()
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
+        t = self.translator.get
+        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(5)
@@ -142,7 +146,7 @@ class CellVoltagesScreen(QWidget):
         main_layout.addWidget(self.status_bar)
         
         # ====== Titel ======
-        title = QLabel("ZELLSPANNUNGEN")
+        title = QLabel(t("cell_voltages"))
         title.setFont(QFont("Arial", 18, QFont.Bold))
         title.setStyleSheet("color: #00ffcc;")
         title.setAlignment(Qt.AlignCenter)
@@ -151,28 +155,28 @@ class CellVoltagesScreen(QWidget):
         # Info-Zeile
         info_layout = QHBoxLayout()
         
-        self.min_cell_label = QLabel("Min: --- V (Z--)")
+        self.min_cell_label = QLabel(t("cell_min_default"))
         self.min_cell_label.setFont(QFont("Arial", 11))
         self.min_cell_label.setStyleSheet("color: #ff6666;")
         info_layout.addWidget(self.min_cell_label)
         
         info_layout.addStretch()
         
-        self.avg_cell_label = QLabel("Ø: --- V")
+        self.avg_cell_label = QLabel(t("cell_avg_default"))
         self.avg_cell_label.setFont(QFont("Arial", 11))
         self.avg_cell_label.setStyleSheet("color: #00ff00;")
         info_layout.addWidget(self.avg_cell_label)
         
         info_layout.addStretch()
         
-        self.max_cell_label = QLabel("Max: --- V (Z--)")
+        self.max_cell_label = QLabel(t("cell_max_default"))
         self.max_cell_label.setFont(QFont("Arial", 11))
         self.max_cell_label.setStyleSheet("color: #66ff66;")
         info_layout.addWidget(self.max_cell_label)
         
         info_layout.addStretch()
         
-        self.delta_label = QLabel("Δ: --- mV")
+        self.delta_label = QLabel(t("cell_delta_default"))
         self.delta_label.setFont(QFont("Arial", 11))
         self.delta_label.setStyleSheet("color: #ffff00;")
         info_layout.addWidget(self.delta_label)
@@ -227,16 +231,18 @@ class CellVoltagesScreen(QWidget):
         if ambient_temp is not None:
             self.status_bar.set_ambient_temp(ambient_temp)
         
+        t = self.translator.get
+        
         cell_voltages = state.get("cell_voltages", [])
         
         if not cell_voltages or len(cell_voltages) == 0:
             # Keine Daten
             for bar in self.cell_bars.values():
                 bar.set_voltage(None)
-            self.min_cell_label.setText("Min: --- V (Z--)")
-            self.max_cell_label.setText("Max: --- V (Z--)")
-            self.avg_cell_label.setText("Ø: --- V")
-            self.delta_label.setText("Δ: --- mV")
+            self.min_cell_label.setText(t("cell_min_default"))
+            self.max_cell_label.setText(t("cell_max_default"))
+            self.avg_cell_label.setText(t("cell_avg_default"))
+            self.delta_label.setText(t("cell_delta_default"))
             return
         
         # Update Bargraphen
@@ -256,8 +262,8 @@ class CellVoltagesScreen(QWidget):
             min_idx = cell_voltages.index(min_v) + 1
             max_idx = cell_voltages.index(max_v) + 1
             
-            self.min_cell_label.setText(f"Min: {min_v:.3f} V (Z{min_idx})")
-            self.max_cell_label.setText(f"Max: {max_v:.3f} V (Z{max_idx})")
+            self.min_cell_label.setText(f"{t('min')}: {min_v:.3f} V (Z{min_idx})")
+            self.max_cell_label.setText(f"{t('max')}: {max_v:.3f} V (Z{max_idx})")
             self.avg_cell_label.setText(f"Ø: {avg_v:.3f} V")
             self.delta_label.setText(f"Δ: {delta_mv:.1f} mV")
             
@@ -271,10 +277,10 @@ class CellVoltagesScreen(QWidget):
             
             self.delta_label.setStyleSheet(f"color: {delta_color};")
         else:
-            self.min_cell_label.setText("Min: --- V (Z--)")
-            self.max_cell_label.setText("Max: --- V (Z--)")
-            self.avg_cell_label.setText("Ø: --- V")
-            self.delta_label.setText("Δ: --- mV")
+            self.min_cell_label.setText(t("cell_min_default"))
+            self.max_cell_label.setText(t("cell_max_default"))
+            self.avg_cell_label.setText(t("cell_avg_default"))
+            self.delta_label.setText(t("cell_delta_default"))
 
 
 # Test

@@ -325,6 +325,28 @@ TRANSLATIONS = {
         "EN": "Collecting Data..."
     },
     
+    # === Cell Voltages Screen ===
+    "cell_voltages": {
+        "DE": "ZELLSPANNUNGEN",
+        "EN": "CELL VOLTAGES"
+    },
+    "cell_min_default": {
+        "DE": "Min: --- V (Z--)",
+        "EN": "Min: --- V (C--)"
+    },
+    "cell_max_default": {
+        "DE": "Max: --- V (Z--)",
+        "EN": "Max: --- V (C--)"
+    },
+    "cell_avg_default": {
+        "DE": "Ø: --- V",
+        "EN": "Avg: --- V"
+    },
+    "cell_delta_default": {
+        "DE": "Δ: --- mV",
+        "EN": "Δ: --- mV"
+    },
+    
     # === Settings Screen ===
     "settings": {
         "DE": "Einstellungen",
