@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from widgets import StatusBar
+from translations import get_translator
 import json
 import os
 
@@ -26,6 +27,8 @@ class SettingsScreen(QWidget):
         super().__init__(parent)
         self.config_file = os.path.expanduser("~/thinkcity-dashboard-v3/config.json")
         self.settings = self.load_settings()
+        self.translator = get_translator()
+        self.translator.set_language(self.settings.get("language", "DE"))
         self.init_ui()
         
     def load_settings(self):
@@ -40,6 +43,7 @@ class SettingsScreen(QWidget):
             "wifi_ssid": "",
             "sync_on_wifi_only": True,
             "db_path": "/home/pi/thinkcity-dashboard-v3/thinkcity.db",
+            "language": "DE",
             # Logging Settings
             "logging_enabled": True,
             "logging_interval_sec": 1,
@@ -134,6 +138,10 @@ class SettingsScreen(QWidget):
         # === Logging ===
         logging_group = self.create_logging_group()
         scroll_layout.addWidget(logging_group)
+        
+        # === Language ===
+        language_group = self.create_language_group()
+        scroll_layout.addWidget(language_group)
         
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
@@ -673,6 +681,28 @@ class SettingsScreen(QWidget):
         group.setLayout(layout)
         return group
     
+    def create_language_group(self):
+        """Language Settings."""
+        t = self.translator.get
+        
+        group = QGroupBox(t("language_settings"))
+        layout = QVBoxLayout()
+        
+        # Language Selection
+        lang_layout = QHBoxLayout()
+        lang_layout.addWidget(QLabel(t("language") + ":"))
+        
+        self.language_combo = QComboBox()
+        self.language_combo.addItems([t("language_german"), t("language_english")])
+        current_lang = self.settings.get("language", "DE")
+        self.language_combo.setCurrentIndex(0 if current_lang == "DE" else 1)
+        lang_layout.addWidget(self.language_combo)
+        
+        layout.addLayout(lang_layout)
+        
+        group.setLayout(layout)
+        return group
+    
     def on_save(self):
         """Speichere Einstellungen."""
         self.settings["can_interface"] = self.can_combo.currentText()
@@ -703,6 +733,11 @@ class SettingsScreen(QWidget):
         
         self.settings["db_path"] = self.db_path.text()
         
+        # Language Settings
+        selected_lang = "DE" if self.language_combo.currentIndex() == 0 else "EN"
+        language_changed = self.settings.get("language", "DE") != selected_lang
+        self.settings["language"] = selected_lang
+        
         # Logging Settings (logging ist immer aktiviert)
         self.settings["logging_enabled"] = True  # Dauerhaft aktiv
         self.settings["logging_interval_sec"] = self.logging_interval_slider.value()
@@ -712,6 +747,12 @@ class SettingsScreen(QWidget):
         ]
         
         self.save_settings()
+        
+        # Update translator if language changed
+        if language_changed:
+            self.translator.set_language(selected_lang)
+            # Reload UI with new language
+            self.reload_ui()
         
         # Handle CAN-Simulation Service
         if self.settings["simulation_mode"]:
@@ -859,6 +900,17 @@ class SettingsScreen(QWidget):
         
         from PyQt5.QtCore import QTimer
         QTimer.singleShot(2000, msg.deleteLater)
+    
+    def reload_ui(self):
+        """Reload UI with new language."""
+        # Clear current layout
+        while self.layout().count():
+            child = self.layout().takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+        
+        # Recreate UI
+        self.init_ui()
     
     def _enable_can_simulation(self):
         """Aktiviere und starte CAN-Simulation Service."""
