@@ -738,8 +738,23 @@ TRANSLATIONS = {
 class Translator:
     """Handle translations for the dashboard."""
     
-    def __init__(self, language="DE"):
-        """Initialize with default language."""
+    def __init__(self, language=None):
+        """Initialize with language from settings or default."""
+        if language is None:
+            # Try to load from settings
+            import os
+            import json
+            settings_file = os.path.expanduser("~/thinkcity-dashboard-v3/settings.json")
+            try:
+                if os.path.exists(settings_file):
+                    with open(settings_file, 'r') as f:
+                        settings = json.load(f)
+                        language = settings.get("language", "DE")
+                else:
+                    language = "DE"
+            except:
+                language = "DE"
+        
         self.language = language
     
     def set_language(self, language):
