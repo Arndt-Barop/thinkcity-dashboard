@@ -14,8 +14,11 @@ class TripComputer:
     
     def __init__(self):
         # Kalibrierbare Parameter (aus Umgebungsvariablen oder Defaults)
-        self.battery_capacity_kwh = float(os.environ.get("TC_BATTERY_CAPACITY_KWH", "24.0"))
+        # WICHTIG: Degradierte Batterie - realistisch 17 kWh nutzbar (statt 24 kWh neu)
+        self.battery_capacity_kwh = float(os.environ.get("TC_BATTERY_CAPACITY_KWH", "17.0"))
         self.default_consumption_wh_km = float(os.environ.get("TC_DEFAULT_CONSUMPTION_WH_KM", "150.0"))
+        # Maximale Reichweite (Sicherheitsbegrenzung für degradierte Batterie)
+        self.max_range_km = float(os.environ.get("TC_MAX_RANGE_KM", "100.0"))
         
         # Trip-Daten (aktuell)
         self.trip_count = 0  # Anzahl Messungen
@@ -34,6 +37,10 @@ class TripComputer:
         self.last_speed_kmh = 0.0
         self.last_time = time.time()
         
+        # Aktuelle Werte (werden in update() gesetzt)
+        self.consumption_now_wh_km = 0.0
+        self.consumption_now_kwh_100km = 0.0
+    
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
         Aktualisiert Trip-Computer mit neuem Zustand.
@@ -62,25 +69,28 @@ class TripComputer:
         
         # Aktueller Verbrauch (nur bei Fahrt > 2 km/h)
         if speed_kmh > 2.0:
-            consumption_now_wh_km = (power_kw * 1000.0) / speed_kmh
+            self.consumption_now_wh_km = (power_kw * 1000.0) / speed_kmh
             
             # Welford-Algorithmus für stabilen Durchschnitt
             self.trip_count += 1
-            self.trip_avg_consumption += (consumption_now_wh_km - self.trip_avg_consumption) / self.trip_count
+            self.trip_avg_consumption += (self.consumption_now_wh_km - self.trip_avg_consumption) / self.trip_count
             
             self.total_count += 1
-            self.total_avg_consumption += (consumption_now_wh_km - self.total_avg_consumption) / self.total_count
+            self.total_avg_consumption += (self.consumption_now_wh_km - self.total_avg_consumption) / self.total_count
         else:
-            consumption_now_wh_km = 0.0
+            self.consumption_now_wh_km = 0.0
+        
+        # Konvertiere zu kWh/100km
+        self.consumption_now_kwh_100km = self.consumption_now_wh_km / 10.0
         
         # Range-Berechnung
         range_km = self.calculate_range(soc_pct)
         
         # State erweitern
-        state["consumption_now_wh_km"] = consumption_now_wh_km
+        state["consumption_now_wh_km"] = self.consumption_now_wh_km
         state["consumption_trip_wh_km"] = self.trip_avg_consumption
         state["consumption_total_wh_km"] = self.total_avg_consumption
-        state["consumption_now_kwh_100km"] = consumption_now_wh_km / 10.0
+        state["consumption_now_kwh_100km"] = self.consumption_now_kwh_100km
         state["consumption_trip_kwh_100km"] = self.trip_avg_consumption / 10.0
         state["consumption_total_kwh_100km"] = self.total_avg_consumption / 10.0
         state["range_km"] = range_km
@@ -98,6 +108,7 @@ class TripComputer:
         Berechnet verbleibende Reichweite in km.
         
         Range = (SOC/100) × Kapazität × 1000 / Durchschnittsverbrauch
+        Begrenzt auf max_range_km (100km für degradierte Batterie)
         """
         # Nutze Trip-Durchschnitt falls vorhanden, sonst Default
         if self.trip_count > 10:  # Min. 10 Messungen für Validität
@@ -113,6 +124,9 @@ class TripComputer:
         
         available_energy_kwh = (soc_pct / 100.0) * self.battery_capacity_kwh
         range_km = (available_energy_kwh * 1000.0) / avg_consumption
+        
+        # Begrenze auf realistisches Maximum (degradierte Batterie)
+        range_km = min(range_km, self.max_range_km)
         
         return max(0.0, range_km)
     
