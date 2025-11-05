@@ -131,10 +131,6 @@ class SettingsScreen(QWidget):
         nas_group = self.create_nas_group()
         scroll_layout.addWidget(nas_group)
         
-        # === Datenbank ===
-        db_group = self.create_db_group()
-        scroll_layout.addWidget(db_group)
-        
         # === Logging ===
         logging_group = self.create_logging_group()
         scroll_layout.addWidget(logging_group)
@@ -363,25 +359,6 @@ class SettingsScreen(QWidget):
         group.setLayout(layout)
         return group
     
-    def create_db_group(self):
-        """Database Settings."""
-        group = QGroupBox("Datenbank")
-        layout = QVBoxLayout()
-        
-        # DB Path
-        path_layout = QHBoxLayout()
-        path_layout.addWidget(QLabel("Pfad:"))
-        self.db_path = QLineEdit(self.settings["db_path"])
-        path_layout.addWidget(self.db_path)
-        layout.addLayout(path_layout)
-        
-        info = QLabel("Info: Standard: /home/pi/thinkcity-dashboard-v3/thinkcity.db")
-        info.setStyleSheet("color: #95a5a6; font-size: 12px;")
-        layout.addWidget(info)
-        
-        group.setLayout(layout)
-        return group
-    
     def create_logging_group(self):
         """Logging Settings."""
         from PyQt5.QtWidgets import QSlider, QGridLayout
@@ -394,10 +371,21 @@ class SettingsScreen(QWidget):
         info_label.setStyleSheet("color: #95a5a6; font-size: 12px; font-style: italic;")
         layout.addWidget(info_label)
         
+        # Datenbankpfad
+        db_path_layout = QHBoxLayout()
+        db_path_layout.addWidget(QLabel("Datenbankpfad:"))
+        self.db_path = QLineEdit(self.settings["db_path"])
+        db_path_layout.addWidget(self.db_path)
+        layout.addLayout(db_path_layout)
+        
+        db_info = QLabel("Info: Standard: /home/pi/thinkcity-dashboard-v3/thinkcity.db")
+        db_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
+        layout.addWidget(db_info)
+        
         # Intervall-Slider
         interval_layout = QVBoxLayout()
         interval_label = QLabel(f"Log-Intervall: {self.settings['logging_interval_sec']} Sekunden")
-        interval_label.setStyleSheet("font-size: 14px;")
+        interval_label.setStyleSheet("font-size: 14px; margin-top: 10px;")
         interval_layout.addWidget(interval_label)
         
         self.logging_interval_slider = QSlider(Qt.Horizontal)
