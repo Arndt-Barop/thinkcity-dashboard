@@ -104,6 +104,22 @@ class RawDataScreen(QWidget):
                 border: 2px solid #00ff00;
                 border-radius: 5px;
             }
+            QScrollBar:vertical {
+                width: 25px;
+                background: #0a0a0a;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical {
+                background: #1e3a5f;
+                border-radius: 5px;
+                min-height: 40px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #2c5282;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
         """)
         terminal_layout.addWidget(self.terminal)
         
@@ -159,6 +175,22 @@ class RawDataScreen(QWidget):
                 border: 1px solid #444444;
                 padding: 5px;
                 font-weight: bold;
+            }
+            QScrollBar:vertical {
+                width: 25px;
+                background: #0a0a0a;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical {
+                background: #1e3a5f;
+                border-radius: 5px;
+                min-height: 40px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #2c5282;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
             }
         """)
         
