@@ -67,16 +67,17 @@ class TripComputer:
                 self.trip_energy_kwh += delta_energy_kwh
                 self.total_energy_kwh += delta_energy_kwh
         
-        # Aktueller Verbrauch (nur bei Fahrt > 2 km/h UND positiver Leistung)
-        if speed_kmh > 2.0 and power_kw > 0:
+        # Aktueller Verbrauch (nur bei Fahrt > 2 km/h)
+        if speed_kmh > 2.0:
             self.consumption_now_wh_km = (power_kw * 1000.0) / speed_kmh
             
-            # Welford-Algorithmus für stabilen Durchschnitt
-            self.trip_count += 1
-            self.trip_avg_consumption += (self.consumption_now_wh_km - self.trip_avg_consumption) / self.trip_count
-            
-            self.total_count += 1
-            self.total_avg_consumption += (self.consumption_now_wh_km - self.total_avg_consumption) / self.total_count
+            # Welford-Algorithmus für stabilen Durchschnitt (nur positive Werte)
+            if power_kw > 0:
+                self.trip_count += 1
+                self.trip_avg_consumption += (self.consumption_now_wh_km - self.trip_avg_consumption) / self.trip_count
+                
+                self.total_count += 1
+                self.total_avg_consumption += (self.consumption_now_wh_km - self.total_avg_consumption) / self.total_count
         else:
             self.consumption_now_wh_km = 0.0
         
@@ -91,6 +92,7 @@ class TripComputer:
         state["consumption_trip_wh_km"] = self.trip_avg_consumption
         state["consumption_total_wh_km"] = self.total_avg_consumption
         state["consumption_now_kwh_100km"] = self.consumption_now_kwh_100km
+        state["consumption_kwh_100km"] = self.consumption_now_kwh_100km  # Alias für Main-Screen
         state["consumption_trip_kwh_100km"] = self.trip_avg_consumption / 10.0
         state["consumption_total_kwh_100km"] = self.total_avg_consumption / 10.0
         state["range_km"] = range_km
