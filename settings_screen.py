@@ -100,16 +100,16 @@ class SettingsScreen(QWidget):
             QScrollArea { border: none; background: transparent; }
             QScrollBar:vertical {
                 width: 25px;
-                background: #1a1a1a;
+                background: #0a0a0a;
                 border-radius: 5px;
             }
             QScrollBar::handle:vertical {
-                background: #3498db;
+                background: #1e3a5f;
                 border-radius: 5px;
                 min-height: 40px;
             }
             QScrollBar::handle:vertical:hover {
-                background: #2980b9;
+                background: #2c5282;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
