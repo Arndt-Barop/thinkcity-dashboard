@@ -396,20 +396,20 @@ class StatusBar(QWidget):
         
         # RECHTS-MITTE: Status-Icons (WLAN, Simulation)
         icon_x = w - 240  # Startposition für Icons
-        font_icon = QFont("Arial", 12)
+        font_icon = QFont("Arial", 11, QFont.Bold)
         painter.setFont(font_icon)
         
         # WLAN-Icon (wenn verbunden)
         if self.wifi_connected:
             painter.setPen(QColor(0, 255, 100))  # Grün
-            painter.drawText(icon_x, 0, 40, h, Qt.AlignCenter, "📶")
-            icon_x += 45
+            painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[WiFi]")
+            icon_x += 55
         
         # Simulation-Icon (wenn aktiv)
         if self.simulation_active:
             painter.setPen(QColor(255, 200, 0))  # Gelb
-            painter.drawText(icon_x, 0, 60, h, Qt.AlignCenter, "🎮 SIM")
-            icon_x += 65
+            painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[SIM]")
+            icon_x += 55
         
         # RECHTS: Außentemperatur (wenn vorhanden)
         if self.ambient_temp is not None:
