@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QTextCursor
 from widgets import StatusBar
+from translations import get_translator
 from collections import deque
 from datetime import datetime
 
@@ -54,6 +55,7 @@ class RawDataScreen(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.translator = get_translator()
         self.can_buffer = deque(maxlen=500)  # Letzte 500 Frames
         self.last_frames = {}  # {can_id: (timestamp, data, count)}
         self._init_ui()
@@ -65,6 +67,8 @@ class RawDataScreen(QWidget):
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
+        t = self.translator.get
+        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(5)
@@ -74,7 +78,7 @@ class RawDataScreen(QWidget):
         main_layout.addWidget(self.status_bar)
         
         # ====== Titel ======
-        title = QLabel("CAN-BUS ROHDATEN")
+        title = QLabel(t("raw_data"))
         title.setFont(QFont("Arial", 18, QFont.Bold))
         title.setStyleSheet("color: #00ffcc;")
         title.setAlignment(Qt.AlignCenter)
@@ -89,7 +93,7 @@ class RawDataScreen(QWidget):
         terminal_layout.setContentsMargins(0, 0, 0, 0)
         terminal_layout.setSpacing(3)
         
-        terminal_title = QLabel("🔴 Live CAN-Traffic")
+        terminal_title = QLabel(t("live_can_traffic"))
         terminal_title.setFont(QFont("Arial", 12, QFont.Bold))
         terminal_title.setStyleSheet("color: #00ff00;")
         terminal_layout.addWidget(terminal_title)
@@ -125,14 +129,14 @@ class RawDataScreen(QWidget):
         
         # Statistik-Zeile
         stats_layout = QHBoxLayout()
-        self.stats_label = QLabel("Frames: 0 | IDs: 0 | Rate: 0.0 fps")
+        self.stats_label = QLabel(t("can_stats_default"))
         self.stats_label.setFont(QFont("Arial", 9))
         self.stats_label.setStyleSheet("color: #888888;")
         stats_layout.addWidget(self.stats_label)
         
         stats_layout.addStretch()
         
-        clear_btn_label = QLabel("💡 Puffer wird automatisch bei 500 Frames geleert")
+        clear_btn_label = QLabel(t("buffer_auto_clear"))
         clear_btn_label.setFont(QFont("Arial", 9))
         clear_btn_label.setStyleSheet("color: #666666;")
         stats_layout.addWidget(clear_btn_label)
@@ -148,7 +152,7 @@ class RawDataScreen(QWidget):
         table_layout.setContentsMargins(0, 0, 0, 0)
         table_layout.setSpacing(3)
         
-        table_title = QLabel("📋 Bekannte CAN-IDs")
+        table_title = QLabel(t("known_can_ids"))
         table_title.setFont(QFont("Arial", 12, QFont.Bold))
         table_title.setStyleSheet("color: #ffaa00;")
         table_layout.addWidget(table_title)
@@ -156,7 +160,7 @@ class RawDataScreen(QWidget):
         self.id_table = QTableWidget()
         self.id_table.setColumnCount(5)
         self.id_table.setHorizontalHeaderLabels([
-            "CAN-ID (Hex)", "CAN-ID (Dez)", "Name", "Inhalt", "Letzte Aktualisierung"
+            t("can_id_hex"), t("can_id_dec"), t("name"), t("content"), t("last_update")
         ])
         self.id_table.setFont(QFont("Arial", 9))
         self.id_table.setStyleSheet("""

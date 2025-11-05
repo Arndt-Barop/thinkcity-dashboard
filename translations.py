@@ -137,8 +137,44 @@ TRANSLATIONS = {
     
     # === Raw Data Screen ===
     "raw_data": {
-        "DE": "CAN Rohdaten",
-        "EN": "CAN Raw Data"
+        "DE": "CAN ROHDATEN",
+        "EN": "CAN RAW DATA"
+    },
+    "live_can_traffic": {
+        "DE": "🔴 Live CAN-Traffic",
+        "EN": "🔴 Live CAN Traffic"
+    },
+    "can_stats_default": {
+        "DE": "Frames: 0 | IDs: 0 | Rate: 0.0 fps",
+        "EN": "Frames: 0 | IDs: 0 | Rate: 0.0 fps"
+    },
+    "buffer_auto_clear": {
+        "DE": "💡 Puffer wird automatisch bei 500 Frames geleert",
+        "EN": "💡 Buffer auto-clears at 500 frames"
+    },
+    "known_can_ids": {
+        "DE": "📋 Bekannte CAN-IDs",
+        "EN": "📋 Known CAN IDs"
+    },
+    "can_id_hex": {
+        "DE": "CAN-ID (Hex)",
+        "EN": "CAN-ID (Hex)"
+    },
+    "can_id_dec": {
+        "DE": "CAN-ID (Dez)",
+        "EN": "CAN-ID (Dec)"
+    },
+    "name": {
+        "DE": "Name",
+        "EN": "Name"
+    },
+    "content": {
+        "DE": "Inhalt",
+        "EN": "Content"
+    },
+    "last_update": {
+        "DE": "Letzte Aktualisierung",
+        "EN": "Last Update"
     },
     "can_terminal": {
         "DE": "CAN Terminal",
