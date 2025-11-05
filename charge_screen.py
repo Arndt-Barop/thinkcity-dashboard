@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QProgress
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QColor
 from widgets import DigitalDisplay, BatteryBar, StatusBar
+from translations import get_translator
 from datetime import datetime, timedelta
 
 
@@ -21,12 +22,15 @@ class ChargeScreen(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.translator = get_translator()
         self.charge_start_time = None
         self.charge_start_soc = None
         self._init_ui()
     
     def _init_ui(self):
         """Erstellt UI-Layout."""
+        t = self.translator.get
+        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(15)
@@ -36,7 +40,7 @@ class ChargeScreen(QWidget):
         main_layout.addWidget(self.status_bar)
         
         # ====== Titel ======
-        title = QLabel("LADEN")
+        title = QLabel(t("charging"))
         title.setFont(QFont("Arial", 20, QFont.Bold))
         title.setStyleSheet("color: #00ff66;")
         title.setAlignment(Qt.AlignCenter)
@@ -47,7 +51,7 @@ class ChargeScreen(QWidget):
         main_layout.addWidget(self.soc_bar)
         
         # ====== Status-Text ======
-        self.status_label = QLabel("Nicht verbunden")
+        self.status_label = QLabel(t("not_connected"))
         self.status_label.setFont(QFont("Arial", 16, QFont.Bold))
         self.status_label.setStyleSheet("color: #888888;")
         self.status_label.setAlignment(Qt.AlignCenter)
@@ -58,19 +62,19 @@ class ChargeScreen(QWidget):
         grid.setSpacing(10)
         
         # AC Spannung
-        self.mains_voltage_display = DigitalDisplay("AC Spannung", "V")
+        self.mains_voltage_display = DigitalDisplay(t("ac_voltage"), "V")
         self.mains_voltage_display.set_decimals(0)
         self.mains_voltage_display.set_color(QColor(255, 200, 0))
         grid.addWidget(self.mains_voltage_display)
         
         # AC Strom
-        self.mains_current_display = DigitalDisplay("AC Strom", "A")
+        self.mains_current_display = DigitalDisplay(t("ac_current"), "A")
         self.mains_current_display.set_decimals(1)
         self.mains_current_display.set_color(QColor(0, 200, 255))
         grid.addWidget(self.mains_current_display)
         
         # DC Leistung (aus Batterie-Sicht: + beim Laden, - beim Entladen)
-        self.charge_power_display = DigitalDisplay("Leistung", "kW")
+        self.charge_power_display = DigitalDisplay(t("power"), "kW")
         self.charge_power_display.set_decimals(2)
         self.charge_power_display.set_color(QColor(0, 255, 100))
         grid.addWidget(self.charge_power_display)
@@ -81,21 +85,21 @@ class ChargeScreen(QWidget):
         time_layout = QVBoxLayout()
         
         # Verstrichene Zeit
-        self.elapsed_label = QLabel("Ladezeit: --:--")
+        self.elapsed_label = QLabel(t("charge_time_default"))
         self.elapsed_label.setFont(QFont("Arial", 14))
         self.elapsed_label.setStyleSheet("color: #aaaaaa;")
         self.elapsed_label.setAlignment(Qt.AlignCenter)
         time_layout.addWidget(self.elapsed_label)
         
         # Verbleibende Zeit
-        self.remaining_label = QLabel("Verbleibend: --:--")
+        self.remaining_label = QLabel(t("remaining_default"))
         self.remaining_label.setFont(QFont("Arial", 16, QFont.Bold))
         self.remaining_label.setStyleSheet("color: #00ffcc;")
         self.remaining_label.setAlignment(Qt.AlignCenter)
         time_layout.addWidget(self.remaining_label)
         
         # Fertig um...
-        self.complete_label = QLabel("Fertig: --:--")
+        self.complete_label = QLabel(t("complete_default"))
         self.complete_label.setFont(QFont("Arial", 12))
         self.complete_label.setStyleSheet("color: #888888;")
         self.complete_label.setAlignment(Qt.AlignCenter)
@@ -107,13 +111,13 @@ class ChargeScreen(QWidget):
         info_layout = QHBoxLayout()
         
         # Max verfügbarer AC-Strom
-        self.max_ac_label = QLabel("Max AC: --- A")
+        self.max_ac_label = QLabel(t("max_ac_default"))
         self.max_ac_label.setFont(QFont("Arial", 12))
         self.max_ac_label.setStyleSheet("color: #888888;")
         info_layout.addWidget(self.max_ac_label)
         
         # Geladene Energie
-        self.energy_label = QLabel("Geladen: --- kWh")
+        self.energy_label = QLabel(t("charged_default"))
         self.energy_label.setFont(QFont("Arial", 12))
         self.energy_label.setStyleSheet("color: #888888;")
         info_layout.addWidget(self.energy_label)
@@ -152,14 +156,15 @@ class ChargeScreen(QWidget):
         self.charge_power_display.set_value(power_kw)
         
         # Max AC Current
+        t = self.translator.get
         max_ac = state.get("max_available_AC_A", 0.0)
-        self.max_ac_label.setText(f"Max AC: {max_ac:.1f} A")
+        self.max_ac_label.setText(f"{t('max_ac')}: {max_ac:.1f} A")
         
         # Status-Erkennung
         is_charging = state.get("vehicle_charge_enabled", False) and mains_v > 100
         
         if is_charging:
-            self.status_label.setText("⚡ LADEN")
+            self.status_label.setText(t("charging_active"))
             self.status_label.setStyleSheet("color: #00ff66;")
             
             # Lade-Start tracken
@@ -171,26 +176,28 @@ class ChargeScreen(QWidget):
             self._update_time_estimates(soc, abs(power_kw))
         
         else:
-            self.status_label.setText("Nicht verbunden")
+            self.status_label.setText(t("not_connected"))
             self.status_label.setStyleSheet("color: #888888;")
             
             # Reset
             self.charge_start_time = None
             self.charge_start_soc = None
-            self.elapsed_label.setText("Ladezeit: --:--")
-            self.remaining_label.setText("Verbleibend: --:--")
-            self.complete_label.setText("Fertig: --:--")
-            self.energy_label.setText("Geladen: --- kWh")
+            self.elapsed_label.setText(t("charge_time_default"))
+            self.remaining_label.setText(t("remaining_default"))
+            self.complete_label.setText(t("complete_default"))
+            self.energy_label.setText(t("charged_default"))
     
     def _update_time_estimates(self, current_soc: float, power_kw: float):
         """Berechnet Zeit-Schätzungen während des Ladens."""
         if self.charge_start_time is None or self.charge_start_soc is None:
             return
         
+        t = self.translator.get
+        
         # Verstrichene Zeit
         elapsed = datetime.now() - self.charge_start_time
         elapsed_str = str(elapsed).split('.')[0]  # HH:MM:SS
-        self.elapsed_label.setText(f"Ladezeit: {elapsed_str}")
+        self.elapsed_label.setText(f"{t('charge_time')}: {elapsed_str}")
         
         # Geladene SOC-Prozent
         charged_soc = current_soc - self.charge_start_soc
@@ -210,21 +217,21 @@ class ChargeScreen(QWidget):
                 # Format HH:MM
                 hours = remaining_td.seconds // 3600
                 minutes = (remaining_td.seconds % 3600) // 60
-                self.remaining_label.setText(f"Verbleibend: {hours:02d}:{minutes:02d}")
+                self.remaining_label.setText(f"{t('remaining')}: {hours:02d}:{minutes:02d}")
                 
                 # Fertig-Zeitpunkt
                 complete_time = datetime.now() + remaining_td
-                self.complete_label.setText(f"Fertig: {complete_time.strftime('%H:%M')}")
+                self.complete_label.setText(f"{t('complete')}: {complete_time.strftime('%H:%M')}")
             else:
-                self.remaining_label.setText("Verbleibend: Berechne...")
+                self.remaining_label.setText(f"{t('remaining')}: {t('calculating')}")
         
         else:
-            self.remaining_label.setText("Verbleibend: Sammle Daten...")
+            self.remaining_label.setText(f"{t('remaining')}: {t('collecting_data')}")
         
         # Geladene Energie (Schätzung: 24 kWh * SOC-Differenz)
         battery_capacity_kwh = 24.0
         energy_charged_kwh = (charged_soc / 100.0) * battery_capacity_kwh
-        self.energy_label.setText(f"Geladen: {energy_charged_kwh:.2f} kWh")
+        self.energy_label.setText(f"{t('charged')}: {energy_charged_kwh:.2f} kWh")
 
 
 # Test

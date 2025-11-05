@@ -255,6 +255,76 @@ TRANSLATIONS = {
         "EN": "Type"
     },
     
+    # === Charge Screen ===
+    "charging": {
+        "DE": "LADEN",
+        "EN": "CHARGING"
+    },
+    "not_connected": {
+        "DE": "Nicht verbunden",
+        "EN": "Not Connected"
+    },
+    "charging_active": {
+        "DE": "⚡ LADEN",
+        "EN": "⚡ CHARGING"
+    },
+    "ac_voltage": {
+        "DE": "AC Spannung",
+        "EN": "AC Voltage"
+    },
+    "ac_current": {
+        "DE": "AC Strom",
+        "EN": "AC Current"
+    },
+    "charge_time": {
+        "DE": "Ladezeit",
+        "EN": "Charge Time"
+    },
+    "charge_time_default": {
+        "DE": "Ladezeit: --:--",
+        "EN": "Charge Time: --:--"
+    },
+    "remaining": {
+        "DE": "Verbleibend",
+        "EN": "Remaining"
+    },
+    "remaining_default": {
+        "DE": "Verbleibend: --:--",
+        "EN": "Remaining: --:--"
+    },
+    "complete": {
+        "DE": "Fertig",
+        "EN": "Complete"
+    },
+    "complete_default": {
+        "DE": "Fertig: --:--",
+        "EN": "Complete: --:--"
+    },
+    "max_ac": {
+        "DE": "Max AC",
+        "EN": "Max AC"
+    },
+    "max_ac_default": {
+        "DE": "Max AC: --- A",
+        "EN": "Max AC: --- A"
+    },
+    "charged": {
+        "DE": "Geladen",
+        "EN": "Charged"
+    },
+    "charged_default": {
+        "DE": "Geladen: --- kWh",
+        "EN": "Charged: --- kWh"
+    },
+    "calculating": {
+        "DE": "Berechne...",
+        "EN": "Calculating..."
+    },
+    "collecting_data": {
+        "DE": "Sammle Daten...",
+        "EN": "Collecting Data..."
+    },
+    
     # === Settings Screen ===
     "settings": {
         "DE": "Einstellungen",
