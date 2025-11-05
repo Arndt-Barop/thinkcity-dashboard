@@ -225,9 +225,12 @@ class ThinkCityDashboard(QWidget):
         def generate_demo_data():
             import random
             
+            # Power meistens positiv (Verbrauch), manchmal negativ (Rekuperation)
+            power = random.uniform(-5, 15) if random.random() > 0.3 else random.uniform(-15, -2)
+            
             self.state.update({
                 "speed_kmh": random.uniform(40, 80),
-                "power_kW": random.uniform(-15, 5),
+                "power_kW": power,
                 "soc_pct": random.uniform(60, 90),
                 "voltage_V": random.uniform(320, 340),
                 "current_A": random.uniform(-30, 5),

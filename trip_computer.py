@@ -67,8 +67,8 @@ class TripComputer:
                 self.trip_energy_kwh += delta_energy_kwh
                 self.total_energy_kwh += delta_energy_kwh
         
-        # Aktueller Verbrauch (nur bei Fahrt > 2 km/h)
-        if speed_kmh > 2.0:
+        # Aktueller Verbrauch (nur bei Fahrt > 2 km/h UND positiver Leistung)
+        if speed_kmh > 2.0 and power_kw > 0:
             self.consumption_now_wh_km = (power_kw * 1000.0) / speed_kmh
             
             # Welford-Algorithmus für stabilen Durchschnitt
