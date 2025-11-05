@@ -241,14 +241,8 @@ class ThinkCityDashboard(QWidget):
                 "e_pack_delta_cell_V": 0.05,
             })
             
-            # Trip-Computer update
-            self.trip_computer.update(self.state)
-            
-            self.state["consumption_wh_km"] = self.trip_computer.consumption_now_wh_km
-            self.state["consumption_kwh_100km"] = self.trip_computer.consumption_now_kwh_100km
-            self.state["range_km"] = self.trip_computer.calculate_range(
-                self.state.get("soc_pct", 70)
-            )
+            # Trip-Computer update - benutzt Return-Value
+            self.state = self.trip_computer.update(self.state)
             
             # SOH
             self.state["soh_pct"] = 92.5
