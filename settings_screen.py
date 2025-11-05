@@ -389,11 +389,10 @@ class SettingsScreen(QWidget):
         group = QGroupBox("Daten-Logging")
         layout = QVBoxLayout()
         
-        # Logging aktivieren
-        self.logging_enabled = QCheckBox("Logging aktiviert")
-        self.logging_enabled.setChecked(self.settings["logging_enabled"])
-        self.logging_enabled.setStyleSheet("font-size: 14px;")
-        layout.addWidget(self.logging_enabled)
+        # Info: Logging ist immer aktiv
+        info_label = QLabel("Info: Daten-Logging ist dauerhaft aktiv")
+        info_label.setStyleSheet("color: #95a5a6; font-size: 12px; font-style: italic;")
+        layout.addWidget(info_label)
         
         # Intervall-Slider
         interval_layout = QVBoxLayout()
@@ -495,8 +494,8 @@ class SettingsScreen(QWidget):
         self.settings["nas_user"] = self.nas_user.text()
         self.settings["db_path"] = self.db_path.text()
         
-        # Logging Settings
-        self.settings["logging_enabled"] = self.logging_enabled.isChecked()
+        # Logging Settings (logging ist immer aktiviert)
+        self.settings["logging_enabled"] = True  # Dauerhaft aktiv
         self.settings["logging_interval_sec"] = self.logging_interval_slider.value()
         self.settings["logging_fields"] = [
             field_name for field_name, checkbox in self.field_checkboxes.items()
