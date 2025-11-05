@@ -315,7 +315,8 @@ class ThinkCityDashboard(QWidget):
             self.battery_screen,
             self.charge_screen,
             self.cell_voltages_screen,
-            self.raw_data_screen
+            self.raw_data_screen,
+            self.settings_screen
         ]
         
         for screen in screens_with_statusbar:
