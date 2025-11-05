@@ -469,6 +469,14 @@ class SettingsScreen(QWidget):
         
         self.save_settings()
         
+        # Handle CAN-Simulation Service
+        if self.settings["simulation_mode"]:
+            # Aktiviere und starte CAN-Simulation Service
+            self._enable_can_simulation()
+        else:
+            # Deaktiviere CAN-Simulation Service
+            self._disable_can_simulation()
+        
         # Zeige Bestätigung
         self.show_message("✅ Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.")
     
@@ -533,3 +541,36 @@ class SettingsScreen(QWidget):
         
         from PyQt5.QtCore import QTimer
         QTimer.singleShot(2000, msg.deleteLater)
+    
+    def _enable_can_simulation(self):
+        """Aktiviere und starte CAN-Simulation Service."""
+        import subprocess
+        try:
+            # Enable Service
+            subprocess.run(['sudo', 'systemctl', 'enable', 'can-simulation'], check=True)
+            print("✓ CAN-Simulation Service aktiviert")
+        except subprocess.CalledProcessError as e:
+            print(f"✗ Fehler beim Aktivieren: {e}")
+    
+    def _disable_can_simulation(self):
+        """Deaktiviere CAN-Simulation Service."""
+        import subprocess
+        try:
+            # Disable Service
+            subprocess.run(['sudo', 'systemctl', 'disable', 'can-simulation'], check=True)
+            # Stop Service (falls läuft)
+            subprocess.run(['sudo', 'systemctl', 'stop', 'can-simulation'], check=False)
+            print("✓ CAN-Simulation Service deaktiviert")
+        except subprocess.CalledProcessError as e:
+            print(f"✗ Fehler beim Deaktivieren: {e}")
+
+
+# Test-Programm
+if __name__ == "__main__":
+    from PyQt5.QtWidgets import QApplication
+    import sys
+    
+    app = QApplication(sys.argv)
+    screen = SettingsScreen()
+    screen.show()
+    sys.exit(app.exec_())
