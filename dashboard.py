@@ -381,6 +381,9 @@ class ThinkCityDashboard(QWidget):
         """Cleanup beim Schließen."""
         logger.info("Shutting down...")
         
+        # Trip-Computer Statistiken speichern
+        self.trip_computer.shutdown()
+        
         # CAN-Bus schließen
         if self.can_interface:
             self.can_interface.shutdown()

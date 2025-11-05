@@ -76,10 +76,21 @@ class MainScreen(QWidget):
         self.range_display.set_decimals(0)
         left_col.addWidget(self.range_display)
         
-        self.consumption_display = DigitalDisplay("Verbrauch", "kWh/100km")
-        self.consumption_display.set_color(self._get_color("yellow"))
-        self.consumption_display.set_decimals(1)
-        left_col.addWidget(self.consumption_display)
+        # Verbrauch: Zwei Displays nebeneinander
+        consumption_layout = QHBoxLayout()
+        consumption_layout.setSpacing(5)
+        
+        self.consumption_now_display = DigitalDisplay("Verbrauch jetzt", "kWh/100km")
+        self.consumption_now_display.set_color(self._get_color("yellow"))
+        self.consumption_now_display.set_decimals(1)
+        consumption_layout.addWidget(self.consumption_now_display)
+        
+        self.consumption_avg_display = DigitalDisplay("Ø Verbrauch", "kWh/100km")
+        self.consumption_avg_display.set_color(self._get_color("orange"))
+        self.consumption_avg_display.set_decimals(1)
+        consumption_layout.addWidget(self.consumption_avg_display)
+        
+        left_col.addLayout(consumption_layout)
         
         bottom_layout.addLayout(left_col, stretch=1)
         
@@ -139,9 +150,13 @@ class MainScreen(QWidget):
         range_km = state.get("range_km", 0.0)
         self.range_display.set_value(range_km)
         
-        # Verbrauch
-        consumption = state.get("consumption_kwh_100km", 0.0)
-        self.consumption_display.set_value(consumption)
+        # Verbrauch aktuell
+        consumption_now = state.get("consumption_kwh_100km", 0.0)
+        self.consumption_now_display.set_value(consumption_now)
+        
+        # Verbrauch Durchschnitt (Trip)
+        consumption_avg = state.get("consumption_trip_kwh_100km", 0.0)
+        self.consumption_avg_display.set_value(consumption_avg)
         
         # SOC
         soc = state.get("soc_pct", 0.0)
