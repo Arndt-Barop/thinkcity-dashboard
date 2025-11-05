@@ -294,29 +294,196 @@ class SettingsScreen(QWidget):
         return group
     
     def create_wifi_group(self):
-        """WLAN Settings."""
-        group = QGroupBox("WLAN")
+        """Network Settings (WLAN only)."""
+        group = QGroupBox("Network Settings")
         layout = QVBoxLayout()
         
-        # Home SSID
+        # === WLAN Configuration ===
+        wlan_label = QLabel("WLAN Konfiguration")
+        wlan_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 5px;")
+        layout.addWidget(wlan_label)
+        
+        # SSID
         ssid_layout = QHBoxLayout()
-        ssid_layout.addWidget(QLabel("Heim-WLAN SSID:"))
-        self.wifi_ssid = QLineEdit(self.settings["wifi_ssid"])
-        self.wifi_ssid.setPlaceholderText("z.B. MeinWLAN")
+        ssid_layout.addWidget(QLabel("SSID:"))
+        self.wifi_ssid = QLineEdit(self.settings.get("wifi_ssid", ""))
+        self.wifi_ssid.setPlaceholderText("WLAN Name")
         ssid_layout.addWidget(self.wifi_ssid)
         layout.addLayout(ssid_layout)
         
-        # Sync only on WLAN
-        self.wifi_only_checkbox = QCheckBox("Sync nur bei WLAN-Verbindung")
-        self.wifi_only_checkbox.setChecked(self.settings["sync_on_wifi_only"])
-        layout.addWidget(self.wifi_only_checkbox)
+        # Password with Show/Hide
+        pwd_layout = QHBoxLayout()
+        pwd_layout.addWidget(QLabel("Passwort:"))
+        self.wifi_password = QLineEdit()
+        self.wifi_password.setEchoMode(QLineEdit.Password)
+        self.wifi_password.setPlaceholderText("WLAN Passwort (wird verschlüsselt)")
+        pwd_layout.addWidget(self.wifi_password)
         
-        info = QLabel("Info: Sync erfolgt nur wenn mit diesem WLAN verbunden")
-        info.setStyleSheet("color: #95a5a6; font-size: 12px;")
-        layout.addWidget(info)
+        # Show/Hide Password Button
+        self.show_pwd_btn = QPushButton("Show")
+        self.show_pwd_btn.setMaximumWidth(60)
+        self.show_pwd_btn.setCheckable(True)
+        self.show_pwd_btn.clicked.connect(self.toggle_password_visibility)
+        pwd_layout.addWidget(self.show_pwd_btn)
+        layout.addLayout(pwd_layout)
+        
+        pwd_info = QLabel("Info: Passwort wird nicht in settings.json gespeichert, nur in NetworkManager")
+        pwd_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
+        pwd_info.setWordWrap(True)
+        layout.addWidget(pwd_info)
+        
+        # === IP Configuration ===
+        ip_label = QLabel("IP Konfiguration (nur WLAN)")
+        ip_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+        layout.addWidget(ip_label)
+        
+        # DHCP / Static
+        ip_mode_layout = QHBoxLayout()
+        ip_mode_layout.addWidget(QLabel("IP-Modus:"))
+        self.ip_mode = QComboBox()
+        self.ip_mode.addItems(["DHCP (automatisch)", "Static (manuell)"])
+        current_mode = self.settings.get("wlan_ip_mode", "dhcp")
+        self.ip_mode.setCurrentIndex(0 if current_mode == "dhcp" else 1)
+        self.ip_mode.currentIndexChanged.connect(self.on_ip_mode_changed)
+        ip_mode_layout.addWidget(self.ip_mode)
+        layout.addLayout(ip_mode_layout)
+        
+        # Static IP Fields Container
+        self.static_ip_container = QWidget()
+        static_layout = QVBoxLayout()
+        static_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # IP Address with CIDR
+        ip_layout = QHBoxLayout()
+        ip_layout.addWidget(QLabel("IP/CIDR:"))
+        self.wlan_ip = QLineEdit(self.settings.get("wlan_ip", "10.42.0.214/24"))
+        self.wlan_ip.setPlaceholderText("z.B. 192.168.1.100/24")
+        ip_layout.addWidget(self.wlan_ip)
+        static_layout.addLayout(ip_layout)
+        
+        # Gateway
+        gw_layout = QHBoxLayout()
+        gw_layout.addWidget(QLabel("Gateway:"))
+        self.wlan_gateway = QLineEdit(self.settings.get("wlan_gateway", "10.42.0.1"))
+        self.wlan_gateway.setPlaceholderText("z.B. 192.168.1.1")
+        gw_layout.addWidget(self.wlan_gateway)
+        static_layout.addLayout(gw_layout)
+        
+        # DNS1
+        dns1_layout = QHBoxLayout()
+        dns1_layout.addWidget(QLabel("DNS 1:"))
+        self.wlan_dns1 = QLineEdit(self.settings.get("wlan_dns1", "8.8.8.8"))
+        self.wlan_dns1.setPlaceholderText("z.B. 8.8.8.8")
+        dns1_layout.addWidget(self.wlan_dns1)
+        static_layout.addLayout(dns1_layout)
+        
+        # DNS2
+        dns2_layout = QHBoxLayout()
+        dns2_layout.addWidget(QLabel("DNS 2:"))
+        self.wlan_dns2 = QLineEdit(self.settings.get("wlan_dns2", "8.8.4.4"))
+        self.wlan_dns2.setPlaceholderText("z.B. 8.8.4.4 (optional)")
+        dns2_layout.addWidget(self.wlan_dns2)
+        static_layout.addLayout(dns2_layout)
+        
+        # NTP Server
+        ntp_layout = QHBoxLayout()
+        ntp_layout.addWidget(QLabel("NTP:"))
+        self.wlan_ntp = QLineEdit(self.settings.get("wlan_ntp", "pool.ntp.org"))
+        self.wlan_ntp.setPlaceholderText("z.B. pool.ntp.org (optional)")
+        ntp_layout.addWidget(self.wlan_ntp)
+        static_layout.addLayout(ntp_layout)
+        
+        self.static_ip_container.setLayout(static_layout)
+        layout.addWidget(self.static_ip_container)
+        
+        # Show/Hide static fields based on mode
+        self.on_ip_mode_changed(self.ip_mode.currentIndex())
+        
+        # === WLAN Status ===
+        status_label = QLabel("WLAN Status")
+        status_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+        layout.addWidget(status_label)
+        
+        self.wlan_status = QLabel("Status wird beim Öffnen geladen...")
+        self.wlan_status.setStyleSheet("color: #95a5a6; font-size: 12px;")
+        self.wlan_status.setWordWrap(True)
+        layout.addWidget(self.wlan_status)
+        
+        # Update status on opening
+        self.update_wlan_status()
+        
+        # === Sync Setting ===
+        self.wifi_only_checkbox = QCheckBox("NAS-Sync nur bei WLAN-Verbindung")
+        self.wifi_only_checkbox.setChecked(self.settings.get("sync_on_wifi_only", True))
+        self.wifi_only_checkbox.setStyleSheet("margin-top: 10px;")
+        layout.addWidget(self.wifi_only_checkbox)
         
         group.setLayout(layout)
         return group
+    
+    def toggle_password_visibility(self):
+        """Toggle WLAN password visibility."""
+        if self.show_pwd_btn.isChecked():
+            self.wifi_password.setEchoMode(QLineEdit.Normal)
+            self.show_pwd_btn.setText("Hide")
+        else:
+            self.wifi_password.setEchoMode(QLineEdit.Password)
+            self.show_pwd_btn.setText("Show")
+    
+    def toggle_nas_password_visibility(self):
+        """Toggle NAS password visibility."""
+        if self.show_nas_pwd_btn.isChecked():
+            self.nas_password.setEchoMode(QLineEdit.Normal)
+            self.show_nas_pwd_btn.setText("Hide")
+        else:
+            self.nas_password.setEchoMode(QLineEdit.Password)
+            self.show_nas_pwd_btn.setText("Show")
+    
+    def on_ip_mode_changed(self, index):
+        """Show/Hide static IP fields based on selection."""
+        self.static_ip_container.setVisible(index == 1)  # Show only for Static
+    
+    def update_wlan_status(self):
+        """Update WLAN connection status."""
+        import subprocess
+        try:
+            # Get WLAN device status
+            result = subprocess.run(
+                ["nmcli", "-t", "-f", "DEVICE,STATE,CONNECTION", "device", "status"],
+                capture_output=True, text=True, timeout=2
+            )
+            
+            status_text = "[X] WLAN nicht verbunden"
+            for line in result.stdout.strip().split("\n"):
+                parts = line.split(":")
+                if len(parts) >= 3 and parts[0] == "wlan0":
+                    state = parts[1]
+                    connection = parts[2]
+                    
+                    if state == "connected":
+                        # Get IP address
+                        ip_result = subprocess.run(
+                            ["nmcli", "-t", "-f", "IP4.ADDRESS", "device", "show", "wlan0"],
+                            capture_output=True, text=True, timeout=2
+                        )
+                        ip_addr = "N/A"
+                        for ip_line in ip_result.stdout.strip().split("\n"):
+                            if ip_line.startswith("IP4.ADDRESS"):
+                                ip_addr = ip_line.split(":")[1] if ":" in ip_line else "N/A"
+                                break
+                        
+                        status_text = f"[OK] Verbunden mit: {connection}\nIP: {ip_addr}"
+                    elif state == "disconnected":
+                        status_text = "[X] WLAN getrennt"
+                    else:
+                        status_text = f"[!] WLAN Status: {state}"
+                    break
+            
+            self.wlan_status.setText(status_text)
+            
+        except Exception as e:
+            self.wlan_status.setText(f"[!] Status konnte nicht geladen werden: {str(e)}")
+
     
     def create_nas_group(self):
         """NAS Sync Settings."""
@@ -351,6 +518,37 @@ class SettingsScreen(QWidget):
         self.nas_user.setPlaceholderText("NAS Benutzername")
         user_layout.addWidget(self.nas_user)
         layout.addLayout(user_layout)
+        
+        # NAS Password with Show/Hide
+        nas_pwd_layout = QHBoxLayout()
+        nas_pwd_layout.addWidget(QLabel("Passwort:"))
+        self.nas_password = QLineEdit()
+        self.nas_password.setEchoMode(QLineEdit.Password)
+        self.nas_password.setPlaceholderText("NAS Passwort (wird verschlüsselt)")
+        
+        # Load and decrypt existing password if available
+        from crypto_utils import get_crypto
+        encrypted_pwd = self.settings.get("nas_password_encrypted", "")
+        if encrypted_pwd:
+            try:
+                decrypted = get_crypto().decrypt(encrypted_pwd)
+                self.nas_password.setText(decrypted)
+            except:
+                pass  # Invalid encrypted password, keep empty
+        
+        nas_pwd_layout.addWidget(self.nas_password)
+        
+        # Show/Hide Password Button
+        self.show_nas_pwd_btn = QPushButton("Show")
+        self.show_nas_pwd_btn.setMaximumWidth(60)
+        self.show_nas_pwd_btn.setCheckable(True)
+        self.show_nas_pwd_btn.clicked.connect(self.toggle_nas_password_visibility)
+        nas_pwd_layout.addWidget(self.show_nas_pwd_btn)
+        layout.addLayout(nas_pwd_layout)
+        
+        nas_pwd_info = QLabel("Info: Passwort wird verschlüsselt in settings.json gespeichert")
+        nas_pwd_info.setStyleSheet("color: #95a5a6; font-size: 11px;")
+        layout.addWidget(nas_pwd_info)
         
         info = QLabel("Info: Datenbank wird nach jeder Fahrt automatisch synchronisiert")
         info.setStyleSheet("color: #95a5a6; font-size: 12px;")
@@ -481,10 +679,28 @@ class SettingsScreen(QWidget):
         self.settings["simulation_mode"] = self.sim_checkbox.isChecked()
         self.settings["wifi_ssid"] = self.wifi_ssid.text()
         self.settings["sync_on_wifi_only"] = self.wifi_only_checkbox.isChecked()
+        
+        # WLAN IP Configuration
+        self.settings["wlan_ip_mode"] = "dhcp" if self.ip_mode.currentIndex() == 0 else "static"
+        self.settings["wlan_ip"] = self.wlan_ip.text()
+        self.settings["wlan_gateway"] = self.wlan_gateway.text()
+        self.settings["wlan_dns1"] = self.wlan_dns1.text()
+        self.settings["wlan_dns2"] = self.wlan_dns2.text()
+        self.settings["wlan_ntp"] = self.wlan_ntp.text()
+        
         self.settings["nas_sync_enabled"] = self.nas_enable.isChecked()
         self.settings["nas_host"] = self.nas_host.text()
         self.settings["nas_path"] = self.nas_path.text()
         self.settings["nas_user"] = self.nas_user.text()
+        
+        # Encrypt and save NAS password
+        from crypto_utils import get_crypto
+        nas_pwd = self.nas_password.text().strip()
+        if nas_pwd:
+            self.settings["nas_password_encrypted"] = get_crypto().encrypt(nas_pwd)
+        else:
+            self.settings["nas_password_encrypted"] = ""
+        
         self.settings["db_path"] = self.db_path.text()
         
         # Logging Settings (logging ist immer aktiviert)
@@ -505,13 +721,87 @@ class SettingsScreen(QWidget):
             # Deaktiviere CAN-Simulation Service
             self._disable_can_simulation()
         
+        # Apply WLAN Configuration via NetworkManager
+        self._apply_wlan_config()
+        
         # Zeige Bestätigung
-        self.show_message("✅ Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.")
+        self.show_message("[OK] Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.")
+    
+    def _apply_wlan_config(self):
+        """Apply WLAN configuration via NetworkManager."""
+        import subprocess
+        
+        ssid = self.wifi_ssid.text().strip()
+        password = self.wifi_password.text().strip()
+        
+        if not ssid:
+            return  # No SSID, skip configuration
+        
+        try:
+            # Check if connection already exists
+            check_cmd = ["nmcli", "-t", "-f", "NAME", "connection", "show"]
+            result = subprocess.run(check_cmd, capture_output=True, text=True, timeout=5)
+            existing_connections = result.stdout.strip().split("\n")
+            
+            # Delete existing connection with same SSID
+            if ssid in existing_connections:
+                subprocess.run(["nmcli", "connection", "delete", ssid], timeout=5)
+            
+            # Build nmcli command
+            cmd = [
+                "nmcli", "connection", "add",
+                "type", "wifi",
+                "ifname", "wlan0",
+                "con-name", ssid,
+                "ssid", ssid
+            ]
+            
+            # Add password if provided
+            if password:
+                cmd.extend(["wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.psk", password])
+            
+            # Add IP configuration
+            if self.settings["wlan_ip_mode"] == "static":
+                ip_addr = self.wlan_ip.text().strip()
+                gateway = self.wlan_gateway.text().strip()
+                dns1 = self.wlan_dns1.text().strip()
+                dns2 = self.wlan_dns2.text().strip()
+                
+                cmd.extend([
+                    "ipv4.method", "manual",
+                    "ipv4.addresses", ip_addr,
+                    "ipv4.gateway", gateway
+                ])
+                
+                # Add DNS servers
+                dns_servers = dns1
+                if dns2:
+                    dns_servers += f",{dns2}"
+                cmd.extend(["ipv4.dns", dns_servers])
+            else:
+                cmd.extend(["ipv4.method", "auto"])
+            
+            # Create connection
+            subprocess.run(cmd, timeout=10, check=True)
+            
+            # Try to activate connection
+            subprocess.run(["nmcli", "connection", "up", ssid], timeout=15)
+            
+            # Update status display
+            from PyQt5.QtCore import QTimer
+            QTimer.singleShot(2000, self.update_wlan_status)
+            
+        except subprocess.TimeoutExpired:
+            self.show_message("[!] WLAN-Konfiguration: Zeitüberschreitung")
+        except subprocess.CalledProcessError as e:
+            self.show_message(f"[!] WLAN-Konfiguration fehlgeschlagen:\n{e}")
+        except Exception as e:
+            self.show_message(f"[!] Fehler bei WLAN-Konfiguration:\n{str(e)}")
     
     def on_cancel(self):
         """Verwerfe Änderungen."""
         self.settings = self.load_settings()
-        self.show_message("❌ Änderungen verworfen")
+        self.show_message("[X] Änderungen verworfen")
     
     def on_reboot(self):
         """System neu starten."""
