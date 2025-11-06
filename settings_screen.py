@@ -145,6 +145,10 @@ class SettingsScreen(QWidget):
         language_group = self.create_language_group()
         scroll_layout.addWidget(language_group)
         
+        # === Trip Computer ===
+        trip_group = self.create_trip_computer_group()
+        scroll_layout.addWidget(trip_group)
+        
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
         
@@ -720,6 +724,45 @@ class SettingsScreen(QWidget):
         group.setLayout(layout)
         return group
     
+    def create_trip_computer_group(self):
+        """Trip Computer Settings."""
+        t = self.translator.get
+        
+        group = QGroupBox(t("trip_computer"))
+        layout = QVBoxLayout()
+        
+        # Reset Button
+        reset_layout = QHBoxLayout()
+        reset_btn = QPushButton(t("reset_consumption"))
+        reset_btn.setMinimumHeight(50)
+        reset_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #c0392b;
+            }
+        """)
+        reset_btn.clicked.connect(self.on_reset_consumption)
+        reset_layout.addWidget(reset_btn)
+        layout.addLayout(reset_layout)
+        
+        # Info Text
+        info_label = QLabel(t("reset_consumption") + ": " + 
+                           ("Setzt den gespeicherten Durchschnittsverbrauch zurück" if t("language") == "DE" 
+                            else "Resets the stored average consumption"))
+        info_label.setWordWrap(True)
+        info_label.setStyleSheet("color: #888888; font-size: 11px;")
+        layout.addWidget(info_label)
+        
+        group.setLayout(layout)
+        return group
+    
     def on_save(self):
         """Speichere Einstellungen."""
         self.settings["can_interface"] = self.can_combo.currentText()
@@ -935,6 +978,29 @@ class SettingsScreen(QWidget):
         
         # Recreate UI
         self.init_ui()
+    
+    def on_reset_consumption(self):
+        """Reset average consumption with confirmation."""
+        from PyQt5.QtWidgets import QMessageBox
+        t = self.translator.get
+        
+        # Confirmation dialog
+        reply = QMessageBox.question(
+            self, 
+            t("trip_computer"),
+            t("reset_consumption_confirm"),
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            # Get trip computer instance from parent (dashboard)
+            parent = self.parent()
+            if parent and hasattr(parent, 'trip_computer'):
+                parent.trip_computer.reset_total_stats()
+                self.show_message(t("consumption_reset"))
+            else:
+                print("Warning: Could not access trip_computer from parent")
     
     def _enable_can_simulation(self):
         """Aktiviere und starte CAN-Simulation Service."""
