@@ -149,6 +149,10 @@ class SettingsScreen(QWidget):
         trip_group = self.create_trip_computer_group()
         scroll_layout.addWidget(trip_group)
         
+        # === Trace Replay ===
+        trace_group = self.create_trace_replay_group()
+        scroll_layout.addWidget(trace_group)
+        
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
         
@@ -763,6 +767,78 @@ class SettingsScreen(QWidget):
         group.setLayout(layout)
         return group
     
+    def create_trace_replay_group(self):
+        """Trace Replay Settings."""
+        t = self.translator.get
+        
+        group = QGroupBox(t("trace_replay"))
+        layout = QVBoxLayout()
+        
+        # Trace File Selection
+        trace_layout = QHBoxLayout()
+        trace_label = QLabel(t("select_trace") + ":")
+        trace_label.setMinimumWidth(150)
+        trace_layout.addWidget(trace_label)
+        
+        self.trace_combo = QComboBox()
+        self.trace_combo.setMinimumHeight(40)
+        self._scan_trace_files()
+        trace_layout.addWidget(self.trace_combo, stretch=1)
+        layout.addLayout(trace_layout)
+        
+        # Loop Playback Checkbox
+        self.loop_checkbox = QCheckBox(t("loop_playback"))
+        self.loop_checkbox.setChecked(self.settings.get("trace_loop", False))
+        layout.addWidget(self.loop_checkbox)
+        
+        # Autostart on Boot Checkbox
+        self.autostart_checkbox = QCheckBox(t("autostart_boot"))
+        self.autostart_checkbox.setChecked(self.settings.get("trace_autostart", False))
+        layout.addWidget(self.autostart_checkbox)
+        
+        # Info Text
+        info_label = QLabel(t("trace_info"))
+        info_label.setWordWrap(True)
+        info_label.setStyleSheet("color: #888888; font-size: 11px; margin-top: 10px;")
+        layout.addWidget(info_label)
+        
+        group.setLayout(layout)
+        return group
+    
+    def _scan_trace_files(self):
+        """Scannt das traces/ Verzeichnis nach .trc Dateien."""
+        import os
+        t = self.translator.get
+        
+        traces_dir = os.path.expanduser("~/thinkcity-dashboard-v3/traces")
+        self.trace_combo.clear()
+        
+        # "Keine Auswahl" Option
+        self.trace_combo.addItem(t("no_trace_selected"), "")
+        
+        if not os.path.exists(traces_dir):
+            self.trace_combo.addItem(t("no_traces_found"), "")
+            return
+        
+        # Finde alle .trc Dateien
+        trace_files = sorted([f for f in os.listdir(traces_dir) if f.endswith('.trc')])
+        
+        if not trace_files:
+            self.trace_combo.addItem(t("no_traces_found"), "")
+            return
+        
+        # Füge Trace-Dateien hinzu
+        for trace_file in trace_files:
+            full_path = os.path.join(traces_dir, trace_file)
+            self.trace_combo.addItem(trace_file, full_path)
+        
+        # Wähle gespeicherten Trace aus
+        saved_trace = self.settings.get("trace_file", "")
+        if saved_trace:
+            index = self.trace_combo.findData(saved_trace)
+            if index >= 0:
+                self.trace_combo.setCurrentIndex(index)
+    
     def on_save(self):
         """Speichere Einstellungen."""
         self.settings["can_interface"] = self.can_combo.currentText()
@@ -805,6 +881,12 @@ class SettingsScreen(QWidget):
             field_name for field_name, checkbox in self.field_checkboxes.items()
             if checkbox.isChecked()
         ]
+        
+        # Trace Replay Settings
+        selected_trace_data = self.trace_combo.currentData()
+        self.settings["trace_file"] = selected_trace_data if selected_trace_data else ""
+        self.settings["trace_loop"] = self.loop_checkbox.isChecked()
+        self.settings["trace_autostart"] = self.autostart_checkbox.isChecked()
         
         self.save_settings()
         
