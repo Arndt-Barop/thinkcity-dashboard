@@ -762,7 +762,7 @@ thinkcity-dashboard-v3/    id INTEGER PRIMARY KEY,
 
 ├── README.md                      # This file (English)
 
-├── README_DE.md                   # German versionSiehe [SIMULATION-VS-REAL.md](SIMULATION-VS-REAL.md) für Details.    drive_id INTEGER,
+├── README_DE.md                   # German version    drive_id INTEGER,
 
 ├── setup.sh                       # Installation script
 
@@ -910,7 +910,6 @@ python3 tools/can_replay.py traces/entladen_91.log vcan0 50.0 --loop
 
 # Start dashboard
 
-TC_CAN_CHANNEL=vcan0 python3 dashboard.py    ├── SIMULATION-VS-REAL.md      # CAN-Modus Umschaltung
 
 ```
 
@@ -928,7 +927,6 @@ python3 -m pytest tests/```TC_INFLUX_TOKEN=mein-token
 
 # UI without CAN busTC_INFLUX_ORG=home
 
-python3 dashboard.py --demo
 
 ```---TC_INFLUX_BUCKET=thinkcity
 
@@ -1263,7 +1261,6 @@ python3 -m pytest tests/    ├── test_can_decoder.py        # Unit-Tests
 
 # UI ohne CAN-Bus```
 
-python3 dashboard.py --demo
 
 ```---
 

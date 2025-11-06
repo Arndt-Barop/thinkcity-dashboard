@@ -380,7 +380,7 @@ python3 can_replay.py ../traces/entladen_91.log vcan0 50.0 --loop-- samples: Det
 
     id INTEGER PRIMARY KEY,
 
-Siehe [SIMULATION-VS-REAL.md](SIMULATION-VS-REAL.md) für Details.    drive_id INTEGER,
+    drive_id INTEGER,
 
     timestamp TEXT,
 
@@ -454,7 +454,6 @@ thinkcity-dashboard-v3/    pack_temp REAL,
 
 └── docs/TC_MQTT_TOPIC=thinkcity
 
-    ├── SIMULATION-VS-REAL.md      # CAN-Modus Umschaltung
 
     ├── CAN_REFERENCE.md           # CAN-ID Dokumentation# InfluxDB (optional)
 
@@ -752,7 +751,6 @@ python3 -m pytest tests/    ├── test_can_decoder.py        # Unit-Tests
 
 # UI ohne CAN-Bus```
 
-python3 dashboard.py --demo
 
 ```---
 
