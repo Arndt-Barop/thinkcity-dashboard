@@ -896,13 +896,13 @@ class SettingsScreen(QWidget):
             # Reload UI with new language
             self.reload_ui()
         
-        # Handle CAN-Simulation Service
-        if self.settings["simulation_mode"]:
-            # Aktiviere und starte CAN-Simulation Service
-            self._enable_can_simulation()
+        # Handle Trace Replay Service
+        if self.settings.get("trace_autostart", False) and self.settings.get("trace_file"):
+            # Aktiviere und starte Trace Replay Service
+            self._enable_trace_replay()
         else:
-            # Deaktiviere CAN-Simulation Service
-            self._disable_can_simulation()
+            # Deaktiviere Trace Replay Service
+            self._disable_trace_replay()
         
         # Apply WLAN Configuration via NetworkManager
         self._apply_wlan_config()
@@ -1084,27 +1084,27 @@ class SettingsScreen(QWidget):
             else:
                 print("Warning: Could not access trip_computer from parent")
     
-    def _enable_can_simulation(self):
-        """Aktiviere und starte CAN-Simulation Service."""
+    def _enable_trace_replay(self):
+        """Aktiviere und starte Trace Replay Service."""
         import subprocess
         try:
             # Enable Service
-            subprocess.run(['sudo', 'systemctl', 'enable', 'can-simulation'], check=True)
-            print("✓ CAN-Simulation Service aktiviert")
+            subprocess.run(['sudo', 'systemctl', 'enable', 'can-trace-replay'], check=True)
+            print("✓ Trace Replay Service aktiviert")
         except subprocess.CalledProcessError as e:
-            print(f"✗ Fehler beim Aktivieren: {e}")
+            print(f"✗ Fehler beim Aktivieren des Trace Replay Service: {e}")
     
-    def _disable_can_simulation(self):
-        """Deaktiviere CAN-Simulation Service."""
+    def _disable_trace_replay(self):
+        """Deaktiviere Trace Replay Service."""
         import subprocess
         try:
             # Disable Service
-            subprocess.run(['sudo', 'systemctl', 'disable', 'can-simulation'], check=True)
+            subprocess.run(['sudo', 'systemctl', 'disable', 'can-trace-replay'], check=True)
             # Stop Service (falls läuft)
-            subprocess.run(['sudo', 'systemctl', 'stop', 'can-simulation'], check=False)
-            print("✓ CAN-Simulation Service deaktiviert")
+            subprocess.run(['sudo', 'systemctl', 'stop', 'can-trace-replay'], check=False)
+            print("✓ Trace Replay Service deaktiviert")
         except subprocess.CalledProcessError as e:
-            print(f"✗ Fehler beim Deaktivieren: {e}")
+            print(f"✗ Fehler beim Deaktivieren des Trace Replay Service: {e}")
 
 
 # Test-Programm

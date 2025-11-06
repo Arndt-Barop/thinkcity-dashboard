@@ -1,0 +1,15 @@
+[Unit]
+Description=PCAN Trace Replay Service
+After=network.target systemd-modules-load.service
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/thinkcity-dashboard-v3
+# Setup vcan0 and replay trace
+ExecStart=/bin/bash -c '/home/pi/thinkcity-dashboard-v3/tools/setup_vcan0.sh && /usr/bin/python3 /home/pi/thinkcity-dashboard-v3/trace_player.py $(cat /home/pi/thinkcity-dashboard-v3/config.json | grep -o "\"trace_file\": *\"[^\"]*\"" | cut -d\" -f4) --loop'
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
