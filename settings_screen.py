@@ -790,6 +790,15 @@ class SettingsScreen(QWidget):
         self.loop_checkbox = QCheckBox(t("loop_playback"))
         self.loop_checkbox.setChecked(self.settings.get("trace_loop", False))
         layout.addWidget(self.loop_checkbox)
+                # Start/Pause/Stop Buttons
+        self.trace_start_btn = QPushButton("Start")
+        self.trace_pause_btn = QPushButton("Pause")
+        self.trace_stop_btn = QPushButton("Stop")
+        self.trace_status_label = QLabel("Status: Stopped")
+        layout.addWidget(self.trace_start_btn)
+        layout.addWidget(self.trace_pause_btn)
+        layout.addWidget(self.trace_stop_btn)
+        layout.addWidget(self.trace_status_label)
         
         # Info text
         info_label = QLabel(t("trace_info"))
