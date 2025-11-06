@@ -62,7 +62,7 @@ class ThinkCityDashboard(QWidget):
         self.db_manager = DBManager()
         self.trip_computer = TripComputer(db_manager=self.db_manager)
         
-        # Odometer-Simulation (wird später aus Geschwindigkeit integriert)
+        # Odometer (wird aus Geschwindigkeit integriert)
         self.odo_km = 0.0
         self.last_speed_update = datetime.now()
         
