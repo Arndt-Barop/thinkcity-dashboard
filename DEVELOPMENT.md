@@ -7,8 +7,8 @@ Das Dashboard enthält einen **Settings-Screen** (⚙️ Button in der Navigatio
 ### Funktionen
 
 **CAN-Interface:**
-- Auswahl zwischen `can0` (Hardware) und `vcan0` (Simulation)
-- Automatischer Start der Simulation beim Boot (nur für vcan0)
+- Auswahl zwischen `can0` (Hardware) und `vcan0` (Virtual CAN for testing)
+- Automatischer Start des CAN-Trace-Replays beim Boot (nur für vcan0)
 
 **WLAN:**
 - Heim-WLAN SSID konfigurieren
@@ -68,9 +68,9 @@ Dies erlaubt dem `pi`-User passwortloses shutdown/reboot.
 
 ---
 
-## 🎬 CAN-Simulation
+## 🎬 CAN Trace Replay
 
-Für Entwicklung und Tests ohne echtes Fahrzeug.
+For development and testing without a real vehicle. Replays recorded CAN traces on vcan0.
 
 ### Installation
 
@@ -84,7 +84,7 @@ chmod +x install_dev_features.sh
 **Option 1: Über Settings-Screen (empfohlen)**
 1. Settings-Screen öffnen (⚙️)
 2. CAN-Interface: `vcan0` wählen
-3. "Simulation beim Boot starten" aktivieren
+3. "Trace-Replay beim Boot starten" aktivieren
 4. Speichern & System neu starten
 
 **Option 2: Manuell**
@@ -266,14 +266,14 @@ sudo systemctl restart thinkcity-dashboard
 
 ### Schneller Workflow
 
-1. **Simulation aktivieren** für Tests ohne Auto
+1. **Trace-Replay aktivieren** für Tests ohne Auto
 2. **Settings-Screen** nutzen für schnelle Änderungen
 3. **Logs überwachen**:
    ```bash
    # Dashboard:
    journalctl -u thinkcity-dashboard -f
    
-   # Simulation:
+   # Trace-Replay:
    journalctl -u can-simulation -f
    
    # NAS Sync:
