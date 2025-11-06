@@ -687,6 +687,24 @@ TRANSLATIONS = {
         "EN": "English"
     },
     
+    # Trip Computer Reset
+    "trip_computer": {
+        "DE": "Bordcomputer",
+        "EN": "Trip Computer"
+    },
+    "reset_consumption": {
+        "DE": "Ø Verbrauch zurücksetzen",
+        "EN": "Reset Avg Consumption"
+    },
+    "reset_consumption_confirm": {
+        "DE": "Durchschnittlichen Verbrauch wirklich zurücksetzen?\n\nAlle gespeicherten Statistiken gehen verloren!",
+        "EN": "Really reset average consumption?\n\nAll saved statistics will be lost!"
+    },
+    "consumption_reset": {
+        "DE": "[OK] Verbrauchsdaten zurückgesetzt",
+        "EN": "[OK] Consumption data reset"
+    },
+    
     # Messages
     "settings_saved": {
         "DE": "[OK] Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.",
