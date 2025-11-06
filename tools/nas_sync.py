@@ -142,7 +142,7 @@ def cleanup_old_backups(config, keep=10):
         if result.returncode == 0:
             files = result.stdout.strip().split('\n')
             
-            # Lösche alte (behalte neueste 'keep')
+            # Delete old (keep newest 'keep')
             if len(files) > keep:
                 to_delete = files[keep:]
                 for file in to_delete:
@@ -163,12 +163,12 @@ def main():
         log("❌ Keine Konfiguration gefunden")
         return 1
     
-    # Prüfe ob Sync aktiviert
+    # Check if sync enabled
     if not config.get('nas_sync_enabled', False):
         log("ℹ️ NAS Sync ist deaktiviert")
         return 0
     
-    # Prüfe WLAN (optional)
+    # Check WLAN (optional)
     if config.get('sync_on_wifi_only', True):
         wifi_ssid = config.get('wifi_ssid', '')
         if not wifi_ssid:
@@ -179,7 +179,7 @@ def main():
             log(f"ℹ️ Nicht mit {wifi_ssid} verbunden, überspringe Sync")
             return 0
     
-    # Prüfe NAS Erreichbarkeit
+    # Check NAS reachability
     nas_host = config.get('nas_host', '')
     if not nas_host:
         log("❌ Kein NAS Host konfiguriert")

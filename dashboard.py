@@ -1,5 +1,5 @@
 # dashboard.py
-# Haupt-Dashboard-Anwendung für ThinkCity
+# Main dashboard application for ThinkCity
 
 import sys
 import os
@@ -112,7 +112,7 @@ class ThinkCityDashboard(QWidget):
         """Erstellt UI-Layout."""
         self.setWindowTitle("ThinkCity Dashboard v3")
         
-        # Fullscreen für Pi
+        # Fullscreen for Pi
         if os.getenv("TC_FULLSCREEN", "1") == "1":
             self.setGeometry(0, 0, 1280, 800)  # Force size before fullscreen (linuxfb fix)
             self.showFullScreen()
@@ -127,7 +127,7 @@ class ThinkCityDashboard(QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
-        # Stacked Widget für Screens
+        # Stacked Widget for screens
         self.screen_stack = QStackedWidget()
         
         self.main_screen = MainScreen()
@@ -195,14 +195,14 @@ class ThinkCityDashboard(QWidget):
             logger.error("Failed to connect to CAN bus")
             self.can_interface = None
         else:
-            # Prüfe ob vcan (virtuelle CAN für Tests)
+            # Check if vcan (virtual CAN for tests)
             logger.info(f"Connected to {channel}")
     
     def _is_wifi_connected(self):
         """Prüft ob WLAN verbunden ist."""
         import subprocess
         try:
-            # Prüfe ob wlan0 eine IP hat
+            # Check if wlan0 eine IP hat
             result = subprocess.run(
                 ["ip", "addr", "show", "wlan0"],
                 capture_output=True,
@@ -293,7 +293,7 @@ class ThinkCityDashboard(QWidget):
     
     def _log_sample(self):
         """Loggt Sample in DB (konfigurierbares Intervall)."""
-        # Prüfe ob Logging aktiviert
+        # Check if logging aktiviert
         if not self.config.get("logging_enabled", True):
             return
         
@@ -305,7 +305,7 @@ class ThinkCityDashboard(QWidget):
         selected_fields = self.config.get("logging_fields", [])
         
         if selected_fields:
-            # Nur ausgewählte Felder loggen
+            # Only log selected fields
             filtered_data = {
                 key: value for key, value in self.state.items()
                 if key in selected_fields or key == "odo_km"  # odo_km immer dabei
@@ -328,7 +328,7 @@ class ThinkCityDashboard(QWidget):
         # Config aktualisieren
         self.config.update(new_config)
         
-        # Prüfe ob Sprache geändert wurde
+        # Check if language changed wurde
         if "language" in new_config:
             logger.info(f"Language changed to {new_config['language']}")
             self.translator.set_language(new_config['language'])
@@ -381,7 +381,7 @@ class ThinkCityDashboard(QWidget):
         self.btn_charge.setText(t("charge"))
         self.btn_raw.setText(t("raw"))
         
-        # Zurück zum vorherigen Screen
+        # Return to previous screen
         self.screen_stack.setCurrentIndex(current_index)
         
         logger.info("All screens reloaded successfully")
@@ -393,7 +393,7 @@ class ThinkCityDashboard(QWidget):
         # Trip-Computer Statistiken speichern
         self.trip_computer.shutdown()
         
-        # CAN-Bus schließen
+        # Close CAN bus
         if self.can_interface:
             self.can_interface.shutdown()
         
@@ -406,7 +406,7 @@ class ThinkCityDashboard(QWidget):
                 avg_consumption_kwh_100km=self.trip_computer.consumption_trip_kwh_100km
             )
         
-        # DB schließen
+        # Close DB
         self.db_manager.vacuum()
         
         event.accept()

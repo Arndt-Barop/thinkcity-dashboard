@@ -104,7 +104,7 @@ class DBManager:
                 )
             """)
             
-            # Migration: Füge neue Spalten hinzu falls nicht vorhanden
+            # Migration: Add new columns if not present
             cursor.execute("PRAGMA table_info(samples)")
             columns = [col[1] for col in cursor.fetchall()]
             
@@ -124,7 +124,7 @@ class DBManager:
                 cursor.execute("ALTER TABLE samples ADD COLUMN total_count INTEGER")
                 logger.info("Added total_count column to samples table")
             
-            # Index für schnellere Queries
+            # Index for faster queries
             cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_samples_trip 
                 ON samples(trip_id)
@@ -230,7 +230,7 @@ class DBManager:
             self.current_trip_id = None
             self.last_sample_time = None
         
-        # Cleanup alte Trips (nur gesyncte, älter als 90 Tage)
+        # Cleanup old trips (only synced, older than 90 days)
         self.cleanup_old_trips(days=90)
     
     def add_sample(self, data: Dict[str, Any]):
@@ -264,7 +264,7 @@ class DBManager:
                 )
                 return  # Kein Sample bei Idle
         
-        # Sample einfügen (nur bei aktivem Trip)
+        # Insert sample (only with active trip)
         if self.current_trip_id is not None:
             with self._get_conn() as conn:
                 cursor = conn.cursor()
@@ -340,7 +340,7 @@ class DBManager:
     
     def get_latest_total_stats(self) -> Optional[Dict[str, Any]]:
         """
-        Holt die neuesten Total-Statistiken aus der DB.
+        Holt die neuesten Total-statistics aus der DB.
         Wird beim Start verwendet um Remanenz zu gewährleisten.
         """
         with self._get_conn() as conn:
@@ -366,7 +366,7 @@ class DBManager:
             return None
     
     def get_lifetime_stats(self) -> Dict[str, Any]:
-        """Berechnet Lifetime-Statistiken."""
+        """Berechnet Lifetime-statistics."""
         with self._get_conn() as conn:
             cursor = conn.cursor()
             
@@ -406,7 +406,7 @@ class DBManager:
         with self._get_conn() as conn:
             cursor = conn.cursor()
             
-            # Zähle betroffene Einträge
+            # Count affected entries
             cursor.execute("""
                 SELECT COUNT(*) FROM trips 
                 WHERE synced = 1 AND end_time < ?
@@ -421,7 +421,7 @@ class DBManager:
             """, (cutoff.isoformat(),))
             samples_count = cursor.fetchone()[0]
             
-            # Lösche Samples zuerst (Foreign Key)
+            # Delete samples first (Foreign Key)
             cursor.execute("""
                 DELETE FROM samples WHERE trip_id IN (
                     SELECT trip_id FROM trips 
@@ -429,7 +429,7 @@ class DBManager:
                 )
             """, (cutoff.isoformat(),))
             
-            # Lösche Trips
+            # Delete trips
             cursor.execute("""
                 DELETE FROM trips 
                 WHERE synced = 1 AND end_time < ?

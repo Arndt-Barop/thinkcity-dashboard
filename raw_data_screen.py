@@ -60,7 +60,7 @@ class RawDataScreen(QWidget):
         self.last_frames = {}  # {can_id: (timestamp, data, count)}
         self._init_ui()
         
-        # Update-Timer für Statistik
+        # Update timer for statistics
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self._update_stats)
         self.update_timer.start(1000)  # Jede Sekunde
@@ -84,10 +84,10 @@ class RawDataScreen(QWidget):
         title.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(title)
         
-        # ====== Splitter (obere/untere Hälfte) ======
+        # ====== Splitter (upper/lower half) ======
         splitter = QSplitter(Qt.Vertical)
         
-        # --- Obere Hälfte: Live-Traffic Terminal ---
+        # --- Upper half: Live traffic terminal ---
         terminal_container = QWidget()
         terminal_layout = QVBoxLayout()
         terminal_layout.setContentsMargins(0, 0, 0, 0)
@@ -146,7 +146,7 @@ class RawDataScreen(QWidget):
         terminal_container.setLayout(terminal_layout)
         splitter.addWidget(terminal_container)
         
-        # --- Untere Hälfte: CAN-ID Tabelle ---
+        # --- Lower half: CAN-ID table ---
         table_container = QWidget()
         table_layout = QVBoxLayout()
         table_layout.setContentsMargins(0, 0, 0, 0)
@@ -206,7 +206,7 @@ class RawDataScreen(QWidget):
         header.setSectionResizeMode(3, QHeaderView.Stretch)
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
         
-        # Tabelle füllen
+        # Fill table
         self._populate_id_table()
         
         table_layout.addWidget(self.id_table)
@@ -214,7 +214,7 @@ class RawDataScreen(QWidget):
         table_container.setLayout(table_layout)
         splitter.addWidget(table_container)
         
-        # Splitter-Verhältnis (60% Terminal, 40% Tabelle)
+        # Splitter ratio (60% terminal, 40% table)
         splitter.setStretchFactor(0, 60)
         splitter.setStretchFactor(1, 40)
         
@@ -292,12 +292,12 @@ class RawDataScreen(QWidget):
         time_str = timestamp.strftime("%H:%M:%S.%f")[:-3]
         line = f"{time_str}  0x{can_id:03X}{name:<30}  [{len(data)}]  {data_hex}\n"
         
-        # Zum Terminal hinzufügen
+        # Add to terminal
         self.terminal.moveCursor(QTextCursor.End)
         self.terminal.insertPlainText(line)
         self.terminal.moveCursor(QTextCursor.End)
         
-        # Tabelle aktualisieren (nur für bekannte IDs)
+        # Update table (only for known IDs)
         self._update_id_table_row(can_id, timestamp)
     
     def _update_id_table_row(self, can_id, timestamp):
@@ -335,7 +335,7 @@ class RawDataScreen(QWidget):
         Hinweis: CAN-Frames werden direkt via add_can_frame() hinzugefügt,
         nicht über update(). Diese Methode existiert für Konsistenz.
         """
-        # Status-Bar (kompletter State für Fehlerprüfung)
+        # Status bar (complete state for error checking)
         self.status_bar.set_state(state)
         ambient_temp = state.get("pcu_ambient_temp_C")
         if ambient_temp is not None:
@@ -361,7 +361,7 @@ if __name__ == "__main__":
         data = bytes([random.randint(0, 255) for _ in range(8)])
         screen.add_can_frame(can_id, data)
     
-    # Timer für Test-Frames
+    # Timer for test frames
     test_timer = QTimer()
     test_timer.timeout.connect(generate_test_frames)
     test_timer.start(100)  # 10 fps

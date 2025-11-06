@@ -1,7 +1,7 @@
 # trip_computer.py
 # Berechnung von Range, Consumption, Trip-Statistiken
-# Verbesserte Version mit Welford-Algorithmus und Kalibrierung
-# Speichert Statistiken persistent in Datenbank (Remanenz bei hartem Abschalten)
+# Verbesserte Version with Welford-Algorithmus und Kalibrierung
+# memoryt Statistiken persistent in Datenbank (Remanenz at hartem Abschalten)
 
 import os
 import time
@@ -9,17 +9,17 @@ from typing import Optional, Dict, Any
 
 class TripComputer:
     """
-    Berechnet Reichweite, Verbrauch und Trip-Statistiken.
+    Calculates range, consumption und Trip-Statistiken.
     Basiert auf Original-BASIC-Code, aber erweitert.
-    Speichert Gesamt-Durchschnitt persistent in Datenbank.
+    memoryt Gesamt-Durchschnitt persistent in Datenbank.
     """
     
     def __init__(self, db_manager=None):
-        # Kalibrierbare Parameter (aus Umgebungsvariablen oder Defaults)
+        # Kalibrierbare Parameter (from Umgebungsvariablen oder Defaults)
         # WICHTIG: Degradierte Batterie - realistisch 17 kWh nutzbar (statt 24 kWh neu)
         self.battery_capacity_kwh = float(os.environ.get("TC_BATTERY_CAPACITY_KWH", "17.0"))
         self.default_consumption_wh_km = float(os.environ.get("TC_DEFAULT_CONSUMPTION_WH_KM", "150.0"))
-        # Maximale Reichweite (Sicherheitsbegrenzung für degradierte Batterie)
+        # Maximum range (safety limit for degraded battery)
         self.max_range_km = float(os.environ.get("TC_MAX_RANGE_KM", "100.0"))
         
         self.db_manager = db_manager
@@ -31,16 +31,16 @@ class TripComputer:
         self.trip_energy_kwh = 0.0
         self.trip_start_soc = None
         
-        # Gesamt-Daten (über alle Trips) - wird aus DB geladen
+        # Total data (across all trips) - loaded from DB
         self.total_count = 0
         self.total_avg_consumption = 0.0
         self.total_distance_km = 0.0
         self.total_energy_kwh = 0.0
         
-        # Lade gespeicherte Statistiken aus Datenbank
+        # Load saved Statistiken from Datenbank
         self._load_stats()
         
-        # Für Distanz-Berechnung (Integration)
+        # For distance calculation (integration)
         self.last_speed_kmh = 0.0
         self.last_time = time.time()
         
@@ -49,10 +49,10 @@ class TripComputer:
         self.consumption_now_kwh_100km = 0.0
     
     def _load_stats(self):
-        """Lädt gespeicherte Gesamt-Statistiken aus der Datenbank (Remanenz)."""
+        """Lädt gespeicherte Gesamt-Statistiken from der Datenbank (Remanenz)."""
         loaded = False
         
-        # Lade aus Datenbank (Hauptquelle für Remanenz bei hartem Abschalten)
+        # Load from database (main source for remanence on hard shutdown)
         if self.db_manager:
             try:
                 stats = self.db_manager.get_latest_total_stats()
@@ -71,8 +71,8 @@ class TripComputer:
     
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Aktualisiert Trip-Computer mit neuem Zustand.
-        Gibt erweiterten State mit Range/Consumption zurück.
+        Aktualisiert Trip-Computer with neuem Zustand.
+        Gibt erweiterten State with Range/Consumption zurück.
         """
         speed_kmh = state.get("speed_kmh", 0.0)
         power_kw = state.get("power_kW", 0.0)
@@ -89,17 +89,17 @@ class TripComputer:
             self.trip_distance_km += delta_distance_km
             self.total_distance_km += delta_distance_km
             
-            # Energie-Inkrement (nur bei Verbrauch, nicht Rekuperation)
+            # Energie-Inkrement (only at consumption, nicht Rekuperation)
             if power_kw > 0:
                 delta_energy_kwh = power_kw * delta_time_h
                 self.trip_energy_kwh += delta_energy_kwh
                 self.total_energy_kwh += delta_energy_kwh
         
-        # Aktueller Verbrauch (nur bei Fahrt > 2 km/h)
+        # Aktueller consumption (only at Fahrt > 2 km/h)
         if speed_kmh > 2.0:
             self.consumption_now_wh_km = (power_kw * 1000.0) / speed_kmh
             
-            # Welford-Algorithmus für stabilen Durchschnitt (nur positive Werte)
+            # Welford algorithm for stable average (only positive values)
             if power_kw > 0:
                 self.trip_count += 1
                 self.trip_avg_consumption += (self.consumption_now_wh_km - self.trip_avg_consumption) / self.trip_count
@@ -120,21 +120,21 @@ class TripComputer:
         state["consumption_trip_wh_km"] = self.trip_avg_consumption
         state["consumption_total_wh_km"] = self.total_avg_consumption
         state["consumption_now_kwh_100km"] = self.consumption_now_kwh_100km
-        state["consumption_kwh_100km"] = self.consumption_now_kwh_100km  # Alias für Main-Screen
+        state["consumption_kwh_100km"] = self.consumption_now_kwh_100km  # Alias for main screen
         state["consumption_trip_kwh_100km"] = self.total_avg_consumption / 10.0  # Zeige TOTAL statt TRIP
         state["consumption_total_kwh_100km"] = self.total_avg_consumption / 10.0
         state["range_km"] = range_km
         state["trip_distance_km"] = self.trip_distance_km
         state["trip_energy_kwh"] = self.trip_energy_kwh
-        # Für DB-Speicherung
+        # For DB storage
         state["total_distance_km"] = self.total_distance_km
         state["total_energy_kwh"] = self.total_energy_kwh
         state["total_count"] = self.total_count
         
         # Daten werden automatisch in DB gespeichert durch dashboard.py _log_sample()
-        # Kein separates Speichern mehr nötig (Remanenz durch DB garantiert)
+        # No separate storage needed anymore (remanence guaranteed by DB)
         
-        # Aktualisiere für nächste Iteration
+        # Update for next iteration
         self.last_speed_kmh = speed_kmh
         self.last_time = current_time
         
@@ -142,13 +142,13 @@ class TripComputer:
     
     def calculate_range(self, soc_pct: float) -> float:
         """
-        Berechnet verbleibende Reichweite in km.
+        Calculates verbleibende Reichweite in km.
         
         Range = (SOC/100) × Kapazität × 1000 / Durchschnittsverbrauch
         Begrenzt auf max_range_km (100km für degradierte Batterie)
         """
-        # Nutze Trip-Durchschnitt falls vorhanden, sonst Default
-        if self.trip_count > 10:  # Min. 10 Messungen für Validität
+        # Nutze Trip-Durchschnitt if vorhanden, sonst Default
+        if self.trip_count > 10:  # Min. 10 measurements for validity
             avg_consumption = self.trip_avg_consumption
         elif self.total_count > 10:
             avg_consumption = self.total_avg_consumption
@@ -176,16 +176,16 @@ class TripComputer:
         self.trip_start_soc = None
     
     def reset_total_stats(self):
-        """Setzt Gesamt-Statistiken zurück (durchschnittlicher Verbrauch)."""
+        """Setzt Gesamt-Statistiken zurück (durchschnittlicher consumption)."""
         self.total_count = 0
         self.total_avg_consumption = 0.0
         self.total_distance_km = 0.0
         self.total_energy_kwh = 0.0
-        # Werte werden im nächsten DB-Sample-Write auf 0 gespeichert
+        # Values will be stored as 0 in next DB sample write
         print("Total trip statistics reset")
     
     def start_trip(self, soc_pct: float):
-        """Startet neuen Trip (z.B. bei Zündung an)."""
+        """Startet neuen Trip (z.B. at Zündung an)."""
         self.reset_trip()
         self.trip_start_soc = soc_pct
     
@@ -224,5 +224,5 @@ class TripComputer:
         }
     
     def shutdown(self):
-        """Cleanup beim Herunterfahren (DB-Speicherung erfolgt automatisch)."""
+        """Cleanup atm Herunterfahren (DB-memoryung erfolgt automatisch)."""
         print("TripComputer shutdown - statistics persisted in database")

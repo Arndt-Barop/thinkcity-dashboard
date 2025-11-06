@@ -1,5 +1,5 @@
 # settings_screen.py
-# Settings-Screen für grundlegende Konfiguration
+# Settings screen for basic configuration
 
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QGroupBox, QCheckBox, QLineEdit,
@@ -98,7 +98,7 @@ class SettingsScreen(QWidget):
         title_layout.addWidget(title)
         main_layout.addLayout(title_layout)
         
-        # Scroll-Bereich für Settings
+        # Scroll area for settings
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet("""
@@ -156,16 +156,16 @@ class SettingsScreen(QWidget):
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
         
-        # Layout mit Scroll-Area links und Buttons rechts
+        # Layout with scroll area left und Buttons rechts
         content_layout = QHBoxLayout()
         content_layout.addWidget(scroll, stretch=1)
         
-        # Button-Spalte rechts
+        # Button column right
         button_column = QVBoxLayout()
         button_column.setSpacing(15)
         button_column.setContentsMargins(10, 0, 0, 0)
         
-        # Speichern Button
+        # Save button
         save_btn = QPushButton(t("save"))
         save_btn.setFont(QFont("Arial", 18, QFont.Bold))
         save_btn.setMinimumSize(150, 100)
@@ -183,7 +183,7 @@ class SettingsScreen(QWidget):
         """)
         button_column.addWidget(save_btn)
         
-        # Abbrechen Button
+        # Cancel button
         cancel_btn = QPushButton(t("cancel"))
         cancel_btn.setFont(QFont("Arial", 18, QFont.Bold))
         cancel_btn.setMinimumSize(150, 100)
@@ -241,7 +241,7 @@ class SettingsScreen(QWidget):
         
         content_layout.addLayout(button_column)
         
-        # Content-Layout zum Haupt-Layout hinzufügen
+        # Add content layout to main layout
         main_layout.addLayout(content_layout)
         
         self.setStyleSheet("""
@@ -644,12 +644,12 @@ class SettingsScreen(QWidget):
         fields_label.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
         layout.addWidget(fields_label)
         
-        # Dauerhaft aktive Felder (nicht abwählbar)
+        # Permanently active fields (not deselectable)
         permanent_label = QLabel(t("avg_consumption_permanent"))
         permanent_label.setStyleSheet("font-size: 12px; color: #95a5a6; font-style: italic; margin-left: 5px;")
         layout.addWidget(permanent_label)
         
-        # Alle verfügbaren Felder
+        # All available fields
         available_fields = {
             "speed_kmh": t("field_speed"),
             "soc_pct": t("field_soc"),
@@ -665,7 +665,7 @@ class SettingsScreen(QWidget):
             "longitude": t("field_longitude")
         }
         
-        # Grid für Checkboxen (2 Spalten)
+        # Grid for checkboxes (2 columns)
         fields_grid = QGridLayout()
         fields_grid.setSpacing(5)
         
@@ -687,7 +687,7 @@ class SettingsScreen(QWidget):
         
         layout.addLayout(fields_grid)
         
-        # Buttons für alle/keine
+        # Buttons for all/none
         select_layout = QHBoxLayout()
         
         select_all_btn = QPushButton(t("select_all"))
@@ -756,7 +756,7 @@ class SettingsScreen(QWidget):
         reset_layout.addWidget(reset_btn)
         layout.addLayout(reset_layout)
         
-        # Info Text
+        # Info text
         info_label = QLabel(t("reset_consumption") + ": " + 
                            ("Setzt den gespeicherten Durchschnittsverbrauch zurück" if t("language") == "DE" 
                             else "Resets the stored average consumption"))
@@ -796,7 +796,7 @@ class SettingsScreen(QWidget):
         self.autostart_checkbox.setChecked(self.settings.get("trace_autostart", False))
         layout.addWidget(self.autostart_checkbox)
         
-        # Info Text
+        # Info text
         info_label = QLabel(t("trace_info"))
         info_label.setWordWrap(True)
         info_label.setStyleSheet("color: #888888; font-size: 11px; margin-top: 10px;")
@@ -806,7 +806,7 @@ class SettingsScreen(QWidget):
         return group
     
     def _scan_trace_files(self):
-        """Scannt das traces/ Verzeichnis nach .trc Dateien."""
+        """Scan traces/ directory nach .trc Dateien."""
         import os
         t = self.translator.get
         
@@ -820,19 +820,19 @@ class SettingsScreen(QWidget):
             self.trace_combo.addItem(t("no_traces_found"), "")
             return
         
-        # Finde alle .trc Dateien
+        # Find all .trc files
         trace_files = sorted([f for f in os.listdir(traces_dir) if f.endswith('.trc')])
         
         if not trace_files:
             self.trace_combo.addItem(t("no_traces_found"), "")
             return
         
-        # Füge Trace-Dateien hinzu
+        # Add trace files
         for trace_file in trace_files:
             full_path = os.path.join(traces_dir, trace_file)
             self.trace_combo.addItem(trace_file, full_path)
         
-        # Wähle gespeicherten Trace aus
+        # Select saved trace aus
         saved_trace = self.settings.get("trace_file", "")
         if saved_trace:
             index = self.trace_combo.findData(saved_trace)
@@ -840,7 +840,7 @@ class SettingsScreen(QWidget):
                 self.trace_combo.setCurrentIndex(index)
     
     def on_save(self):
-        """Speichere Einstellungen."""
+        """Save settings."""
         self.settings["can_interface"] = self.can_combo.currentText()
         self.settings["simulation_mode"] = self.sim_checkbox.isChecked()
         self.settings["wifi_ssid"] = self.wifi_ssid.text()
@@ -907,7 +907,7 @@ class SettingsScreen(QWidget):
         # Apply WLAN Configuration via NetworkManager
         self._apply_wlan_config()
         
-        # Zeige Bestätigung
+        # Show confirmation
         t = self.translator.get
         self.show_message(t("settings_saved"))
     
@@ -1100,7 +1100,7 @@ class SettingsScreen(QWidget):
         try:
             # Disable Service
             subprocess.run(['sudo', 'systemctl', 'disable', 'can-trace-replay'], check=True)
-            # Stop Service (falls läuft)
+            # Stop service (if running)
             subprocess.run(['sudo', 'systemctl', 'stop', 'can-trace-replay'], check=False)
             print("✓ Trace Replay Service deaktiviert")
         except subprocess.CalledProcessError as e:

@@ -36,7 +36,7 @@ class CANDecoder:
     BMI_3 = 0x303
     BMI_4 = 0x304
     BMI_5 = 0x305
-    BMI_6 = 0x306  # Zusätzliche BMI-Daten
+    BMI_6 = 0x306  # Additional BMI data
     
     # Vehicle Control Unit
     GENERAL = 0x263
@@ -177,13 +177,13 @@ class CANDecoder:
             else:
                 return None  # Unbekannte ID
             
-            # Cachen für Diagnostics
+            # Cache for diagnostics
             self.last_values[arbid] = out
             
             return out
             
         except Exception as e:
-            # Fehler beim Parsen → Logge und gib None zurück
+            # Parse error → Log and return None
             print(f"[CAN] Parse error for 0x{arbid:03X}: {e}")
             return None
     
@@ -445,7 +445,7 @@ class CANDecoder:
         return {
             "hvac_temp_setpoint_raw": temp1,  # 0x0D6E = 3438
             "hvac_temp_actual_raw": temp2,    # 0x090A = 2314
-            # Scaling noch zu bestimmen (evtl. /100 für °C?)
+            # Scaling TBD (maybe /100 for °C?)
         }
     
     def _parse_hvac2(self, d: list) -> Dict[str, Any]:
@@ -506,7 +506,7 @@ class CANDecoder:
         """
         state.update(update)
         
-        # SOC: Prefer EnerDel wenn verfügbar
+        # SOC: Prefer EnerDel when available
         if "e_pack_soc_pct" in state and state.get("is_enerdel"):
             state["soc_pct"] = max(0.0, min(100.0, float(state["e_pack_soc_pct"])))
         elif "dod_pct" in state:
@@ -516,12 +516,12 @@ class CANDecoder:
         if "power_kW" not in state and "voltage_V" in state and "current_A" in state:
             state["power_kW"] = (state["voltage_V"] * state["current_A"]) / 1000.0
         
-        # SOH-Schätzung (Platzhalter - später aus Zellspannungen)
+        # SOH estimation (placeholder - later from cell voltages)
         if "soh_pct" not in state:
             state["soh_pct"] = self._estimate_soh(state)
         
         # TEMP: Generiere Test-Zellspannungen falls noch nicht vorhanden
-        # (Wird später durch echte Dekodierung ersetzt)
+        # (Will be replaced by real decoding later)
         if "cell_voltages" not in state:
             import random
             # Simuliere 88 Zellen mit realistischen Werten um 3.7V
@@ -541,7 +541,7 @@ class CANDecoder:
         if state.get("is_enerdel") and "e_pack_delta_cell_V" in state:
             delta_v = state["e_pack_delta_cell_V"]
             
-            # Heuristik: Je größer Delta, desto schlechter SOH
+            # Heuristic: The larger the delta, the worse the SOH
             # Neu: < 0.05V → 100%
             # Alt/Degradiert: > 0.15V → < 80%
             if delta_v < 0.05:

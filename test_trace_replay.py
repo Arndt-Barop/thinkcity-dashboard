@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # test_trace_replay.py
-# Standalone-Test für Parser und Player (ohne CAN-Bus)
+# Standalone test for parser und Player (without CAN bus)
 
 import sys
 import os
@@ -10,7 +10,7 @@ from trace_parser import PCANTraceParser
 from trace_player import TracePlayer
 
 def test_parser(trace_file: str):
-    """Test Parser."""
+    """Test parser."""
     print("=" * 70)
     print("TEST 1: PCAN Trace Parser")
     print("=" * 70)
@@ -32,7 +32,7 @@ def test_parser(trace_file: str):
     return True
 
 def test_player_load(trace_file: str):
-    """Test Player Loading (ohne CAN-Bus Connection)."""
+    """Test player Loading (without CAN bus Connection)."""
     print("\n" + "=" * 70)
     print("TEST 2: Trace Player (Load Only)")
     print("=" * 70)

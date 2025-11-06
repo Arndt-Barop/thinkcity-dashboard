@@ -40,7 +40,7 @@ class MainScreen(QWidget):
         top_layout = QHBoxLayout()
         top_layout.setSpacing(10)
         
-        # Geschwindigkeit (links, groß)
+        # Speed (left, large)
         speed_layout = QVBoxLayout()
         self.speed_label = QLabel("0")
         self.speed_label.setAlignment(Qt.AlignCenter)
@@ -132,7 +132,7 @@ class MainScreen(QWidget):
             state: Dict mit keys: speed_kmh, power_kW, soc_pct, range_km,
                    consumption_kwh_100km, soh_pct, gear, pcu_ambient_temp_C
         """
-        # Status-Bar (kompletter State für Fehlerprüfung)
+        # Status bar (complete state for error checking)
         self.status_bar.set_state(state)
         ambient_temp = state.get("pcu_ambient_temp_C")
         if ambient_temp is not None:

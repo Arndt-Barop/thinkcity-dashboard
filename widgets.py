@@ -1,5 +1,5 @@
 # widgets.py
-# Wiederverwendbare UI-Widgets für ThinkCity Dashboard
+# Reusable UI widgets for ThinkCity Dashboard
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import Qt, QRect, QPoint, QRectF
@@ -9,14 +9,14 @@ import math
 
 class PowerGauge(QWidget):
     """
-    Halbkreis-Anzeige für Leistung mit pseudo-logarithmischer Skalierung.
-    Bereich: -50 kW (Rekuperation) bis +200 kW (Vollgas)
-    Grün = Rekuperation, Gelb = Fahren, Rot = Vollgas
+    Halbkreis-Anzeige for Leistung mit pseudo-logarithmischer scaling.
+    Bereich: -50 kW (Rekuperation) to +200 kW (full power)
+    Green = Rekuperation, Yellow = Fahren, Red = full power
     
-    Skalierung:
-    - -50 bis 0 kW: Linear (25% des Bogens)
-    - 0 bis +30 kW: Linear (40% des Bogens) - wichtigster Bereich
-    - +30 bis +200 kW: Komprimiert (35% des Bogens)
+    scaling:
+    - -50 to 0 kW: Linear (25% des Bogens)
+    - 0 to +30 kW: Linear (40% des Bogens) - wichtigster Bereich
+    - +30 to +200 kW: Komprimiert (35% des Bogens)
     """
     
     def __init__(self, parent=None):
@@ -33,12 +33,12 @@ class PowerGauge(QWidget):
     
     def _power_to_angle_pct(self, power: float) -> float:
         """
-        Konvertiert Leistung zu Winkel-Prozent (0.0 - 1.0) mit pseudo-log Skalierung.
+        Konvertiert Leistung zu Winkel-Prozent (0.0 - 1.0) mit pseudo-log scaling.
         
         Bereiche:
-        - -50 bis 0 kW   → 0% bis 25% (linear)
-        - 0 bis +30 kW   → 25% bis 65% (linear)
-        - +30 bis +200 kW → 65% bis 100% (komprimiert)
+        - -50 to 0 kW   → 0% to 25% (linear)
+        - 0 to +30 kW   → 25% to 65% (linear)
+        - +30 to +200 kW → 65% to 100% (komprimiert)
         """
         if power <= 0:
             # Rekuperation: -50 kW = 0%, 0 kW = 25%
@@ -47,7 +47,7 @@ class PowerGauge(QWidget):
             # Normal: 0 kW = 25%, 30 kW = 65%
             return 0.25 + 0.40 * (power / 30.0)
         else:
-            # Vollgas: 30 kW = 65%, 200 kW = 100%
+            # full power: 30 kW = 65%, 200 kW = 100%
             return 0.65 + 0.35 * ((power - 30.0) / 170.0)
     
     def paintEvent(self, event):
@@ -82,12 +82,12 @@ class PowerGauge(QWidget):
             center.y() - int(needle_length * math.sin(needle_angle))
         )
         
-        # Zeiger-Linie (weiß, deutlich sichtbar)
+        # Pointer line (white, clearly visible)
         pen = QPen(Qt.white, 4, Qt.SolidLine)
         painter.setPen(pen)
         painter.drawLine(center, needle_end)
         
-        # Zentrum-Punkt (weiß)
+        # Center point (white)
         painter.setBrush(QBrush(Qt.white))
         painter.setPen(QPen(QColor(100, 100, 100), 2))
         painter.drawEllipse(center, 10, 10)
@@ -112,18 +112,18 @@ class PowerGauge(QWidget):
     def _draw_colored_segments(self, painter, rect, center, radius):
         """Zeichnet statische farbige Segmente auf der Skala."""
         # Segmente definieren:
-        # -50 bis -5 kW: Grün (starke Rekuperation) - LINKS
-        # -5 bis 0 kW: Hellgrün (leichte Rekuperation)
-        # 0 bis 15 kW: Gelb (normale Fahrt)
-        # 15 bis 50 kW: Orange (sportlich)
-        # 50 bis 200 kW: Rot (Vollgas) - RECHTS
+        # -50 to -5 kW: Green (strong recuperation) - LEFT
+        # -5 to 0 kW: Hellgreen (leichte Rekuperation)
+        # 0 to 15 kW: Yellow (normale Fahrt)
+        # 15 to 50 kW: Orange (sportlich)
+        # 50 to 200 kW: Red (full power) - RECHTS
         
         segments = [
-            (-50, -5, QColor(0, 255, 100)),      # Grün (links)
-            (-5, 0, QColor(100, 255, 150)),      # Hellgrün
-            (0, 15, QColor(255, 220, 0)),        # Gelb (mitte)
+            (-50, -5, QColor(0, 255, 100)),      # Green (links)
+            (-5, 0, QColor(100, 255, 150)),      # Hellgreen
+            (0, 15, QColor(255, 220, 0)),        # Yellow (mitte)
             (15, 50, QColor(255, 140, 0)),       # Orange
-            (50, 200, QColor(255, 50, 50))       # Rot (rechts)
+            (50, 200, QColor(255, 50, 50))       # Red (rechts)
         ]
         
         for start_power, end_power, color in segments:
@@ -131,7 +131,7 @@ class PowerGauge(QWidget):
             end_pct = self._power_to_angle_pct(end_power)
             
             # Qt Winkel: 0° = rechts (3 Uhr), gegen Uhrzeigersinn
-            # Für Halbkreis von links nach rechts: Start bei 180° (links)
+            # For semicircle left to right: Start at 180° (left)
             # Unser start_pct: 0.0 = links (-50kW), 1.0 = rechts (+200kW)
             # Qt Winkel: 180° = links, 0° = rechts
             start_angle_qt = int((1.0 - end_pct) * 180 * 16)  # Invertiert!
@@ -151,7 +151,7 @@ class PowerGauge(QWidget):
         painter.setFont(font_scale)
         
         for value in scale_values:
-            # Winkel für diesen Wert berechnen
+            # Winkel for diesen Wert berechnen
             angle_pct = self._power_to_angle_pct(value)
             angle_rad = math.radians(180 - (180.0 * angle_pct))
             
@@ -164,7 +164,7 @@ class PowerGauge(QWidget):
             x_end = center.x() + int(tick_end * math.cos(angle_rad))
             y_end = center.y() - int(tick_end * math.sin(angle_rad))
             
-            # Strich zeichnen (dicker für 0, 50, 100, 200)
+            # Strich zeichnen (dicker for 0, 50, 100, 200)
             if value in [0, 50, 100, 200]:
                 pen = QPen(QColor(200, 200, 200), 3)
             else:
@@ -172,7 +172,7 @@ class PowerGauge(QWidget):
             painter.setPen(pen)
             painter.drawLine(x_start, y_start, x_end, y_end)
             
-            # Text-Position (etwas weiter außen)
+            # Text position (slightly further out)
             text_dist = radius + 15
             x_text = center.x() + int(text_dist * math.cos(angle_rad))
             y_text = center.y() - int(text_dist * math.sin(angle_rad))
@@ -193,7 +193,7 @@ class PowerGauge(QWidget):
 
 class DigitalDisplay(QWidget):
     """
-    Digital-Anzeige für Werte mit Einheit.
+    Digital-Anzeige for Werte mit Einheit.
     Groß und Touch-freundlich.
     """
     
@@ -245,7 +245,7 @@ class DigitalDisplay(QWidget):
         label_rect = QRect(0, 10, w, 20)
         painter.drawText(label_rect, Qt.AlignCenter, self.label)
         
-        # Wert (groß, Mitte)
+        # Value (large, center)
         font_value = QFont("Arial", 32, QFont.Bold)
         painter.setFont(font_value)
         painter.setPen(self.color)
@@ -265,13 +265,13 @@ class DigitalDisplay(QWidget):
 class StatusBar(QWidget):
     """
     Status-Leiste oben auf allen Screens: Datum, Uhrzeit, Außentemperatur.
-    Zeigt kritische Warnungen mit roter Umrandung und Icon.
+    Zeigt kritische Warnungen mit reder Umrandung und Icon.
     """
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ambient_temp = None
-        self.state = {}  # Speichert aktuellen State für Fehlerprüfung
+        self.state = {}  # Stores current state for error checking
         self.wifi_connected = False  # WLAN-Status
         self.setFixedHeight(30)  # Schmaler!
         self.setMinimumWidth(400)
@@ -282,7 +282,7 @@ class StatusBar(QWidget):
         self.update()
     
     def set_state(self, state: dict):
-        """Setzt kompletten State für Fehlerprüfung."""
+        """Setzt kompletten State for Fehlerprüfung."""
         self.state = state
         self.update()
     
@@ -298,9 +298,9 @@ class StatusBar(QWidget):
         Returns:
             tuple: (warning_text, icon) oder (None, None) wenn alles OK
         """
-        # Priorisierte Fehlerprüfung (schwerste zuerst)
+        # Prioritized error checking (most severe first)
         
-        # 1. Isolationsfehler (höchste Priorität)
+        # 1. Isolation error (highest priority)
         if self.state.get("iso_error"):
             return ("⚠ ISOLATION", "⚠")
         
@@ -316,7 +316,7 @@ class StatusBar(QWidget):
                 max_v = max(valid_voltages)
                 min_v = min(valid_voltages)
                 
-                if max_v > 4.25:  # Überladen (kritisch!)
+                if max_v > 4.25:  # Overcharged (critical!)
                     return ("⚡ ÜBERLADEN", "⚡")
                 elif min_v < 2.5:  # Tiefentladen (kritisch!)
                     return ("🔋 TIEFENTLADEN", "🔋")
@@ -344,14 +344,14 @@ class StatusBar(QWidget):
         w = self.width()
         h = self.height()
         
-        # Kritische Warnung prüfen
+        # Check critical warning
         warning_text, warning_icon = self._get_critical_warning()
         has_warning = warning_text is not None
         
-        # Hintergrund (rot bei Warnung!)
+        # Hintergrund (red bei Warnung!)
         if has_warning:
-            painter.fillRect(self.rect(), QColor(80, 20, 20, 230))  # Dunkles Rot
-            # Rote Umrandung (dick und auffällig)
+            painter.fillRect(self.rect(), QColor(80, 20, 20, 230))  # Dunkles Red
+            # Red border (thick and prominent)
             painter.setPen(QPen(QColor(255, 50, 50), 3))
             painter.drawRect(self.rect().adjusted(1, 1, -2, -2))
         else:
@@ -383,29 +383,29 @@ class StatusBar(QWidget):
         if not has_warning:
             painter.setPen(QColor(200, 200, 200))
         else:
-            painter.setPen(QColor(255, 255, 255))  # Weiß bei Warnung
+            painter.setPen(QColor(255, 255, 255))  # White bei Warnung
         font_time = QFont("Arial", 14, QFont.Bold)
         painter.setFont(font_time)
         painter.drawText(0, 0, w, h, Qt.AlignCenter, time_str)
         
         # RECHTS-MITTE: Status-Icons (WLAN)
-        icon_x = w - 240  # Startposition für Icons
+        icon_x = w - 240  # Startposition for Icons
         font_icon = QFont("Arial", 11, QFont.Bold)
         painter.setFont(font_icon)
         
         # WLAN-Icon (wenn verbunden)
         if self.wifi_connected:
-            painter.setPen(QColor(0, 255, 100))  # Grün
+            painter.setPen(QColor(0, 255, 100))  # Green
             painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[WiFi]")
             icon_x += 55
         
-        # RECHTS: Außentemperatur (wenn vorhanden)
+        # RIGHT: Ambient temperature (if available)
         if self.ambient_temp is not None:
             temp_str = f"{self.ambient_temp:.1f}°C"
             
-            # Frostwarnung: Rot bei unter 3°C
+            # Frostwarnung: Red bei unter 3°C
             if self.ambient_temp < 3.0:
-                temp_color = QColor(255, 80, 80)  # Rot (Frost!)
+                temp_color = QColor(255, 80, 80)  # Red (Frost!)
                 painter.setPen(temp_color)
                 font_temp = QFont("Arial", 14, QFont.Bold)  # Fett bei Warnung
             else:
@@ -448,13 +448,13 @@ class GearDisplay(QWidget):
         
         # Farbe je nach Gang
         if self.gear == "R":
-            color = QColor(255, 100, 100)  # Rot für Rückwärts
+            color = QColor(255, 100, 100)  # Red for reverse
         elif self.gear == "P":
-            color = QColor(200, 200, 200)  # Grau für Park
+            color = QColor(200, 200, 200)  # Grau for Park
         elif self.gear == "E":
-            color = QColor(100, 255, 100)  # Grün für Eco
+            color = QColor(100, 255, 100)  # Green for Eco
         else:
-            color = QColor(0, 255, 200)    # Cyan für N/D
+            color = QColor(0, 255, 200)    # Cyan for N/D
         
         # Fahrmodus-Text
         painter.setPen(color)
@@ -472,7 +472,7 @@ class GearDisplay(QWidget):
 class BatteryBar(QWidget):
     """
     Horizontale Batterie-Balken-Anzeige mit SOC-Prozent.
-    Farbe ändert sich: Grün > Gelb > Orange > Rot
+    Farbe ändert sich: Green > Yellow > Orange > Red
     """
     
     def __init__(self, parent=None):
@@ -506,17 +506,17 @@ class BatteryBar(QWidget):
         painter.drawRoundedRect(bar_rect, 5, 5)
         painter.drawRoundedRect(pole_rect, 3, 3)
         
-        # Füllfarbe basierend auf SOC
+        # Fill color based on SOC
         if self.soc_pct > 60:
-            fill_color = QColor(0, 255, 100)  # Grün
+            fill_color = QColor(0, 255, 100)  # Green
         elif self.soc_pct > 30:
-            fill_color = QColor(255, 220, 0)  # Gelb
+            fill_color = QColor(255, 220, 0)  # Yellow
         elif self.soc_pct > 15:
             fill_color = QColor(255, 140, 0)  # Orange
         else:
-            fill_color = QColor(255, 50, 50)  # Rot
+            fill_color = QColor(255, 50, 50)  # Red
         
-        # Füllung zeichnen
+        # Draw fill
         fill_width = (bar_rect.width() - 4) * (self.soc_pct / 100.0)
         fill_rect = QRectF(
             bar_rect.left() + 2,
@@ -545,14 +545,14 @@ class BatteryBar(QWidget):
 class TouchButton(QWidget):
     """
     Touch-freundlicher Button mit Custom Styling.
-    Größere Version für bessere Bedienbarkeit.
+    Größere Version for bessere Bedienbarkeit.
     """
     
     def __init__(self, text: str, parent=None):
         super().__init__(parent)
         self.text = text
         self.pressed = False
-        self.setMinimumSize(140, 70)  # Größer für Touch
+        self.setMinimumSize(140, 70)  # Larger for touch
         self.callback = None
     
     def set_callback(self, callback):
@@ -595,8 +595,8 @@ class TouchButton(QWidget):
         painter.setPen(QPen(QColor(100, 100, 100), 2))
         painter.drawRoundedRect(self.rect().adjusted(2, 2, -2, -2), 8, 8)
         
-        # Text (größer)
-        font = QFont("Arial", 16, QFont.Bold)  # Größere Schrift
+        # Text (larger)
+        font = QFont("Arial", 16, QFont.Bold)  # Larger font
         painter.setFont(font)
         painter.setPen(Qt.white)
         painter.drawText(self.rect(), Qt.AlignCenter, self.text)

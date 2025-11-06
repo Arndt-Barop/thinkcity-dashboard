@@ -81,7 +81,7 @@ class ChargeScreen(QWidget):
         
         main_layout.addLayout(grid)
         
-        # ====== Zeit-Schätzungen ======
+        # ====== Time estimates ======
         time_layout = QVBoxLayout()
         
         # Verstrichene Zeit
@@ -110,7 +110,7 @@ class ChargeScreen(QWidget):
         # ====== Zusatz-Infos ======
         info_layout = QHBoxLayout()
         
-        # Max verfügbarer AC-Strom
+        # Max available AC current
         self.max_ac_label = QLabel(t("max_ac_default"))
         self.max_ac_label.setFont(QFont("Arial", 12))
         self.max_ac_label.setStyleSheet("color: #888888;")
@@ -133,7 +133,7 @@ class ChargeScreen(QWidget):
         Args:
             state: Dict mit Lade-Daten
         """
-        # Status-Bar (kompletter State für Fehlerprüfung)
+        # Status bar (complete state for error checking)
         self.status_bar.set_state(state)
         ambient_temp = state.get("pcu_ambient_temp_C")
         if ambient_temp is not None:
@@ -151,7 +151,7 @@ class ChargeScreen(QWidget):
         
         # DC Power (aus Batterie-Sicht: + beim Laden, - beim Entladen)
         # power_kW ist normalerweise positiv beim Entladen, negativ beim Laden
-        # Wir drehen das Vorzeichen um für Batterie-Perspektive
+        # We reverse the sign for battery perspective
         power_kw = -state.get("power_kW", 0.0)  # Negativ = Batterie-Sicht
         self.charge_power_display.set_value(power_kw)
         
@@ -188,7 +188,7 @@ class ChargeScreen(QWidget):
             self.energy_label.setText(t("charged_default"))
     
     def _update_time_estimates(self, current_soc: float, power_kw: float):
-        """Berechnet Zeit-Schätzungen während des Ladens."""
+        """Calculatet Zeit-Schätzungen während des Ladens."""
         if self.charge_start_time is None or self.charge_start_soc is None:
             return
         
@@ -210,7 +210,7 @@ class ChargeScreen(QWidget):
             rate_pct_per_sec = charged_soc / elapsed.total_seconds()
             
             if rate_pct_per_sec > 0:
-                # Geschätzte verbleibende Sekunden
+                # Estimated remaining seconds
                 remaining_sec = remaining_soc / rate_pct_per_sec
                 remaining_td = timedelta(seconds=int(remaining_sec))
                 
@@ -228,7 +228,7 @@ class ChargeScreen(QWidget):
         else:
             self.remaining_label.setText(f"{t('remaining')}: {t('collecting_data')}")
         
-        # Geladene Energie (Schätzung: 24 kWh * SOC-Differenz)
+        # Charged energy (estimate: 24 kWh * SOC difference)
         battery_capacity_kwh = 24.0
         energy_charged_kwh = (charged_soc / 100.0) * battery_capacity_kwh
         self.energy_label.setText(f"{t('charged')}: {energy_charged_kwh:.2f} kWh")

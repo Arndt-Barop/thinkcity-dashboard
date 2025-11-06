@@ -1,5 +1,5 @@
 # trace_parser.py
-# Parser für PCAN-View .trc Trace-Dateien
+# Parser for PCAN-View .trc Trace-Dateien
 
 import os
 import re
@@ -17,7 +17,7 @@ class PCANTraceParser:
              1)         2.1  Rx         0251  8  40 00 00 00 00 00 00 00 
              2)        11.4  Rx         0460  8  03 E0 00 00 00 00 00 00 
     
-    Datenzeilen: Nummer) Zeit_ms Rx/Tx CAN-ID Länge Daten...
+    Data lines: Number) Time_ms Rx/Tx CAN-ID Länge Daten...
     """
     
     def __init__(self, filepath: str):
@@ -31,7 +31,7 @@ class PCANTraceParser:
     
     def parse(self) -> List[Tuple[float, int, bytes]]:
         """
-        Parsed die Trace-Datei und gibt CAN-Messages zurück.
+        Parse the trace-Datei and returns CAN-Messages back.
         
         Returns:
             List of tuples: (timestamp_ms, can_id, data_bytes)
@@ -49,12 +49,12 @@ class PCANTraceParser:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 
-                # Überspringe Kommentare und leere Zeilen
+                # Skip comments und leere Zeilen
                 if not line or line.startswith(';'):
                     self._parse_metadata(line)
                     continue
                 
-                # Parse Datenzeile
+                # Parse data line
                 try:
                     msg = self._parse_message_line(line)
                     if msg:
@@ -67,7 +67,7 @@ class PCANTraceParser:
         return self.messages
     
     def _parse_metadata(self, line: str):
-        """Extrahiert Metadaten aus Kommentarzeilen."""
+        """Extract metadata aus Kommentarzeilen."""
         if line.startswith(';$FILEVERSION='):
             self.metadata['version'] = line.split('=')[1]
         elif line.startswith(';$STARTTIME='):
@@ -80,16 +80,16 @@ class PCANTraceParser:
     
     def _parse_message_line(self, line: str) -> Optional[Tuple[float, int, bytes]]:
         """
-        Parsed eine einzelne CAN-Message Zeile.
+        Parse a single CAN-Message Zeile.
         
-        Format: Nummer) Zeit_ms Rx/Tx CAN-ID Länge Daten...
-        Beispiel: 1) 2.1 Rx 0251 8 40 00 00 00 00 00 00 00
+        Format: Number) Time_ms Rx/Tx CAN-ID Länge Daten...
+        Example: 1) 2.1 Rx 0251 8 40 00 00 00 00 00 00 00
         
         Returns:
             Tuple (timestamp_ms, can_id, data_bytes) oder None
         """
-        # Regex: Nummer) Zeit Rx/Tx CAN-ID Länge Daten
-        # Flexibel für verschiedene Spacing-Varianten
+        # Regex: Number) Time Rx/Tx CAN-ID Length Data
+        # Flexible for different spacing variants
         pattern = r'^\s*\d+\)\s+([\d.]+)\s+(?:Rx|Tx)\s+([0-9A-Fa-f]+)\s+(\d+)\s+(.*)$'
         match = re.match(pattern, line)
         
@@ -117,11 +117,11 @@ class PCANTraceParser:
         return (timestamp_ms, can_id, data_bytes)
     
     def get_metadata(self) -> dict:
-        """Gibt Trace-Metadaten zurück."""
+        """Gibt Trace-Metadaten back."""
         return self.metadata
     
     def get_duration_seconds(self) -> float:
-        """Berechnet Gesamtdauer des Traces in Sekunden."""
+        """Calculate total duration des Traces in Sekunden."""
         if not self.messages:
             return 0.0
         
@@ -130,11 +130,11 @@ class PCANTraceParser:
         return (last_ts - first_ts) / 1000.0
     
     def get_message_count(self) -> int:
-        """Gibt Anzahl der Messages zurück."""
+        """Returns number der Messages back."""
         return len(self.messages)
     
     def get_unique_can_ids(self) -> set:
-        """Gibt alle vorkommenden CAN-IDs zurück."""
+        """Returns all occurring CAN-IDs back."""
         return set(msg[1] for msg in self.messages)
 
 

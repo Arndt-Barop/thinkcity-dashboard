@@ -37,7 +37,7 @@ class CellVoltageBar(QWidget):
         self.bar.setValue(0)
         self.bar.setTextVisible(False)
         self.bar.setFixedSize(25, 90)  # Kleiner: 25x90 statt 35x120
-        # Initialer Style (wird dynamisch überschrieben)
+        # Initial style (will be dynamically overridden)
         self.bar.setStyleSheet("""
             QProgressBar {
                 border: 2px solid #444444;
@@ -82,9 +82,9 @@ class CellVoltageBar(QWidget):
             self.bar.setValue(bar_value)
             
             # Farbe je nach Spannung
-            # KRITISCH: Zu hoch (> 4.2V) = ROT (gefährlich!)
+            # CRITICAL: Too high (> 4.2V) = RED (dangerous!)
             # WARNUNG: Zu niedrig (< 3.0V) = ORANGE
-            # OK: Normal (3.5-4.1V) = GRÜN
+            # OK: Normal (3.5-4.1V) = GREEN
             # GRENZWERTIG: Dazwischen = GELB
             
             if voltage_v > 4.2:
@@ -96,7 +96,7 @@ class CellVoltageBar(QWidget):
                 border_color = "#ff8800"  # Orange Umrandung
                 border_width = "3px"
             elif 3.5 <= voltage_v <= 4.1:
-                color = "#00ff00"  # Grün (optimal)
+                color = "#00ff00"  # Green (optimal)
                 border_color = "#444444"  # Normale Umrandung
                 border_width = "2px"
             else:
@@ -183,10 +183,10 @@ class CellVoltagesScreen(QWidget):
         
         main_layout.addLayout(info_layout)
         
-        # ====== Container für Zellen (KEINE Scroll-Area) ======
+        # ====== Container for cells (NO Scroll-Area) ======
         # 88 Zellen auf 4 Reihen = 22 Zellen pro Reihe
         
-        # Container für alle 4 Reihen
+        # Container for all 4 rows
         rows_layout = QVBoxLayout()
         rows_layout.setSpacing(3)
         
@@ -225,7 +225,7 @@ class CellVoltagesScreen(QWidget):
     
     def update(self, state):
         """Aktualisiert Anzeige mit neuem State."""
-        # Status-Bar (kompletter State für Fehlerprüfung)
+        # Status bar (complete state for error checking)
         self.status_bar.set_state(state)
         ambient_temp = state.get("pcu_ambient_temp_C")
         if ambient_temp is not None:
@@ -267,7 +267,7 @@ class CellVoltagesScreen(QWidget):
             self.avg_cell_label.setText(f"Ø: {avg_v:.3f} V")
             self.delta_label.setText(f"Δ: {delta_mv:.1f} mV")
             
-            # Delta-Farbe (grün < 50mV, gelb < 100mV, rot >= 100mV)
+            # Delta color (green < 50mV, yellow < 100mV, red >= 100mV)
             if delta_mv < 50:
                 delta_color = "#00ff00"
             elif delta_mv < 100:

@@ -1,38 +1,39 @@
 # ThinkCity Dashboard v3
 
-**Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge**  
+**Modernes PyQt5 Dashboard für Think City Elektrofahrzeuge**
+
 **Raspberry Pi 4B + HDMI-Touchscreen + MCP2515 CAN**
 
 Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI-Touchscreen und MCP2515 CAN-Interface. Entwickelt mit Claude Sonnet 3.5 für präzise CAN-Bus-Dekodierung und professionelle UI-Gestaltung.
 
-## ⚠️ Disclaimer
+[🇬🇧 English Version](README.md)
+
+## ⚠️ Haftungsausschluss
 
 **Dieses Projekt ist nicht mit Think Global AS, Electric Mobility Solutions AS oder anderen Herstellern des Think City Fahrzeugs verbunden oder von diesen autorisiert.** "Think City" bezieht sich ausschließlich auf das Elektrofahrzeugmodell. Dieses Dashboard wurde als Community-Projekt für Besitzer von Think City Fahrzeugen entwickelt.
-
-**This project is not affiliated with or authorized by Think Global AS, Electric Mobility Solutions AS, or any manufacturer of the Think City vehicle.** "Think City" refers solely to the electric vehicle model. This dashboard was developed as a community project for Think City vehicle owners.
 
 ---
 
 ## 📸 Screenshots
 
-### Hauptscreen
-![Main Screen](docs/images/screen1-main.png)
-*Geschwindigkeit, Power-Gauge (-50 bis +200 kW), Range, Verbrauch, Fahrmodus*
+### Hauptbildschirm
+![Hauptbildschirm](docs/images/screen1-main.png)
+*Geschwindigkeit, Power-Gauge (-50 bis +200 kW), Reichweite, Verbrauch, Fahrmodus*
 
 ### Batterie-Übersicht
-![Battery Screen](docs/images/screen2-battery.png)
+![Batterie-Screen](docs/images/screen2-battery.png)
 *Spannungen, Ströme, Temperaturen, SOC, SOH, Status-Flags*
 
 ### Zellspannungen
-![Cell Voltages Screen](docs/images/screen3-cells.png)
+![Zellspannungen-Screen](docs/images/screen3-cells.png)
 *Alle 88 Zellen einzeln mit Bargraphen und Farbcodierung*
 
 ### Ladestatus
-![Charge Screen](docs/images/screen4-charge.png)
+![Lade-Screen](docs/images/screen4-charge.png)
 *AC/DC-Werte, Ladestrom, geschätzte Ladezeit*
 
 ### CAN-Rohdaten
-![Raw Data Screen](docs/images/screen5-rawdata.png)
+![Rohdaten-Screen](docs/images/screen5-rawdata.png)
 *Live CAN-Traffic mit ID-Referenztabelle*
 
 ---
@@ -47,37 +48,49 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 ### 📊 **5 Hauptscreens**
 
-- **Haupt**: Geschwindigkeit, Power-Gauge, Range, Verbrauch, Fahrmodus (P/N/R/D/E)
+- **Haupt**: Geschwindigkeit, Power-Gauge, Reichweite, Verbrauch, Fahrmodus (P/N/R/D/E)
 - **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags
 - **Zellen**: Detaillierte Ansicht aller 88 Zellspannungen mit Bargraphen
 - **Laden**: Ladestatus, AC/DC-Werte, Zeitschätzungen
 - **Rohdaten**: Live CAN-Terminal + ID-Referenztabelle
+- **Einstellungen**: Systemkonfiguration, CAN-Interface, Netzwerk, Logging, **Trace Replay**
 
 ### 🎛️ **Power-Gauge mit logarithmischer Skalierung**
 
 - Bereich: -50 kW (Rekuperation) bis +200 kW (Vollgas)
 - Pseudo-logarithmische Skalierung für bessere Auflösung im Normalbereich (0-30 kW)
-- Statische Farbsegmente: Grün (Reku) → Gelb → Orange → Rot (Vollgas)
-- Skala-Striche mit Zahlenbeschriftung
+- Statische Farbsegmente: Grün (Rekuperation) → Gelb → Orange → Rot (Vollgas)
 
-### 🚨 **Intelligentes Warn-System**
+### 🌍 **Zweisprachige Benutzeroberfläche (DE/EN)**
 
-- **Status-Bar** auf allen Screens mit Datum, Uhrzeit, Außentemperatur
-- **Kritische Fehler-Warnung**: Rote Umrandung + blinkende Meldung bei:
-  - Isolationsfehler (⚠ ISOLATION)
-  - Emergency/Notfall (⚠ NOTFALL)
-  - Zell-Überladen >4.25V (⚡ ÜBERLADEN)
-  - Zell-Tiefentladen <2.5V (🔋 TIEFENTLADEN)
-  - Temperatur-Fehler (🌡 TEMP HOCH/❄ TEMP TIEF)
+- Vollständiges Übersetzungssystem mit 150+ UI-Texten
+- Sprachumschalter in den Einstellungen
+- Sofortiges UI-Reload bei Sprachwechsel
+
+### 🎨 **Professionelles UI-Design**
+
+- Touch-optimierte Buttons (mindestens 80px Höhe)
+- Modernes Flat-Design mit klarer Farbcodierung
+- Status-Bar auf allen Screens mit Datum, Uhrzeit, Außentemperatur
 - **Frostwarnung**: Außentemperatur <3°C wird rot markiert
 
-### 🔋 **Zellspannungs-Monitoring**
+### 🚨 **Intelligentes Warnsystem**
+
+Kritische Batteriezustände lösen visuelle Warnungen aus:
+- Zellunterspannung (<3,0V)
+- Zellüberspannung (>4,15V)
+- Hohe Temperatur (>45°C)
+- Niedrige Temperatur (<5°C)
+- Isolationsfehler (⚠ ISOLATION)
+- Schützfehler (⚠ CONTACTOR)
+
+### 🔋 **Zellspannungs-Überwachung**
 
 - Alle 88 Zellen einzeln dargestellt (4 Reihen × 22 Zellen)
-- Vertikale Bargraphen mit Farbcodierung:
-  - Rot: >4.2V (kritisch hoch)
-  - Orange: <3.0V (kritisch niedrig)
-  - Grün: 3.5-4.1V (optimal)
+- Farbcodierte Bargraphen:
+  - Rot: <3,0V oder >4,15V (kritisch)
+  - Orange: <3,0V (kritisch niedrig)
+  - Grün: 3,5-4,1V (optimal)
   - Gelb: Grenzbereich
 - Dicke rote Umrandung bei kritischen Zellen
 - Min/Max/Durchschnitt/Delta-Anzeige
@@ -87,7 +100,7 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 - Zuverlässige Initialisierung mit Retry-Logik
 - Automatisches Recovery bei CAN-Bus-Fehlern
 - Vollständige Dekodierung aller bekannten ThinkCity CAN-IDs
-- Testmodus mit vcan0 für Entwicklung ohne Hardware
+- PCAN Trace Replay für Entwicklung/Testing (vcan0)
 
 ### 💾 **Datenlogging & Performance**
 
@@ -102,740 +115,261 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 ### Voraussetzungen
 
+**Hardware:**
 - Raspberry Pi 4B
 - USB-SSD (empfohlen für schnelles Booten)
 - HDMI-Touchscreen (getestet mit SunFounder 10" 1280x800)
-- MCP2515 CAN-Modul (SPI)
+- MCP2515 CAN-Modul (SPI-Interface)
+
+**Software:**
+- Raspberry Pi OS Lite (64-Bit empfohlen)
+- Python 3.9+
+- PyQt5, python-can, SQLite3
 
 ### Schnellstart
 
 ```bash
-cd /home/pi
-git clone <repo> thinkcity-dashboard-v3  # oder kopiere den Ordner
+git clone https://github.com/Arndt-Barop/thinkcity-dashboard.git
 cd thinkcity-dashboard-v3
 chmod +x setup.sh
-./setup.sh
-sudo reboot
+sudo ./setup.sh
 ```
 
-Das Setup-Skript:
+Das Setup-Script führt aus:
+1. Installation aller Abhängigkeiten
+2. Konfiguration des CAN-Interface (MCP2515)
+3. Einrichtung der systemd-Services
+4. Touchscreen-Kalibrierung
+5. Aktivierung des Auto-Starts beim Booten
 
-1. Installiert alle Abhängigkeiten
+Siehe [INSTALL_DE.md](INSTALL_DE.md) für detaillierte manuelle Installationsschritte.
 
----2. Konfiguriert MCP2515 (SPI + Device Tree Overlay)
+---
 
-3. Richtet Auto-Mount für SSD ein
-
-## 🖥️ Hardware-Anforderungen4. Installiert systemd-Services
-
-5. Optimiert das System für schnellen Boot
+## 🖥️ Hardware-Anforderungen
 
 ### Minimum
-
-- **Raspberry Pi 4B** (2GB RAM)---
-
-- **SunFounder 10" HDMI Touchscreen** (1280×800)
-
-- **MCP2515 CAN-Modul** (SPI-Interface)## 🖥️ Display-Konfiguration
-
-- **16GB microSD-Karte** (USB-Boot empfohlen für Geschwindigkeit)
-
-Das System unterstützt **drei Modi** für HDMI-Touchscreens:
+- Raspberry Pi 4B mit 2GB RAM
+- 16GB microSD-Karte (USB-Boot empfohlen für Geschwindigkeit)
+- 5V/2,5A USB-C Netzteil
+- 7" HDMI-Touchscreen (min. 800x480)
 
 ### Empfohlen
+- Raspberry Pi 4B mit 4GB RAM
+- USB-SSD (128GB+) für Datenbank und schnelles Booten
+- Hochwertiges 5V/3A USB-C Netzteil
+- 10" HDMI-Touchscreen (1280x800)
+- MCP2515 CAN-Modul mit 8MHz Quarz
 
-- Raspberry Pi 4B mit 4GB RAM## 📦 Installations-Optionen
+### CAN-Bus Verbindung
 
-- USB 3.0 SSD (128GB+) für Boot und Datenbank
-
-- Aktive Kühlung (kleiner Lüfter)### Option 1: Minimal X11 + Kiosk (EMPFOHLEN)
-
-- Hochwertige 5V/3A USB-C Stromversorgung```bash
-
-sudo raspi-config
-
-### CAN-Bus Verbindung# → System Options → Boot → Desktop Autologin
-
-- MCP2515 per SPI an GPIO-Header# → Display Options → Resolution → Wähle native Auflösung
-
-- CAN-H/CAN-L an ThinkCity OBD-Stecker```
-
-- 120Ω Abschlusswiderstand (meist im MCP2515-Modul integriert)
-
-**Service nutzt automatisch:**
-
----```ini
-
-Environment=QT_QPA_PLATFORM=xcb
-
-## 📦 InstallationEnvironment=DISPLAY=:0
+MCP2515 an Raspberry Pi SPI anschließen:
 
 ```
+MCP2515    Raspberry Pi
+-------    ------------
+VCC    →   Pin 2  (5V)
+GND    →   Pin 6  (GND)
+CS     →   Pin 24 (CE0)
+SO     →   Pin 21 (MISO)
+SI     →   Pin 19 (MOSI)
+SCK    →   Pin 23 (SCLK)
+INT    →   Pin 22 (GPIO25)
+```
 
-### Schnellinstallation
-
-**Vorteile:**
-
-```bash- ✅ Beste Kompatibilität mit HDMI-Touchscreens
-
-# 1. System vorbereiten- ✅ Touch funktioniert out-of-the-box
-
-sudo apt update && sudo apt upgrade -y- ✅ Einfache Konfiguration
-
-
-
-# 2. Projekt klonen**Nachteile:**
-
-cd /home/pi- ⚠️ Etwas langsamerer Boot (~5s mehr)
-
-git clone https://github.com/Arndt-Barop/thinkcity-dashboard.git thinkcity-dashboard-v3
-
-cd thinkcity-dashboard-v3---
-
-
-
-# 3. Installation ausführen### Option 2: Linux Framebuffer (Lite-Alternative)
-
-chmod +x install.shEditiere `/etc/systemd/system/thinkcity-dashboard.service`:
-
-./install.sh```ini
-
-Environment=QT_QPA_PLATFORM=linuxfb
-
-# 4. Neustart```
-
-sudo reboot
-
-```**Vorteile:**
-
-- ✅ Funktioniert ohne X11
-
-Das Installations-Skript:- ✅ Schnellerer Boot
-
-- Installiert Python 3.9+ und alle Abhängigkeiten
-
-- Konfiguriert MCP2515 CAN-Interface (Device Tree Overlay)**Nachteile:**
-
-- Richtet systemd-Service für Auto-Start ein- ⚠️ Touch-Input benötigt ggf. manuelle Konfiguration
-
-- Optimiert Boot-Parameter für schnellen Start- ⚠️ Nicht alle Qt-Widgets funktionieren perfekt
-
-- Konfiguriert Framebuffer und Video-Treiber
+CAN-H und CAN-L an Fahrzeug-OBD-Port anschließen.
 
 ---
 
-### Manuelle Installation
-
-### Option 3: EGLFS (nur für DSI-Displays)
-
-<details>Nur verwenden, wenn du ein **offizielles Raspberry Pi DSI-Display** hast!
-
-<summary>Klick zum Ausklappen</summary>
-
-```ini
-
-```bashEnvironment=QT_QPA_PLATFORM=eglfs
-
-# Python-Pakete installierenEnvironment=QT_QPA_EGLFS_INTEGRATION=eglfs_kms
-
-sudo apt install python3-pyqt5 python3-pip can-utils -y```
-
-pip3 install python-can
-
----
-
-# MCP2515 konfigurieren
-
-echo "dtoverlay=mcp2515-can0,oscillator=8000000,interrupt=25" | sudo tee -a /boot/config.txt## 🎮 Bedienung
-
-echo "dtoverlay=spi-bcm2835" | sudo tee -a /boot/config.txt
+## 🎮 Bedienung
 
 ### Touch-Navigation
 
-# CAN-Interface Setup-Service- **Main** → Hauptbildschirm (Geschwindigkeit, Leistung, SOC)
+- **Touch-Buttons** unten: Wechsel zwischen den 5 Hauptscreens
+- **Einstellungen-Button** (⚙️): Systemkonfiguration
+- **Wischgesten**: Nicht implementiert (Button-basierte Navigation)
 
-sudo cp systemd/can-setup.service /etc/systemd/system/- **Battery** → Zellspannungen, Temperaturen, Details
+### Tastatur-Shortcuts (Debug)
 
-sudo systemctl enable can-setup.service- **Charge** → Ladestatus, Mains-Info, EOC
-
-- **Settings** → Kalibrierung, Trip-Reset, System
-
-# Dashboard-Service
-
-sudo cp systemd/thinkcity-dashboard.service /etc/systemd/system/### Tastatur-Shortcuts (Debug)
-
-sudo systemctl enable thinkcity-dashboard.service- `Q` → Beenden
-
-- `F` → Fullscreen Toggle
-
-# Boot-Optimierung- `R` → Trip-Counter zurücksetzen
-
-sudo nano /boot/cmdline.txt- `1-4` → Screen-Wechsel
-
-# Füge hinzu: sdhci.debug_quirks2=4 vt.global_cursor_default=0
+- `Q`: Anwendung beenden
+- `F`: Vollbild umschalten
+- `R`: Bordcomputer zurücksetzen
+- `1-5`: Zu Screen 1-5 wechseln
 
 ---
 
-# Video-Treiber
+## 📊 Berechnete Werte
 
-sudo nano /boot/config.txt## 📊 Berechnete Werte
-
-# Füge hinzu: dtoverlay=vc4-fkms-v3d
-
-### Range (km)
-
-sudo reboot```
-
-```Range = (SOC / 100) × Batteriekapazität_kWh × 1000 / Durchschnittsverbrauch_Wh_km
-
-</details>```
-
-- **Batteriekapazität:** 24 kWh (EnerDel), kalibrierbar
-
----- **Durchschnittsverbrauch:** Aus Trip-Daten oder Standardwert 150 Wh/km
-
-
-
-## 🚀 Verwendung### Consumption (kWh/100km)
+### Reichweite (km)
 
 ```
-
-### StartAktuell = (Leistung_kW / Geschwindigkeit_km_h) × 100
-
-Das Dashboard startet automatisch beim Booten. Alternativ manuell:Trip = Gesamt_kWh_verbraucht / Distanz_km × 100
-
+Reichweite = (SOC / 100) × Batteriekapazität_kWh × 1000 / Durchschnittsverbrauch_Wh_km
 ```
 
-```bash**Nur berechnet bei Geschwindigkeit > 2 km/h**
+**Parameter:**
+- **Batteriekapazität:** 24 kWh (EnerDel), kalibrierbar in Einstellungen
+- **Durchschnittsverbrauch:** Berechnet aus letzten 100 Samples (rollendes Fenster)
 
-sudo systemctl start thinkcity-dashboard.service
+### Momentanverbrauch (Wh/km)
 
-```### SOH (State of Health)
+```
+Momentanverbrauch = (Leistung_kW / Geschwindigkeit_km_h) × 1000
+```
 
-Geschätzt aus:
+**Nur berechnet bei Geschwindigkeit > 2 km/h**
 
-### Navigation- Max/Min Zellspannungen (EnerDel)
+### Bordcomputer
 
-- **Touch-Buttons** unten: Wechsel zwischen den 5 Hauptscreens- Anzahl fehlerhafter Zellen
+- Erkennt automatisch Fahrtbeginn/-ende (Zündschlüssel-Zustand)
+- Erfasst Gesamtstrecke, Gesamtenergie, Durchschnittsverbrauch
+- In Datenbank gespeichert (überlebt harten Shutdown)
+- Manueller Reset über Einstellungsmenü
 
-- **Swipe** (optional): Links/Rechts für Screen-Wechsel- Alterungskurve (optional kalibrierbar)
+---
 
+## 🛠️ Entwicklung
 
+Siehe [DEVELOPMENT.md](DEVELOPMENT.md) für:
+- CAN Trace Replay Setup (vcan0)
+- NAS-Synchronisation
+- Datenbank-Schema
+- Eigene Anpassungen
 
-### CAN-Bus Modi**Aktuell:** Platzhalter, da nicht direkt via CAN verfügbar
-
-
-
-#### Echtes Fahrzeug (Produktion)---
+### Entwicklungs-Setup
 
 ```bash
-
-# Service-Datei editieren## 🗄️ Datenlogging
-
-sudo nano /etc/systemd/system/thinkcity-dashboard.service
-
-### Automatisches Trip-Tracking
-
-# Setze:- **Start:** Erste Bewegung nach Standstill (Geschwindigkeit > 0)
-
-Environment=TC_CAN_CHANNEL=can0- **Stop:** 5 Minuten Standstill oder Zündung aus
-
-
-
-sudo systemctl daemon-reload### Datenbank-Struktur
-
-sudo systemctl restart thinkcity-dashboard.service```sql
-
-```-- drives: Ein Eintrag pro Fahrt
-
-CREATE TABLE drives (
-
-#### Simulation (Test mit Replay)    id INTEGER PRIMARY KEY,
-
-```bash    start_time TEXT,
-
-# Virtual CAN erstellen    end_time TEXT,
-
-sudo ip link add dev vcan0 type vcan    start_soc REAL,
-
-sudo ip link set vcan0 up    end_soc REAL,
-
-    start_odometer REAL,
-
-# Service auf vcan0 umstellen    end_odometer REAL,
-
-sudo nano /etc/systemd/system/thinkcity-dashboard.service    distance_km REAL,
-
-Environment=TC_CAN_CHANNEL=vcan0    avg_consumption_kwh_100km REAL,
-
-    synced INTEGER DEFAULT 0
-
-# CAN-Trace abspielen);
-
-cd tools
-
-python3 can_replay.py ../traces/entladen_91.log vcan0 50.0 --loop-- samples: Detaillierte Werte (alle 1-5s)
-
-```CREATE TABLE samples (
-
-    id INTEGER PRIMARY KEY,
-
-    drive_id INTEGER,
-
-    timestamp TEXT,
-
----    speed REAL,
-
-    soc REAL,
-
-## 📁 Projekt-Struktur    power REAL,
-
-    voltage REAL,
-
-```    current REAL,
-
-thinkcity-dashboard-v3/    pack_temp REAL,
-
-├── README.md                      # Diese Datei    latitude REAL,      -- NULL wenn kein GPS
-
-├── install.sh                     # Installations-Skript    longitude REAL,
-
-├── requirements.txt               # Python-Abhängigkeiten    FOREIGN KEY(drive_id) REFERENCES drives(id)
-
-│);
-
-├── dashboard.py                   # Haupt-Anwendung```
-
-├── can_decoder.py                 # CAN-Frame Dekodierung
-
-├── can_interface.py               # CAN-Bus Verwaltung### Synchronisierung
-
-├── trip_computer.py               # Range/Verbrauch BerechnungWenn im Home-WLAN (`TC_HOME_SSID`):
-
-├── db_manager.py                  # SQLite Datenbank- Upload zu MQTT/InfluxDB (`sync_data.py`)
-
-│- Markiere Fahrten als `synced=1`
-
-├── main_screen.py                 # Hauptbildschirm- Optional: Alte Daten löschen (> 30 Tage)
-
-├── battery_screen.py              # Batterie-Details
-
-├── charge_screen.py               # Lade-Screen---
-
-├── cell_voltages_screen.py        # Zellspannungs-Detail
-
-├── raw_data_screen.py             # CAN-Rohdaten## 🔧 Konfiguration
-
-├── widgets.py                     # Wiederverwendbare UI-Komponenten
-
-│### Umgebungsvariablen
-
-├── tools/Setze in `/etc/environment` oder per systemd-Override:
-
-│   ├── can_replay.py              # CAN-Trace Abspieler
-
-│   └── trc2candump.py             # PCAN-Trace Konverter```bash
-
-│# Datenbank-Pfad
-
-├── traces/                        # Beispiel CAN-TracesTC_DB_PATH=/mnt/ssd/thinkcity.db
-
-│   └── entladen_91.log
-
-│# Home-WLAN für Sync
-
-├── systemd/TC_HOME_SSID=MeinWLAN
-
-│   ├── thinkcity-dashboard.service
-
-│   └── can-setup.service# MQTT (optional)
-
-│TC_MQTT_HOST=192.168.1.10
-
-└── docs/TC_MQTT_TOPIC=thinkcity
-
-
-    ├── CAN_REFERENCE.md           # CAN-ID Dokumentation# InfluxDB (optional)
-
-    └── INSTALL.md                 # Detaillierte InstallationTC_INFLUX_URL=http://192.168.1.10:8086
-
-```TC_INFLUX_TOKEN=mein-token
-
-TC_INFLUX_ORG=home
-
----TC_INFLUX_BUCKET=thinkcity
-
-
-
-## 🔧 Konfiguration# Batterie-Kalibrierung
-
-TC_BATTERY_CAPACITY_KWH=24.0
-
-### UmgebungsvariablenTC_DEFAULT_CONSUMPTION_WH_KM=150.0
-
+# Repository klonen
+git clone https://github.com/Arndt-Barop/thinkcity-dashboard.git
+cd thinkcity-dashboard-v3
+
+# Virtuelle Umgebung erstellen
+python3 -m venv venv
+source venv/bin/activate
+
+# Abhängigkeiten installieren
+pip3 install -r requirements.txt
+
+# Dashboard mit vcan0 starten (keine Hardware nötig)
+python3 dashboard.py
 ```
 
-Setze in `/etc/systemd/system/thinkcity-dashboard.service`:
+Siehe [INSTALL_DE.md](INSTALL_DE.md) für vollständige Installationsanleitung.
 
-### Systemd-Override
+---
 
-```ini```bash
-
-[Service]sudo systemctl edit thinkcity-dashboard.service
-
-# CAN-Interface```
-
-Environment=TC_CAN_CHANNEL=can0          # oder vcan0 für SimulationFüge hinzu:
-
-```ini
-
-# Display[Service]
-
-Environment=QT_QPA_PLATFORM=linuxfbEnvironment=TC_BATTERY_CAPACITY_KWH=23.5
-
-Environment=TC_FULLSCREEN=1Environment=TC_DEFAULT_CONSUMPTION_WH_KM=140.0
+## 📁 Projekt-Struktur
 
 ```
-
-# Datenbank
-
-Environment=TC_DB_PATH=/home/pi/thinkcity-dashboard-v3/thinkcity.db---
-
-
-
-# Batterie-Kalibrierung## 🐛 Troubleshooting
-
-Environment=TC_BATTERY_CAPACITY_KWH=24.0
-
-Environment=TC_DEFAULT_CONSUMPTION_WH_KM=150.0### Dashboard startet nicht
-
-``````bash
-
-# Logs prüfen
-
-### CAN-Interface Parameterjournalctl -u thinkcity-dashboard.service -b
-
-
-
-```bash# Häufige Probleme:
-
-# can-setup.service editieren# 1. CAN-Interface fehlt
-
-sudo nano /etc/systemd/system/can-setup.servicesudo ip link set can0 up type can bitrate 500000
-
-
-
-# Bitrate ändern (Standard: 500000)# 2. Qt-Backend passt nicht
-
-ExecStart=/usr/sbin/ip link set can0 up type can bitrate 500000sudo systemctl edit thinkcity-dashboard.service
-
-```# Ändere QT_QPA_PLATFORM=linuxfb
-
-
-
----# 3. Permissions
-
-sudo chown -R pi:pi /home/pi/thinkcity-dashboard-v3
-
-## 🐛 Troubleshooting```
-
-
-
-### Dashboard startet nicht### Touch funktioniert nicht
-
-```bash```bash
-
-# Logs prüfen# Touchscreen-Devices anzeigen
-
-journalctl -u thinkcity-dashboard.service -n 50ls -l /dev/input/event*
-
-
-
-# Häufige Fehler:# Für libinput (X11):
-
-# - PyQt5 fehlt: sudo apt install python3-pyqt5sudo apt install xserver-xorg-input-libinput
-
-# - CAN-Interface fehlt: sudo systemctl start can-setup.service
-
-# - Permissions: sudo chown -R pi:pi /home/pi/thinkcity-dashboard-v3# Für evdev (Framebuffer):
-
-```sudo apt install tslib
-
-```
-
-### Kein CAN-Traffic
-
-```bash### CAN-Bus empfängt keine Daten
-
-# Interface Status```bash
-
-ip -details link show can0# Interface prüfen
-
-ip -details link show can0
-
-# Manuell hochfahren
-
-sudo ip link set can0 down# Manueller Test
-
-sudo ip link set can0 up type can bitrate 500000candump can0
-
-
-
-# Traffic testen# MCP2515 verbunden?
-
-candump can0dmesg | grep spi
-
-dmesg | grep can
-
-# MCP2515 erkannt?```
-
-dmesg | grep mcp251
-
-dmesg | grep spi### Display zeigt nichts
-
-``````bash
-
-# HDMI-Output prüfen
-
-### Touch funktioniert nichtvcgencmd display_power
-
-```bash
-
-# Touchscreen-Events prüfen# Auflösung setzen
-
-evtestsudo raspi-config
-
-# → Display Options → Resolution
-
-# Für linuxfb Backend```
-
-sudo apt install tslib
-
-export TSLIB_TSDEVICE=/dev/input/event0---
-
-```
-
-## 🚀 Performance-Tuning
-
-### Display-Probleme
-
-```bash### Boot-Optimierung (< 15s Ziel)
-
-# Auflösung prüfenBereits im `setup.sh` enthalten:
-
-fbset```bash
-
-# Unnötige Services deaktivieren
-
-# HDMI-Ausgabe forcierensudo systemctl disable bluetooth.service
-
-sudo raspi-configsudo systemctl disable avahi-daemon.service
-
-# → Display Options → Resolution → 1280x800sudo systemctl mask systemd-networkd-wait-online.service
-
-```
-
-# Kernel-Parameter
-
-Siehe [INSTALL.md](docs/INSTALL.md) für detaillierte Lösungen.# In /boot/cmdline.txt:
-
-quiet loglevel=0 logo.nologo
-
----```
-
-
-
-## 📊 CAN-Bus Referenz### RAM-Optimierung
-
-```bash
-
-### Unterstützte CAN-IDs# GPU-Memory reduzieren (wenn kein Video)
-
-# In /boot/config.txt:
-
-| ID (Hex) | Beschreibung | Update-Rate |gpu_mem=64
-
-|----------|--------------|-------------|```
-
-| 0x210 | Batterie Spannung/Strom/Leistung | 100ms |
-
-| 0x215 | SOC, Kapazität, Flags | 100ms |### CPU-Governor
-
-| 0x220 | Limits (Max V/A) | 500ms |```bash
-
-| 0x230 | Status-Flags, Fehler | 100ms |# Performance-Mode für schnelleres UI
-
-| 0x264 | Fahrmodus (P/N/R/D/E) | 50ms |echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
-
-| 0x26C | PCU Ambient Temperatur | 500ms |```
-
-| 0x301-0x316 | Zellspannungen (88 Zellen, 4 pro Frame) | 1000ms |
-
-| 0x4B0 | Motor Geschwindigkeit | 50ms |---
-
-| 0x495 | Motor Leistung | 50ms |
-
-| 0x5E3 | Mains (AC) Spannung/Strom | 200ms |## 📁 Projekt-Struktur
-
-
-
-Vollständige Dokumentation: [CAN_REFERENCE.md](docs/CAN_REFERENCE.md)```
-
 thinkcity-dashboard-v3/
-
----├── README.md                      # Diese Datei
-
-├── setup.sh                       # Installations-Skript
-
-## 🛠️ Entwicklung├── requirements.txt               # Python-Abhängigkeiten
-
-│
-
-### Voraussetzungen├── dashboard.py                   # Haupt-GUI-Anwendung
-
-- Python 3.9+├── can_decoder.py                 # CAN-Frame-Parser (erweitert)
-
-- PyQt5├── trip_computer.py               # Range/Consumption-Logik (NEU)
-
-- python-can├── db_manager.py                  # Datenbank-Wrapper (verbessert)
-
-- SQLite3│
-
-├── ui/
-
-### Entwicklungs-Setup│   ├── main_screen.py             # Hauptbildschirm
-
-```bash│   ├── battery_screen.py          # Batterie-Details
-
-# Virtuelle Umgebung erstellen│   ├── charge_screen.py           # Lade-Screen
-
-python3 -m venv venv│   ├── settings_screen.py         # Settings (NEU)
-
-source venv/bin/activate│   └── widgets.py                 # Wiederverwendbare Widgets
-
-│
-
-# Abhängigkeiten installieren├── utils/
-
-pip install -r requirements.txt│   ├── can_interface.py           # CAN-Bus-Verwaltung (robust)
-
-│   ├── wifi_detector.py           # WLAN-Detection (NEU)
-
-# CAN-Simulator starten│   └── logger.py                  # Logging-Config
-
-sudo ip link add dev vcan0 type vcan│
-
-sudo ip link set vcan0 up├── sync/
-
-python3 tools/can_replay.py traces/entladen_91.log vcan0 50.0 --loop│   ├── mqtt_sync.py               # MQTT-Upload
-
-│   └── influx_sync.py             # InfluxDB-Upload
-
-# Dashboard starten│
-
-TC_CAN_CHANNEL=vcan0 python3 dashboard.py├── systemd/
-
-```│   ├── thinkcity-dashboard.service
-
-│   ├── thinkcity-sync.service
-
-### Tests│   └── thinkcity-sync.timer       # Periodischer Sync (NEU)
-
-```bash│
-
-# CAN-Decoder testen└── tests/
-
-python3 -m pytest tests/    ├── test_can_decoder.py        # Unit-Tests
-
-    └── can_simulator.py           # CAN-Bus-Simulator für Tests
-
-# UI ohne CAN-Bus```
-
-
-```---
-
-
-
----## 🔮 Geplante Features (GPS-Vorbereitung)
-
-
-
-## 📝 Roadmap### GPS-Modul (später)
-
-- **Hardware:** USB-GPS (z.B. VK-162, U-blox NEO-6M)
-
-### v3.1 (geplant)- **Schema erweitert:** `latitude`, `longitude` bereits in DB
-
-- [ ] GPS-Integration (USB-Modul)- **Karten-Integration:** Offline-Karten (OSM) für Trip-Replay
-
-- [ ] Offline-Karten für Trip-Replay- **Geofencing:** Automatische Home-Detection (statt WLAN)
-
-- [ ] MQTT/InfluxDB Export
-
-- [ ] Web-Interface für Remote-Monitoring### Erweiterte Statistiken
-
-- Höhenprofil (Steigung/Gefälle)
-
-### v3.2 (Zukunft)- Energie-Rückgewinnung pro Trip
-
-- [ ] Smartphone-App (Bluetooth-Sync)- Temperatur-Korrelation
-
-- [ ] OTA-Updates über WLAN- Ladekurven-Analyse
-
-- [ ] Erweiterte Statistiken und Diagramme
-
-- [ ] Multi-Fahrzeug Support---
-
-
-
----## 📝 Lizenz
-
-
-
-## 🤝 BeitragenMIT License - Freie Nutzung für private Projekte.
-
-
-
-Contributions sind willkommen! Bitte:---
-
-1. Fork das Repo
-
-2. Erstelle einen Feature-Branch (`git checkout -b feature/AmazingFeature`)## 🙏 Credits
-
-3. Commit deine Änderungen (`git commit -m 'Add AmazingFeature'`)
-
-4. Push zum Branch (`git push origin feature/AmazingFeature`)- **Original-Code:** DuinoMite MMBasic (ENER_AUTORUN.BAS)
-
-5. Öffne einen Pull Request- **CAN-Database:** SavvyCAN Community
-
-- **Konzept:** Arndt + GitHub Copilot
-
----- **Basis:** ChatGPT-Version (thinkcity-dashboard-rpios-v2)
-
-
-## 📄 Lizenz
-
-MIT License - siehe [LICENSE](LICENSE) für Details.
-
-Freie Nutzung für private und kommerzielle Projekte. Keine Garantie oder Haftung.
+├── dashboard.py                # Hauptanwendung
+├── main_screen.py              # Hauptbildschirm
+├── battery_screen.py           # Batterie-Übersicht
+├── cells_screen.py             # Zellspannungen
+├── charge_screen.py            # Ladestatus
+├── raw_screen.py               # CAN-Rohdaten
+├── settings_screen.py          # Einstellungsmenü
+├── widgets.py                  # Custom Widgets
+├── translations.py             # Übersetzungssystem
+├── db_manager.py               # Datenbank-Interface
+├── trip_computer.py            # Bordcomputer-Berechnungen
+├── trace_parser.py             # PCAN Trace Parser
+├── trace_player.py             # CAN Trace Replay
+├── test_trace_replay.py        # Trace Replay Tests
+├── can_decoder.py              # CAN-Message Decoder
+├── crypto_utils.py             # Passwort-Verschlüsselung
+├── requirements.txt            # Python-Abhängigkeiten
+├── config.json                 # Benutzer-Einstellungen
+├── thinkcity.db                # SQLite-Datenbank
+├── traces/                     # PCAN Trace-Dateien (.trc)
+├── systemd/                    # Service-Dateien
+│   ├── thinkcity-dashboard.service
+│   ├── can-interface.service
+│   └── can-trace-replay.service
+├── docs/                       # Dokumentation
+│   └── images/                 # Screenshots
+└── tools/                      # Hilfsprogramme
+    └── setup_vcan0.sh          # Virtual CAN Setup
+```
 
 ---
 
-## 🙏 Credits
+## 🔧 Fehlerbehebung
 
-- **Hardware-Reverse-Engineering**: ThinkCity Community
-- **CAN-Database**: [DuinoMite MMBasic](https://github.com/duinomite) Original-Code
-- **Entwicklung**: Arndt Barop + GitHub Copilot
-- **Inspiration**: SavvyCAN, OVMS Project
+### Dashboard startet nicht
+
+```bash
+# Service-Status prüfen
+systemctl status thinkcity-dashboard
+
+# Logs anzeigen
+journalctl -u thinkcity-dashboard -f
+
+# CAN-Interface testen
+candump can0
+```
+
+### CAN-Bus Fehler
+
+```bash
+# CAN-Interface neu starten
+sudo systemctl restart can-interface
+
+# Kernel-Meldungen prüfen
+dmesg | grep -i spi
+dmesg | grep -i mcp
+```
+
+### Touch funktioniert nicht
+
+```bash
+# Touchscreen-Tools installieren
+sudo apt install xinput-calibrator
+
+# Touchscreen kalibrieren
+DISPLAY=:0 xinput_calibrator
+```
+
+### Datenbank-Probleme
+
+```bash
+# Datenbank-Integrität prüfen
+sqlite3 thinkcity.db "PRAGMA integrity_check;"
+
+# Datenbank sichern
+cp thinkcity.db thinkcity.db.backup
+
+# Datenbank zurücksetzen (erstellt neues Schema)
+rm thinkcity.db
+python3 dashboard.py
+```
 
 ---
 
-## 📞 Support
+## 📝 Lizenz
 
-- **Issues**: [GitHub Issues](https://github.com/Arndt-Barop/thinkcity-dashboard/issues)
-- **Diskussionen**: [GitHub Discussions](https://github.com/Arndt-Barop/thinkcity-dashboard/discussions)
-- **Wiki**: [Project Wiki](https://github.com/Arndt-Barop/thinkcity-dashboard/wiki)
+MIT License - siehe [LICENSE](LICENSE) Datei für Details.
+
+## 🤝 Beiträge
+
+Beiträge sind willkommen! Bitte:
+1. Repository forken
+2. Feature-Branch erstellen
+3. Änderungen committen
+4. Zum Branch pushen
+5. Pull Request öffnen
+
+## 👨‍💻 Credits
+
+- **Entwicklung:** Arndt Barop + Claude Sonnet 3.5
+- **CAN-Datenbank:** Community Reverse Engineering
+- **Testing:** Think City Besitzer Community
+
+## 📧 Kontakt
+
+Für Fragen, Probleme oder Vorschläge:
+- GitHub Issues: [thinkcity-dashboard/issues](https://github.com/Arndt-Barop/thinkcity-dashboard/issues)
+- Email: [your-email@example.com]
 
 ---
 
-**Viel Spaß mit deinem ThinkCity Dashboard! ⚡🚗**
+**⚡ Mit ❤️ für die Think City Community entwickelt**

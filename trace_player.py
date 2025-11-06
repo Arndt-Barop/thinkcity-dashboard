@@ -1,5 +1,5 @@
 # trace_player.py
-# CAN Trace Player für vcan0 mit originalem Timing
+# CAN Trace Player for vcan0 mit originalem Timing
 
 import time
 import threading
@@ -15,8 +15,8 @@ except ImportError:
 
 class TracePlayer:
     """
-    Spielt PCAN Trace-Dateien auf einem virtuellen CAN-Bus (vcan0) ab.
-    Verwendet das originale Timing aus dem Trace.
+    Plays PCAN trace-Dateien on a virtual CAN-Bus (vcan0) ab.
+    Uses original timing aus dem Trace.
     """
     
     def __init__(self, interface: str = 'vcan0', bitrate: int = 500000):
@@ -45,7 +45,7 @@ class TracePlayer:
     
     def load_trace(self, trace_file: str):
         """
-        Lädt eine Trace-Datei.
+        Load a trace-Datei.
         
         Args:
             trace_file: Pfad zur .trc Datei
@@ -67,7 +67,7 @@ class TracePlayer:
             print(f"  Original recording: {metadata['start_datetime']}")
     
     def connect(self):
-        """Verbindet zum CAN-Bus."""
+        """Connect to CAN bus."""
         if not CAN_AVAILABLE:
             raise RuntimeError("python-can not installed. Install with: pip3 install python-can")
         
@@ -82,7 +82,7 @@ class TracePlayer:
             raise RuntimeError(f"Failed to connect to {self.interface}: {e}")
     
     def disconnect(self):
-        """Trennt die CAN-Bus Verbindung."""
+        """Disconnect CAN bus Verbindung."""
         if self.bus:
             self.bus.shutdown()
             self.bus = None
@@ -90,7 +90,7 @@ class TracePlayer:
     
     def start(self, loop: bool = False):
         """
-        Startet das Abspielen des Traces.
+        Start playback des Traces.
         
         Args:
             loop: Wenn True, wird der Trace endlos wiederholt
@@ -116,19 +116,19 @@ class TracePlayer:
         print(f"▶ Started playback (loop={'ON' if loop else 'OFF'})")
     
     def pause(self):
-        """Pausiert das Abspielen."""
+        """Pause playback."""
         if self.is_playing and not self.is_paused:
             self.is_paused = True
             print("⏸ Paused")
     
     def resume(self):
-        """Setzt das Abspielen fort."""
+        """Resume playback."""
         if self.is_playing and self.is_paused:
             self.is_paused = False
             print("▶ Resumed")
     
     def stop(self):
-        """Stoppt das Abspielen."""
+        """Stop playback."""
         if not self.is_playing:
             return
         
@@ -141,14 +141,14 @@ class TracePlayer:
         print(f"■ Stopped (sent {self.messages_sent} messages)")
     
     def _playback_loop(self):
-        """Haupt-Playback-Loop (läuft in separatem Thread)."""
+        """Main playback loop (runs in separate Thread)."""
         self.messages_sent = 0
         
         while not self.stop_event.is_set():
             self.current_position = 0
             iteration_start = time.time()
             
-            # Sende alle Messages mit originalem Timing
+            # Send all messages mit originalem Timing
             prev_timestamp = 0.0
             
             for i, (timestamp_ms, can_id, data) in enumerate(self.messages):
@@ -162,12 +162,12 @@ class TracePlayer:
                 if self.stop_event.is_set():
                     break
                 
-                # Berechne Wartezeit bis zur nächsten Message
+                # Calculate wait time until next message
                 delta_ms = timestamp_ms - prev_timestamp
                 if delta_ms > 0:
                     time.sleep(delta_ms / 1000.0)
                 
-                # Sende CAN-Message
+                # Send CAN message
                 try:
                     msg = can.Message(arbitration_id=can_id, data=data, is_extended_id=False)
                     self.bus.send(msg)
@@ -182,7 +182,7 @@ class TracePlayer:
             if not self.loop_enabled:
                 break
             
-            # Kurze Pause zwischen Loop-Iterationen
+            # Short pause between Loop-Iterationen
             if not self.stop_event.is_set():
                 time.sleep(0.5)
         
@@ -191,7 +191,7 @@ class TracePlayer:
     
     def get_status(self) -> dict:
         """
-        Gibt aktuellen Playback-Status zurück.
+        Returns current playback-Status zurück.
         
         Returns:
             Dict mit Status-Informationen
@@ -225,7 +225,7 @@ def main():
     # Erstelle und starte Player
     player = TracePlayer(interface='vcan0')
     
-    # Signal-Handler für sauberes Beenden
+    # Signal handler for clean shutdown
     def signal_handler(sig, frame):
         print("\n\n^C caught, stopping...")
         player.stop()

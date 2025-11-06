@@ -39,7 +39,7 @@ class CANInterface:
         
         while retries < self.max_retries:
             try:
-                # Prüfe ob Interface existiert
+                # Check if interface exists
                 if not self._check_interface_exists():
                     logger.warning(
                         f"CAN interface {self.channel} not found, "
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     
     print("Testing CAN interface...")
     
-    # Setup (falls nötig)
+    # Setup (if needed)
     setup_can_interface()
     
     # Connect

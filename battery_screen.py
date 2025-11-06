@@ -145,7 +145,7 @@ class BatteryScreen(QWidget):
         status_title.setStyleSheet("color: #aaaaaa;")
         status_group.addWidget(status_title)
         
-        # Grid für Flags
+        # Grid for flags
         flags_grid = QGridLayout()
         flags_grid.setSpacing(5)
         
@@ -189,7 +189,7 @@ class BatteryScreen(QWidget):
         Args:
             state: Dict mit allen Batterie-Werten
         """
-        # Status-Bar (kompletter State für Fehlerprüfung)
+        # Status bar (complete state for error checking)
         self.status_bar.set_state(state)
         ambient_temp = state.get("pcu_ambient_temp_C")
         if ambient_temp is not None:
@@ -205,7 +205,7 @@ class BatteryScreen(QWidget):
         self.ambient_temp_display.set_value(state.get("pcu_ambient_temp_C", 0.0))
         self.dod_display.set_value(state.get("dod_pct", 0.0))
         
-        # Zellspannungen (EnerDel)
+        # Cell voltages (EnerDel)
         if state.get("is_enerdel"):
             min_v = state.get("e_pack_min_cell_V")
             max_v = state.get("e_pack_max_cell_V")
@@ -221,7 +221,7 @@ class BatteryScreen(QWidget):
             if delta_v is not None:
                 self.cell_delta_value.setText(f"{delta_v:.3f} V")
                 
-                # Delta-Farbe: Grün bei <50mV, Rot bei >100mV
+                # Delta color: Green at <50mV, Red at >100mV
                 if delta_v < 0.05:
                     color = "#66ff66"
                 elif delta_v < 0.1:
@@ -246,7 +246,7 @@ class BatteryScreen(QWidget):
                 text = label.text().split(" ", 1)[1]  # Nur Text ohne Symbol
                 
                 # Fehler-Flags (iso_error, emergency) -> Rot wenn aktiv
-                # Normale Flags (charge_en, discharge_en, etc.) -> Grün wenn aktiv
+                # Normal flags (charge_en, discharge_en, etc.) -> Green when active
                 is_error_flag = key in ["iso_error", "emergency"]
                 
                 if value is True:
@@ -255,7 +255,7 @@ class BatteryScreen(QWidget):
                         label.setText(f"🔴 {text}")
                         label.setStyleSheet("color: #ff4444;")
                     else:
-                        # Normal aktiv = GRÜN (OK)
+                        # Normal active = GREEN (OK)
                         label.setText(f"🟢 {text}")
                         label.setStyleSheet("color: #66ff66;")
                 else:
