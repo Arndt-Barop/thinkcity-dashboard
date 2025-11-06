@@ -1,20 +1,20 @@
 # trip_computer.py
 # Berechnung von Range, Consumption, Trip-Statistiken
 # Verbesserte Version mit Welford-Algorithmus und Kalibrierung
+# Speichert Statistiken persistent in Datenbank (Remanenz bei hartem Abschalten)
 
 import os
 import time
-import json
 from typing import Optional, Dict, Any
 
 class TripComputer:
     """
     Berechnet Reichweite, Verbrauch und Trip-Statistiken.
     Basiert auf Original-BASIC-Code, aber erweitert.
-    Speichert Gesamt-Durchschnitt persistent.
+    Speichert Gesamt-Durchschnitt persistent in Datenbank.
     """
     
-    def __init__(self, stats_file: str = "/home/pi/thinkcity-dashboard-v3/trip_stats.json"):
+    def __init__(self, db_manager=None):
         # Kalibrierbare Parameter (aus Umgebungsvariablen oder Defaults)
         # WICHTIG: Degradierte Batterie - realistisch 17 kWh nutzbar (statt 24 kWh neu)
         self.battery_capacity_kwh = float(os.environ.get("TC_BATTERY_CAPACITY_KWH", "17.0"))
@@ -22,7 +22,7 @@ class TripComputer:
         # Maximale Reichweite (Sicherheitsbegrenzung für degradierte Batterie)
         self.max_range_km = float(os.environ.get("TC_MAX_RANGE_KM", "100.0"))
         
-        self.stats_file = stats_file
+        self.db_manager = db_manager
         
         # Trip-Daten (aktuell)
         self.trip_count = 0  # Anzahl Messungen
@@ -31,13 +31,13 @@ class TripComputer:
         self.trip_energy_kwh = 0.0
         self.trip_start_soc = None
         
-        # Gesamt-Daten (über alle Trips) - wird aus Datei geladen
+        # Gesamt-Daten (über alle Trips) - wird aus DB geladen
         self.total_count = 0
         self.total_avg_consumption = 0.0
         self.total_distance_km = 0.0
         self.total_energy_kwh = 0.0
         
-        # Lade gespeicherte Statistiken
+        # Lade gespeicherte Statistiken aus Datenbank
         self._load_stats()
         
         # Für Distanz-Berechnung (Integration)
@@ -47,37 +47,27 @@ class TripComputer:
         # Aktuelle Werte (werden in update() gesetzt)
         self.consumption_now_wh_km = 0.0
         self.consumption_now_kwh_100km = 0.0
-        
-        # Counter für periodisches Speichern
-        self.update_counter = 0
     
     def _load_stats(self):
-        """Lädt gespeicherte Gesamt-Statistiken."""
-        try:
-            if os.path.exists(self.stats_file):
-                with open(self.stats_file, 'r') as f:
-                    data = json.load(f)
-                    self.total_count = data.get('total_count', 0)
-                    self.total_avg_consumption = data.get('total_avg_consumption', 0.0)
-                    self.total_distance_km = data.get('total_distance_km', 0.0)
-                    self.total_energy_kwh = data.get('total_energy_kwh', 0.0)
-                    print(f"Loaded trip stats: {self.total_count} samples, avg {self.total_avg_consumption:.1f} Wh/km")
-        except Exception as e:
-            print(f"Could not load trip stats: {e}")
-    
-    def _save_stats(self):
-        """Speichert Gesamt-Statistiken persistent."""
-        try:
-            data = {
-                'total_count': self.total_count,
-                'total_avg_consumption': self.total_avg_consumption,
-                'total_distance_km': self.total_distance_km,
-                'total_energy_kwh': self.total_energy_kwh
-            }
-            with open(self.stats_file, 'w') as f:
-                json.dump(data, f, indent=2)
-        except Exception as e:
-            print(f"Could not save trip stats: {e}")
+        """Lädt gespeicherte Gesamt-Statistiken aus der Datenbank (Remanenz)."""
+        loaded = False
+        
+        # Lade aus Datenbank (Hauptquelle für Remanenz bei hartem Abschalten)
+        if self.db_manager:
+            try:
+                stats = self.db_manager.get_latest_total_stats()
+                if stats:
+                    self.total_count = stats.get('total_count', 0)
+                    self.total_avg_consumption = stats.get('total_avg_consumption', 0.0)
+                    self.total_distance_km = stats.get('total_distance_km', 0.0)
+                    self.total_energy_kwh = stats.get('total_energy_kwh', 0.0)
+                    print(f"Loaded trip stats from DB: {self.total_count} samples, avg {self.total_avg_consumption:.1f} Wh/km")
+                    loaded = True
+            except Exception as e:
+                print(f"Could not load trip stats from DB: {e}")
+        
+        if not loaded:
+            print("No trip stats found in DB, starting fresh")
     
     def update(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -136,13 +126,13 @@ class TripComputer:
         state["range_km"] = range_km
         state["trip_distance_km"] = self.trip_distance_km
         state["trip_energy_kwh"] = self.trip_energy_kwh
+        # Für DB-Speicherung
+        state["total_distance_km"] = self.total_distance_km
+        state["total_energy_kwh"] = self.total_energy_kwh
+        state["total_count"] = self.total_count
         
-        # Periodisch speichern (alle 100 Updates - ca. alle 10 Sekunden)
-        # Eigentliches Speichern erfolgt durch DB-Logging mit einstellbarem Intervall
-        self.update_counter += 1
-        if self.update_counter >= 100:
-            self._save_stats()
-            self.update_counter = 0
+        # Daten werden automatisch in DB gespeichert durch dashboard.py _log_sample()
+        # Kein separates Speichern mehr nötig (Remanenz durch DB garantiert)
         
         # Aktualisiere für nächste Iteration
         self.last_speed_kmh = speed_kmh
@@ -185,6 +175,15 @@ class TripComputer:
         self.trip_energy_kwh = 0.0
         self.trip_start_soc = None
     
+    def reset_total_stats(self):
+        """Setzt Gesamt-Statistiken zurück (durchschnittlicher Verbrauch)."""
+        self.total_count = 0
+        self.total_avg_consumption = 0.0
+        self.total_distance_km = 0.0
+        self.total_energy_kwh = 0.0
+        # Werte werden im nächsten DB-Sample-Write auf 0 gespeichert
+        print("Total trip statistics reset")
+    
     def start_trip(self, soc_pct: float):
         """Startet neuen Trip (z.B. bei Zündung an)."""
         self.reset_trip()
@@ -225,6 +224,5 @@ class TripComputer:
         }
     
     def shutdown(self):
-        """Speichert Statistiken beim Herunterfahren."""
-        self._save_stats()
-        print("Trip statistics saved on shutdown")
+        """Cleanup beim Herunterfahren (DB-Speicherung erfolgt automatisch)."""
+        print("TripComputer shutdown - statistics persisted in database")
