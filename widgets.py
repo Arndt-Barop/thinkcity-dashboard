@@ -388,7 +388,7 @@ class StatusBar(QWidget):
         painter.setFont(font_time)
         painter.drawText(0, 0, w, h, Qt.AlignCenter, time_str)
         
-        # RECHTS-MITTE: Status-Icons (WLAN, Simulation)
+        # RECHTS-MITTE: Status-Icons (WLAN)
         icon_x = w - 240  # Startposition für Icons
         font_icon = QFont("Arial", 11, QFont.Bold)
         painter.setFont(font_icon)
