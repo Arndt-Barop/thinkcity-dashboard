@@ -60,7 +60,7 @@ class ThinkCityDashboard(QWidget):
         self.can_interface: Optional[CANInterface] = None
         self.can_decoder = CANDecoder()
         self.db_manager = DBManager()
-        self.trip_computer = TripComputer()
+        self.trip_computer = TripComputer(db_manager=self.db_manager)
         
         # Odometer-Simulation (wird später aus Geschwindigkeit integriert)
         self.odo_km = 0.0
