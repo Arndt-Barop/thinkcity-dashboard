@@ -192,21 +192,11 @@ class ThinkCityDashboard(QWidget):
         self.can_interface = CANInterface(channel=channel)
         
         if not self.can_interface.connect():
-            logger.error("Failed to connect to CAN bus - running in demo mode")
+            logger.error("Failed to connect to CAN bus")
             self.can_interface = None
-            # Demo-Daten-Timer starten
-            self._start_demo_mode()
         else:
-            # Prüfe ob vcan (Simulation) oder echtes CAN
+            # Prüfe ob vcan (virtuelle CAN für Tests)
             logger.info(f"Connected to {channel}")
-    
-    def _is_simulation_active(self):
-        """Prüft ob CAN-Simulation aktiv ist (vcan)."""
-        if self.can_interface is None:
-            return True  # Demo-Modus = Simulation
-        
-        channel = os.getenv("TC_CAN_CHANNEL", "can0")
-        return channel.startswith("vcan")
     
     def _is_wifi_connected(self):
         """Prüft ob WLAN verbunden ist."""
@@ -223,42 +213,6 @@ class ThinkCityDashboard(QWidget):
             return "inet " in result.stdout
         except Exception:
             return False
-    
-    def _start_demo_mode(self):
-        """Startet Demo-Modus mit Fake-Daten."""
-        logger.info("Starting demo mode with fake data")
-        
-        def generate_demo_data():
-            import random
-            
-            # Power meistens positiv (Verbrauch), manchmal negativ (Rekuperation)
-            power = random.uniform(-5, 15) if random.random() > 0.3 else random.uniform(-15, -2)
-            
-            self.state.update({
-                "speed_kmh": random.uniform(40, 80),
-                "power_kW": power,
-                "soc_pct": random.uniform(60, 90),
-                "voltage_V": random.uniform(320, 340),
-                "current_A": random.uniform(-30, 5),
-                "pack_temp_C": random.uniform(20, 30),
-                "pcu_ambient_temp_C": random.uniform(15, 25),
-                "dod_pct": 100 - self.state.get("soc_pct", 70),
-                "is_enerdel": True,
-                "e_pack_min_cell_V": 3.45,
-                "e_pack_max_cell_V": 3.50,
-                "e_pack_avg_cell_V": 3.47,
-                "e_pack_delta_cell_V": 0.05,
-            })
-            
-            # Trip-Computer update - benutzt Return-Value
-            self.state = self.trip_computer.update(self.state)
-            
-            # SOH
-            self.state["soh_pct"] = 92.5
-        
-        demo_timer = QTimer()
-        demo_timer.timeout.connect(generate_demo_data)
-        demo_timer.start(100)
     
     def _update_loop(self):
         """Haupt-Update-Loop (10 Hz)."""
