@@ -705,6 +705,36 @@ TRANSLATIONS = {
         "EN": "[OK] Consumption data reset"
     },
     
+    # Trace Replay
+    "trace_replay": {
+        "DE": "Trace Replay",
+        "EN": "Trace Replay"
+    },
+    "select_trace": {
+        "DE": "Trace-Datei auswählen",
+        "EN": "Select Trace File"
+    },
+    "no_trace_selected": {
+        "DE": "Keine Trace-Datei",
+        "EN": "No Trace File"
+    },
+    "no_traces_found": {
+        "DE": "(keine .trc Dateien gefunden)",
+        "EN": "(no .trc files found)"
+    },
+    "loop_playback": {
+        "DE": "Endlos-Wiedergabe",
+        "EN": "Loop Playback"
+    },
+    "autostart_boot": {
+        "DE": "Beim Boot starten",
+        "EN": "Start on Boot"
+    },
+    "trace_info": {
+        "DE": "Lege .trc Dateien in ~/thinkcity-dashboard-v3/traces/ ab",
+        "EN": "Place .trc files in ~/thinkcity-dashboard-v3/traces/"
+    },
+    
     # Messages
     "settings_saved": {
         "DE": "[OK] Einstellungen gespeichert!\n\nNeustart erforderlich für CAN-Interface Änderung.",
