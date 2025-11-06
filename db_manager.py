@@ -94,11 +94,35 @@ class DBManager:
                     latitude REAL,
                     longitude REAL,
                     consumption_wh_km REAL,
+                    consumption_total_wh_km REAL,
+                    total_distance_km REAL,
+                    total_energy_kwh REAL,
+                    total_count INTEGER,
                     range_km REAL,
                     synced INTEGER DEFAULT 0,
                     FOREIGN KEY (trip_id) REFERENCES trips (trip_id)
                 )
             """)
+            
+            # Migration: Füge neue Spalten hinzu falls nicht vorhanden
+            cursor.execute("PRAGMA table_info(samples)")
+            columns = [col[1] for col in cursor.fetchall()]
+            
+            if "consumption_total_wh_km" not in columns:
+                cursor.execute("ALTER TABLE samples ADD COLUMN consumption_total_wh_km REAL")
+                logger.info("Added consumption_total_wh_km column to samples table")
+            
+            if "total_distance_km" not in columns:
+                cursor.execute("ALTER TABLE samples ADD COLUMN total_distance_km REAL")
+                logger.info("Added total_distance_km column to samples table")
+            
+            if "total_energy_kwh" not in columns:
+                cursor.execute("ALTER TABLE samples ADD COLUMN total_energy_kwh REAL")
+                logger.info("Added total_energy_kwh column to samples table")
+            
+            if "total_count" not in columns:
+                cursor.execute("ALTER TABLE samples ADD COLUMN total_count INTEGER")
+                logger.info("Added total_count column to samples table")
             
             # Index für schnellere Queries
             cursor.execute("""
@@ -249,8 +273,10 @@ class DBManager:
                         trip_id, timestamp, speed_kmh, soc_pct,
                         voltage_V, current_A, power_kW, pack_temp_C,
                         ambient_temp_C, latitude, longitude,
-                        consumption_wh_km, range_km
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        consumption_wh_km, consumption_total_wh_km,
+                        total_distance_km, total_energy_kwh, total_count,
+                        range_km
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     self.current_trip_id,
                     now.isoformat(),
@@ -264,6 +290,10 @@ class DBManager:
                     data.get("latitude"),
                     data.get("longitude"),
                     data.get("consumption_wh_km", 0.0),
+                    data.get("consumption_total_wh_km", 0.0),
+                    data.get("total_distance_km", 0.0),
+                    data.get("total_energy_kwh", 0.0),
+                    data.get("total_count", 0),
                     data.get("range_km", 0.0)
                 ))
             
@@ -307,6 +337,33 @@ class DBManager:
             )
             
             logger.info(f"Marked trip {trip_id} as synced")
+    
+    def get_latest_total_stats(self) -> Optional[Dict[str, Any]]:
+        """
+        Holt die neuesten Total-Statistiken aus der DB.
+        Wird beim Start verwendet um Remanenz zu gewährleisten.
+        """
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT consumption_total_wh_km, total_distance_km, 
+                       total_energy_kwh, total_count
+                FROM samples 
+                WHERE consumption_total_wh_km IS NOT NULL 
+                  AND total_count > 0
+                ORDER BY timestamp DESC 
+                LIMIT 1
+            """)
+            
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'total_avg_consumption': row[0] or 0.0,
+                    'total_distance_km': row[1] or 0.0,
+                    'total_energy_kwh': row[2] or 0.0,
+                    'total_count': row[3] or 0
+                }
+            return None
     
     def get_lifetime_stats(self) -> Dict[str, Any]:
         """Berechnet Lifetime-Statistiken."""
