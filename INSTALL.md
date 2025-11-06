@@ -588,7 +588,6 @@ Bei Problemen:
 
 export TSLIB_TSDEVICE=/dev/input/event02. CAN-Bus testen: `candump can0`
 
-```3. Demo-Mode testen: `./start_dashboard.sh` (ohne CAN)
 
 
 
@@ -596,7 +595,6 @@ export TSLIB_TSDEVICE=/dev/input/event02. CAN-Bus testen: `candump can0`
 
 
 
-```bash## ⚙️ Entwicklung / Demo-Mode
 
 # Check HDMI
 

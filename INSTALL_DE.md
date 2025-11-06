@@ -293,11 +293,9 @@ sudo systemctl restart thinkcity-dashboard
 Bei Problemen:
 1. Logs prüfen: `sudo journalctl -u thinkcity-dashboard`
 2. CAN-Bus testen: `candump can0`
-3. Demo-Mode testen: `./start_dashboard.sh` (ohne CAN)
 
 ---
 
-## ⚙️ Entwicklung / Demo-Mode
 
 ```bash
 # Ohne CAN-Bus testen (generiert Fake-Daten)
