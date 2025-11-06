@@ -262,9 +262,8 @@ class ThinkCityDashboard(QWidget):
         """Updated nur den aktuell sichtbaren Screen."""
         current_idx = self.screen_stack.currentIndex()
         
-        # WLAN- und Simulation-Status ermitteln
+        # WLAN-Status ermitteln
         wifi_status = self._is_wifi_connected()
-        simulation_status = self._is_simulation_active()
         
         # Status an alle StatusBars weitergeben (nur aktueller Screen wird gerendert)
         screens_with_statusbar = [
@@ -279,7 +278,6 @@ class ThinkCityDashboard(QWidget):
         for screen in screens_with_statusbar:
             if hasattr(screen, 'status_bar'):
                 screen.status_bar.set_wifi_status(wifi_status)
-                screen.status_bar.set_simulation_status(simulation_status)
         
         # Screen-spezifische Updates
         if current_idx == 0:

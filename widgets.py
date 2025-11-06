@@ -273,7 +273,6 @@ class StatusBar(QWidget):
         self.ambient_temp = None
         self.state = {}  # Speichert aktuellen State für Fehlerprüfung
         self.wifi_connected = False  # WLAN-Status
-        self.simulation_active = False  # Simulation-Status
         self.setFixedHeight(30)  # Schmaler!
         self.setMinimumWidth(400)
     
@@ -290,11 +289,6 @@ class StatusBar(QWidget):
     def set_wifi_status(self, connected: bool):
         """Setzt WLAN-Verbindungsstatus."""
         self.wifi_connected = connected
-        self.update()
-    
-    def set_simulation_status(self, active: bool):
-        """Setzt Simulation-Status."""
-        self.simulation_active = active
         self.update()
     
     def _get_critical_warning(self):
@@ -403,12 +397,6 @@ class StatusBar(QWidget):
         if self.wifi_connected:
             painter.setPen(QColor(0, 255, 100))  # Grün
             painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[WiFi]")
-            icon_x += 55
-        
-        # Simulation-Icon (wenn aktiv)
-        if self.simulation_active:
-            painter.setPen(QColor(255, 200, 0))  # Gelb
-            painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[SIM]")
             icon_x += 55
         
         # RECHTS: Außentemperatur (wenn vorhanden)
