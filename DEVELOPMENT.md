@@ -70,62 +70,102 @@ Dies erlaubt dem `pi`-User passwortloses shutdown/reboot.
 
 ## 🎬 CAN Trace Replay
 
-For development and testing without a real vehicle. Replays recorded CAN traces on vcan0.
+For development and testing without a real vehicle. Replays recorded PCAN traces on vcan0.
 
-### Installation
+### Quick Start
 
-```bash
-chmod +x install_dev_features.sh
-./install_dev_features.sh
-```
-
-### Aktivierung
-
-**Option 1: Über Settings-Screen (empfohlen)**
-1. Settings-Screen öffnen (⚙️)
-2. CAN-Interface: `vcan0` wählen
-3. "Trace-Replay beim Boot starten" aktivieren
-4. Speichern & System neu starten
-
-**Option 2: Manuell**
-```bash
-# Service aktivieren
-sudo systemctl enable can-simulation
-sudo systemctl start can-simulation
-
-# Status prüfen
-systemctl status can-simulation
-
-# Logs anzeigen
-journalctl -u can-simulation -f
-```
-
-### Funktionsweise
-
-- Erstellt virtuelle CAN-Schnittstelle `vcan0`
-- Spielt CAN-Trace `traces/entladen_91.log` in Endlosschleife ab
-- 50× Geschwindigkeit für schnelle Tests
-- Startet automatisch beim Boot (wenn aktiviert)
-
-### Eigene Traces verwenden
-
-1. Trace aufnehmen (candump Format):
+1. **Copy PCAN .trc files** to `~/thinkcity-dashboard-v3/traces/`
    ```bash
-   candump can0 -l
-   # Erzeugt: candump-YYYY-MM-DD_HHMMSS.log
+   cp ~/path/to/your/*.trc ~/thinkcity-dashboard-v3/traces/
    ```
 
-2. Trace in `traces/` Verzeichnis kopieren
+2. **Configure in Settings:**
+   - Open Settings (⚙️ button)
+   - CAN Interface: Select `vcan0`
+   - Trace Replay: Select your .trc file from dropdown
+   - Enable "Loop Playback" for continuous replay
+   - Enable "Start on Boot" for automatic startup
+   - Save settings
 
-3. Service-Datei anpassen:
+3. **Reboot or start manually:**
    ```bash
-   sudo nano /etc/systemd/system/can-simulation.service
-   # ExecStart Zeile ändern:
-   ExecStart=/usr/bin/python3 ... traces/mein-trace.log vcan0 50 --loop
+   # Automatic (after reboot with "Start on Boot" enabled)
+   systemctl status can-trace-replay
    
-   sudo systemctl daemon-reload
-   sudo systemctl restart can-simulation
+   # Manual start
+   python3 trace_player.py ~/thinkcity-dashboard-v3/traces/your-trace.trc --loop
    ```
+
+### Architecture
+
+**Components:**
+- `trace_parser.py` - PCAN .trc format parser
+- `trace_player.py` - CAN bus replay with original timing
+- `can-trace-replay.service` - Systemd service for auto-start
+- Settings UI - Trace selection dropdown
+
+**Format Support:**
+- PCAN-View .trc files (Version 1.1)
+- Original timing preserved
+- All CAN IDs supported
+
+### Testing Traces
+
+Standalone test without CAN bus:
+```bash
+# Parse and analyze trace
+python3 trace_parser.py ~/path/to/trace.trc
+
+# Test player (requires vcan0)
+# 1. Setup vcan0
+sudo modprobe vcan
+sudo ip link add dev vcan0 type vcan
+sudo ip link set up vcan0
+
+# 2. Play trace
+python3 trace_player.py ~/path/to/trace.trc --loop
+
+# 3. Monitor CAN traffic
+candump vcan0
+```
+
+### Creating Your Own Traces
+
+**Option 1: PCAN-View Recording**
+1. Record with PCAN-View software
+2. Export as .trc file (v1.1 format)
+3. Copy to `~/thinkcity-dashboard-v3/traces/`
+
+**Option 2: Convert from candump**
+```bash
+# Record with candump
+candump can0 -l
+
+# Convert to PCAN format (if converter available)
+python3 tools/candump2trc.py candump-*.log > trace.trc
+```
+
+### Service Management
+
+The `can-trace-replay.service` is automatically managed by Settings:
+- **Enable/Disable:** Via "Start on Boot" checkbox
+- **Trace Selection:** Reads `trace_file` from `config.json`
+- **Loop Mode:** Configured via Settings
+
+Manual service control:
+```bash
+# Status
+systemctl status can-trace-replay
+
+# Logs
+journalctl -u can-trace-replay -f
+
+# Manual control
+sudo systemctl start can-trace-replay
+sudo systemctl stop can-trace-replay
+sudo systemctl enable can-trace-replay
+sudo systemctl disable can-trace-replay
+```
 
 ---
 
