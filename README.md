@@ -106,7 +106,7 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 
 - **Raw Data**: Live CAN terminal + ID reference table- **Rohdaten**: Live CAN-Terminal + ID-Referenztabelle
 
-- **Settings**: System configuration, CAN interface, Network, Logging
+- **Settings**: System configuration, CAN interface, Network, Logging, **Trace Replay**
 
 ### 🎛️ **Power-Gauge mit logarithmischer Skalierung**
 
