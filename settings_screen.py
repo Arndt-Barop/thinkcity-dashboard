@@ -791,11 +791,6 @@ class SettingsScreen(QWidget):
         self.loop_checkbox.setChecked(self.settings.get("trace_loop", False))
         layout.addWidget(self.loop_checkbox)
         
-        # Autostart on Boot Checkbox
-        self.autostart_checkbox = QCheckBox(t("autostart_boot"))
-        self.autostart_checkbox.setChecked(self.settings.get("trace_autostart", False))
-        layout.addWidget(self.autostart_checkbox)
-        
         # Info text
         info_label = QLabel(t("trace_info"))
         info_label.setWordWrap(True)
@@ -886,7 +881,6 @@ class SettingsScreen(QWidget):
         selected_trace_data = self.trace_combo.currentData()
         self.settings["trace_file"] = selected_trace_data if selected_trace_data else ""
         self.settings["trace_loop"] = self.loop_checkbox.isChecked()
-        self.settings["trace_autostart"] = self.autostart_checkbox.isChecked()
         
         self.save_settings()
         
@@ -895,14 +889,6 @@ class SettingsScreen(QWidget):
             self.translator.set_language(selected_lang)
             # Reload UI with new language
             self.reload_ui()
-        
-        # Handle Trace Replay Service
-        if self.settings.get("trace_autostart", False) and self.settings.get("trace_file"):
-            # Aktiviere und starte Trace Replay Service
-            self._enable_trace_replay()
-        else:
-            # Deaktiviere Trace Replay Service
-            self._disable_trace_replay()
         
         # Apply WLAN Configuration via NetworkManager
         self._apply_wlan_config()
@@ -1083,28 +1069,6 @@ class SettingsScreen(QWidget):
                 self.show_message(t("consumption_reset"))
             else:
                 print("Warning: Could not access trip_computer from parent")
-    
-    def _enable_trace_replay(self):
-        """Aktiviere und starte Trace Replay Service."""
-        import subprocess
-        try:
-            # Enable Service
-            subprocess.run(['sudo', 'systemctl', 'enable', 'can-trace-replay'], check=True)
-            print("✓ Trace Replay Service aktiviert")
-        except subprocess.CalledProcessError as e:
-            print(f"✗ Fehler beim Aktivieren des Trace Replay Service: {e}")
-    
-    def _disable_trace_replay(self):
-        """Deaktiviere Trace Replay Service."""
-        import subprocess
-        try:
-            # Disable Service
-            subprocess.run(['sudo', 'systemctl', 'disable', 'can-trace-replay'], check=True)
-            # Stop service (if running)
-            subprocess.run(['sudo', 'systemctl', 'stop', 'can-trace-replay'], check=False)
-            print("✓ Trace Replay Service deaktiviert")
-        except subprocess.CalledProcessError as e:
-            print(f"✗ Fehler beim Deaktivieren des Trace Replay Service: {e}")
 
 
 # Test-Programm

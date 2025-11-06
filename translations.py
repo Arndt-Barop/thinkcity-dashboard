@@ -726,10 +726,6 @@ TRANSLATIONS = {
         "DE": "Endlos-Wiedergabe",
         "EN": "Loop Playback"
     },
-    "autostart_boot": {
-        "DE": "Beim Boot starten",
-        "EN": "Start on Boot"
-    },
     "trace_info": {
         "DE": "Lege .trc Dateien in ~/thinkcity-dashboard-v3/traces/ ab",
         "EN": "Place .trc files in ~/thinkcity-dashboard-v3/traces/"
