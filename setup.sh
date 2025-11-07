@@ -190,6 +190,15 @@ fi
 # ==========================================
 info "Schritt 8/9: Systemd-Services installieren..."
 
+# CAN-Setup Service (für dynamisches can0/vcan0 Setup)
+sudo cp "$SCRIPT_DIR/systemd/can-setup.service" /etc/systemd/system/
+sudo cp "$SCRIPT_DIR/tools/setup_can_interface.sh" /home/pi/thinkcity-dashboard-v3/tools/
+sudo chmod +x /home/pi/thinkcity-dashboard-v3/tools/setup_can_interface.sh
+sudo systemctl daemon-reload
+sudo systemctl enable can-setup.service
+
+info "CAN-Setup-Service aktiviert (liest config.json für can0/vcan0)"
+
 # Haupt-Service
 sudo cp "$SCRIPT_DIR/systemd/thinkcity-dashboard.service" /etc/systemd/system/
 sudo systemctl daemon-reload

@@ -1,8 +1,7 @@
 [Unit]
 Description=ThinkCity Dashboard v3
-After=network.target can-interface.service
-Wants=can-interface.service
-ConditionPathExists=/sys/class/net/can0
+After=network.target can-setup.service
+Wants=can-setup.service
 
 [Service]
 Type=simple
@@ -13,7 +12,7 @@ Environment="QT_QPA_PLATFORM=xcb"
 Environment="DISPLAY=:0"
 Environment="TC_FULLSCREEN=1"
 Environment="TC_HIDE_CURSOR=1"
-Environment="TC_CAN_CHANNEL=can0"
+Environment="TC_CAN_CHANNEL=vcan0"
 Environment="TC_DB_PATH=/mnt/usbssd/thinkcity.db"
 Environment="TC_BATTERY_CAPACITY_KWH=24.0"
 ExecStartPre=/bin/sleep 2
