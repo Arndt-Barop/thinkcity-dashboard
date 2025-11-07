@@ -784,6 +784,56 @@ TRANSLATIONS = {
         "DE": "System wird heruntergefahren...",
         "EN": "System is shutting down..."
     },
+    
+    # === CAN Trace Recording ===
+    "can_trace_recording": {
+        "DE": "CAN Trace Aufzeichnung",
+        "EN": "CAN Trace Recording"
+    },
+    "not_recording": {
+        "DE": "Keine Aufnahme",
+        "EN": "Not Recording"
+    },
+    "recording_active": {
+        "DE": "AUFNAHME LÄUFT",
+        "EN": "RECORDING"
+    },
+    "start_recording": {
+        "DE": "Aufnahme Starten",
+        "EN": "Start Recording"
+    },
+    "stop_recording": {
+        "DE": "Aufnahme Stoppen",
+        "EN": "Stop Recording"
+    },
+    "duration": {
+        "DE": "Dauer",
+        "EN": "Duration"
+    },
+    "messages": {
+        "DE": "Nachrichten",
+        "EN": "Messages"
+    },
+    "file_size": {
+        "DE": "Dateigröße",
+        "EN": "File Size"
+    },
+    "filename": {
+        "DE": "Dateiname",
+        "EN": "Filename"
+    },
+    "storage_location": {
+        "DE": "Speicherort",
+        "EN": "Storage Location"
+    },
+    "recording_stopped": {
+        "DE": "Aufnahme gestoppt",
+        "EN": "Recording Stopped"
+    },
+    "recording_saved": {
+        "DE": "Aufnahme gespeichert",
+        "EN": "Recording saved to"
+    },
 }
 
 
