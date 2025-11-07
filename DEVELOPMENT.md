@@ -99,15 +99,16 @@ For development and testing without a real vehicle. Replays recorded PCAN traces
 ### Architecture
 
 **Components:**
-- `trace_parser.py` - PCAN .trc format parser
+- `trace_parser.py` - PCAN .trc format parser (supports v1.1)
 - `trace_player.py` - CAN bus replay with original timing
 - `can-trace-replay.service` - Systemd service for auto-start
-- Settings UI - Trace selection dropdown
+- Settings UI - Trace selection dropdown with Start/Pause/Stop controls
 
 **Format Support:**
 - PCAN-View .trc files (Version 1.1)
-- Original timing preserved
-- All CAN IDs supported
+- Original timing preserved (timestamps in milliseconds)
+- All CAN IDs supported (37 unique IDs, 100% decoder coverage)
+- Module voltages (0x4B0) included for battery diagnostics
 
 ### Testing Traces
 
