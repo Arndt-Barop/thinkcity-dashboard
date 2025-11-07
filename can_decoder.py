@@ -198,6 +198,9 @@ class CANDecoder:
             else:
                 return None  # Unbekannte ID
             
+            # Calculate derived values (SOH, etc.) after parsing
+            out = self.merge_state({}, out)
+            
             # Cache for diagnostics
             self.last_values[arbid] = out
             
