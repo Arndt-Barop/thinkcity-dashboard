@@ -49,7 +49,7 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 ### 📊 **5 Hauptscreens**
 
 - **Haupt**: Geschwindigkeit, Power-Gauge, Reichweite, Verbrauch, Fahrmodus (P/N/R/D/E)
-- **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags, **Modul-Spannungen (4 Module)**
+- **Batterie**: Spannungen, Ströme, Temperaturen, Status-Flags
 - **Zellen**: Detaillierte Ansicht aller 88 Zellspannungen mit Bargraphen
 - **Laden**: Ladestatus, AC/DC-Werte, Zeitschätzungen
 - **Rohdaten**: Live CAN-Terminal + ID-Referenztabelle
@@ -99,10 +99,8 @@ Kritische Batteriezustände lösen visuelle Warnungen aus:
 
 - Zuverlässige Initialisierung mit Retry-Logik
 - Automatisches Recovery bei CAN-Bus-Fehlern
-- Vollständige Dekodierung aller bekannten ThinkCity CAN-IDs (37 eindeutige IDs, 100% Abdeckung)
-- **Modul-Spannungsüberwachung**: 4 Batterie-Module einzeln angezeigt (0x4B0)
+- Vollständige Dekodierung aller bekannten ThinkCity CAN-IDs
 - PCAN Trace Replay für Entwicklung/Testing (vcan0)
-- Start/Pause/Stop-Steuerung für Trace-Wiedergabe
 
 ### 💾 **Datenlogging & Performance**
 

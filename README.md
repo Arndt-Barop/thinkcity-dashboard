@@ -49,7 +49,7 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 ### 📊 **5 Main Screens**
 
 - **Main**: Speed, Power Gauge, Range, Consumption, Drive Mode (P/N/R/D/E)
-- **Battery**: Voltages, Currents, Temperatures, Status Flags, **Module Voltages (4 modules)**
+- **Battery**: Voltages, Currents, Temperatures, Status Flags
 - **Cells**: Detailed view of all 88 cell voltages with bar graphs
 - **Charge**: Charging status, AC/DC values, time estimates
 - **Raw Data**: Live CAN terminal + ID reference table
@@ -99,10 +99,8 @@ Critical battery conditions trigger visual warnings:
 
 - Reliable initialization with retry logic
 - Automatic recovery from CAN bus errors
-- Complete decoding of all known ThinkCity CAN IDs (37 unique IDs, 100% coverage)
-- **Module Voltage Monitoring**: 4 battery modules individually displayed (0x4B0)
+- Complete decoding of all known ThinkCity CAN IDs
 - PCAN trace replay for development/testing (vcan0)
-- Start/Pause/Stop controls for trace playback
 
 ### 💾 **Data Logging & Performance**
 
