@@ -78,6 +78,9 @@ class CANDecoder:
     ENERDEL_1 = 0x610
     ENERDEL_2 = 0x611
     
+    # Module Voltages (4 modules)
+    MODULE_VOLTAGES = 0x4B0
+    
     # Diagnostics / ID
     DIAG_1 = 0x30E  # Part Numbers (ASCII)
     DIAG_2 = 0x30F  # Part Numbers (ASCII)
@@ -169,6 +172,10 @@ class CANDecoder:
             elif arbid == self.ENERDEL_2:
                 self.is_enerdel = True
                 out.update(self._parse_enerdel2(d))
+            
+            # Module Voltages
+            elif arbid == self.MODULE_VOLTAGES:
+                out.update(self._parse_module_voltages(d))
             
             # Diagnostics
             elif arbid == self.DIAG_1:
@@ -345,6 +352,25 @@ class CANDecoder:
             "e_pack_soc_pct": d[5] * 0.4,
             "e_pack_soc1_pct": d[6] * 0.4,
             "e_pack_soc2_pct": d[7] * 0.4,
+        }
+    
+    def _parse_module_voltages(self, d: list) -> Dict[str, Any]:
+        """
+        0x4B0: Module Voltages (4 modules).
+        Each module is 16-bit Big-Endian, scaled by 0.00244140625 (EnerDel cell voltage scaling).
+        Format: [Mod1_Hi, Mod1_Lo, Mod2_Hi, Mod2_Lo, Mod3_Hi, Mod3_Lo, Mod4_Hi, Mod4_Lo]
+        """
+        module1_V = _u16(d[0], d[1]) * 0.00244140625
+        module2_V = _u16(d[2], d[3]) * 0.00244140625
+        module3_V = _u16(d[4], d[5]) * 0.00244140625
+        module4_V = _u16(d[6], d[7]) * 0.00244140625
+        
+        return {
+            "module1_voltage_V": module1_V,
+            "module2_voltage_V": module2_V,
+            "module3_voltage_V": module3_V,
+            "module4_voltage_V": module4_V,
+            "modules_total_V": module1_V + module2_V + module3_V + module4_V,
         }
     
     def _parse_bmi6(self, d: list) -> Dict[str, Any]:
