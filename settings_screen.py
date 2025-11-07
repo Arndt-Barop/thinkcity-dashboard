@@ -736,11 +736,11 @@ class SettingsScreen(QWidget):
         group = QGroupBox(t("trip_computer"))
         layout = QVBoxLayout()
         
-        # Reset Button
-        reset_layout = QHBoxLayout()
-        reset_btn = QPushButton(t("reset_consumption"))
-        reset_btn.setMinimumHeight(50)
-        reset_btn.setStyleSheet("""
+        # Reset Consumption Button
+        reset_consumption_layout = QHBoxLayout()
+        reset_consumption_btn = QPushButton(t("reset_consumption"))
+        reset_consumption_btn.setMinimumHeight(50)
+        reset_consumption_btn.setStyleSheet("""
             QPushButton {
                 background-color: #e74c3c;
                 color: white;
@@ -753,17 +753,46 @@ class SettingsScreen(QWidget):
                 background-color: #c0392b;
             }
         """)
-        reset_btn.clicked.connect(self.on_reset_consumption)
-        reset_layout.addWidget(reset_btn)
-        layout.addLayout(reset_layout)
+        reset_consumption_btn.clicked.connect(self.on_reset_consumption)
+        reset_consumption_layout.addWidget(reset_consumption_btn)
+        layout.addLayout(reset_consumption_layout)
         
-        # Info text
-        info_label = QLabel(t("reset_consumption") + ": " + 
+        # Info text for consumption
+        info_consumption_label = QLabel(t("reset_consumption") + ": " + 
                            ("Setzt den gespeicherten Durchschnittsverbrauch zurück" if t("language") == "DE" 
                             else "Resets the stored average consumption"))
-        info_label.setWordWrap(True)
-        info_label.setStyleSheet("color: #888888; font-size: 11px;")
-        layout.addWidget(info_label)
+        info_consumption_label.setWordWrap(True)
+        info_consumption_label.setStyleSheet("color: #888888; font-size: 11px; margin-bottom: 15px;")
+        layout.addWidget(info_consumption_label)
+        
+        # Reset SOH Button
+        reset_soh_layout = QHBoxLayout()
+        reset_soh_btn = QPushButton("SOH " + ("zurücksetzen" if t("language") == "DE" else "Reset"))
+        reset_soh_btn.setMinimumHeight(50)
+        reset_soh_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e67e22;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #d35400;
+            }
+        """)
+        reset_soh_btn.clicked.connect(self.on_reset_soh)
+        reset_soh_layout.addWidget(reset_soh_btn)
+        layout.addLayout(reset_soh_layout)
+        
+        # Info text for SOH
+        info_soh_label = QLabel("SOH: " + 
+                           ("Setzt den State of Health auf 100% zurück (nach Batterietausch)" if t("language") == "DE" 
+                            else "Resets State of Health to 100% (after battery replacement)"))
+        info_soh_label.setWordWrap(True)
+        info_soh_label.setStyleSheet("color: #888888; font-size: 11px;")
+        layout.addWidget(info_soh_label)
         
         group.setLayout(layout)
         return group
@@ -1105,6 +1134,29 @@ class SettingsScreen(QWidget):
                 self.show_message(t("consumption_reset"))
             else:
                 print("Warning: Could not access trip_computer from parent")
+    
+    def on_reset_soh(self):
+        """Reset SOH with confirmation."""
+        from PyQt5.QtWidgets import QMessageBox
+        t = self.translator.get
+        
+        # Confirmation dialog
+        reply = QMessageBox.question(
+            self, 
+            t("trip_computer"),
+            "SOH auf 100% zurücksetzen?" if t("language") == "DE" else "Reset SOH to 100%?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            # Get soh_tracker instance from parent (dashboard)
+            parent = self.parent()
+            if parent and hasattr(parent, 'soh_tracker'):
+                parent.soh_tracker.reset_soh(100.0)
+                self.show_message("SOH " + ("zurückgesetzt auf 100%" if t("language") == "DE" else "reset to 100%"))
+            else:
+                print("Warning: Could not access soh_tracker from parent")
 
 
 # Test-Programm
