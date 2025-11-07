@@ -2,10 +2,11 @@
 
 ## Übersicht
 
-**Gesamt: 33 dekodierte CAN-IDs** (Stand: 02.11.2025)
+**Gesamt: 37 dekodierte CAN-IDs** (Stand: 05.11.2025)
 
 - 10 Basis-IDs (bereits in v1/v2 implementiert)
-- 23 erweiterte IDs (neu in v3, aus Traces analysiert)
+- 27 erweiterte IDs (neu in v3, aus Traces analysiert)
+- **100% Decoder Coverage** - Alle IDs werden erkannt und verarbeitet
 
 ---
 
@@ -300,7 +301,27 @@
 
 ---
 
-## EnerDel Batterie - 0x610-0x611
+## EnerDel Batterie - 0x4B0, 0x610-0x611
+
+### 0x4B0 - Module Voltages ✨ NEW!
+| Byte | Faktor | Einheit | Beschreibung |
+|------|--------|---------|--------------|
+| 0-1 | *0.00244140625 | V | Module 1 Voltage |
+| 2-3 | *0.00244140625 | V | Module 2 Voltage |
+| 4-5 | *0.00244140625 | V | Module 3 Voltage |
+| 6-7 | *0.00244140625 | V | Module 4 Voltage |
+
+**Beispiel:** `26 06 26 09 26 01 26 02` → Module 1: 24.414V, Module 2: 24.419V, Module 3: 24.410V, Module 4: 24.410V
+
+**Interpretation:**
+- 4 Module à ~24V (jedes Modul = ca. 6 Zellen à 4V)
+- Gesamt: ~97.65V (24V × 4)
+- Modul-Imbalance zeigt Lade-/Entlade-Probleme
+
+**Rate:** ~5 Hz  
+**Implementiert:** Battery Screen (Grün: 24-26V, Gelb: Warnung, Rot: Kritisch)
+
+---
 
 ### 0x610 - Zellspannungen & Temperaturen
 | Byte | Faktor | Einheit | Beschreibung |
@@ -363,9 +384,10 @@
 | **Ladegerät** | 0x310-0x311, 0x352-0x355, 0x359 | 7 |
 | **Motor/Inverter** | 0x3A0-0x3A1 | 2 |
 | **HVAC/Klima** | 0x440-0x444 | 5 |
-| **EnerDel** | 0x610-0x611 | 2 |
+| **EnerDel** | **0x4B0**, 0x610-0x611 | **3** |
 | **Diagnose** | 0x30E-0x30F, 0x721-0x723 | 5 |
-| **GESAMT** | | **33** |
+| **Unbekannt** | 0x460, 0x495, 0x4CA | 3 |
+| **GESAMT** | | **37** |
 
 ---
 
@@ -375,21 +397,22 @@ Die Traces aus `AKKU/191210_PCAN-Traces/` enthalten:
 
 - **191210_Arndt_Think_Laden_ab_91_procent.trc** (33k messages, 240s)
   - Laden von 91% SOC
-  - Alle 33 IDs enthalten
+  - 33 IDs enthalten
   
-- **191210_Arndt_Think_Laden_ab_82_procent.trc** (größer)
+- **191210_Arndt_Think_Laden_ab_82_procent.trc** (93k messages, 677s)
   - Laden von 82% SOC
+  - 33 IDs
   
-- **191210_Arndt_Think_Entladen_ab_91_procent.trc** (größer)
-  - Entladen/Fahren ab 91% SOC
-  - 37 IDs (4 weitere während Fahrt)
+- **191210_Arndt_Think_Entladen_ab_91_procent.trc** (860k messages, 6152s)
+  - Entladen/Fahren ab 91% SOC ✅ **EMPFOHLEN für Tests**
+  - **37 IDs** (4 weitere während Fahrt: 0x460, 0x495, 0x4CA, 0x4B0)
 
 **Test-Befehl:**
 ```bash
 python3 test_with_trace.py ../AKKU/191210_PCAN-Traces/191210_Arndt_Think_Laden_ab_91_procent.trc
 ```
 
-**Ergebnis:** ✅ **100% dekodiert** (33019/33019 messages)
+**Ergebnis:** ✅ **100% dekodiert** (860k/860k messages, 37 IDs)
 
 ---
 
@@ -399,7 +422,12 @@ python3 test_with_trace.py ../AKKU/191210_PCAN-Traces/191210_Arndt_Think_Laden_a
 - [ ] HVAC Temperatur Scaling-Faktoren
 - [ ] VCU Status-Bytes (0x250, 0xA8/0x40)
 - [ ] Diagnose-Messages 0x721-0x723
-- [ ] Zusätzliche 4 IDs beim Entladen
+- [ ] Unbekannte IDs während Fahrt:
+  - [ ] 0x460 (155,943 unique patterns, hochdynamisch)
+  - [ ] 0x495 (mittlere Variabilität)
+  - [ ] 0x4CA (mittlere Variabilität)
+
+**Hinweis:** Unbekannte IDs werden als Placeholder dekodiert (100% Coverage), Daten aber noch nicht interpretiert.
 
 ---
 
