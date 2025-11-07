@@ -45,6 +45,14 @@ class CANDecoder:
     VCU_2 = 0x251
     VCU_3 = 0x265
     VCU_4 = 0x300
+    UNKNOWN_023 = 0x023  # TODO: Identify
+    UNKNOWN_210 = 0x210  # TODO: Identify
+    UNKNOWN_408 = 0x408  # TODO: Identify
+    UNKNOWN_409 = 0x409  # TODO: Identify
+    UNKNOWN_40B = 0x40B  # TODO: Identify
+    UNKNOWN_460 = 0x460  # TODO: Identify
+    UNKNOWN_495 = 0x495  # TODO: Identify
+    UNKNOWN_4B0 = 0x4B0  # TODO: Identify
     
     # Charger / Power Control
     MAX_AC = 0x311
@@ -173,6 +181,12 @@ class CANDecoder:
                 out.update(self._parse_diag4(d))
             elif arbid == self.DIAG_5:
                 out.update(self._parse_diag5(d))
+            
+            # Unknown IDs (placeholder to avoid returning None)
+            elif arbid in [self.UNKNOWN_023, self.UNKNOWN_210, self.UNKNOWN_408, 
+                          self.UNKNOWN_409, self.UNKNOWN_40B, self.UNKNOWN_460,
+                          self.UNKNOWN_495, self.UNKNOWN_4B0]:
+                out.update(self._parse_unknown(d))
             
             else:
                 return None  # Unbekannte ID
@@ -499,6 +513,15 @@ class CANDecoder:
     def _parse_diag5(self, d: list) -> Dict[str, Any]:
         """0x723: Diagnose 5."""
         return {"diag5_raw": d[:8]}
+    
+    def _parse_unknown(self, d: list) -> Dict[str, Any]:
+        """
+        Placeholder for unknown CAN-IDs.
+        Returns empty dict to prevent message from being dropped.
+        TODO: Analyze trace data to identify these IDs:
+        - 0x023, 0x210, 0x408, 0x409, 0x40B, 0x460, 0x495, 0x4B0
+        """
+        return {}
     
     def merge_state(self, state: Dict[str, Any], update: Dict[str, Any]) -> Dict[str, Any]:
         """
