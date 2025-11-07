@@ -36,6 +36,16 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 ![Rohdaten-Screen](docs/images/screen5-rawdata.png)
 *Live CAN-Traffic mit ID-Referenztabelle*
 
+### Einstellungen-Screen
+![Einstellungen-Screen - Sprache/Trace](docs/images/screen6-settings-Language-reset-trace.png)
+*Sprachauswahl, Trace Replay Steuerung, Bordcomputer zurücksetzen*
+
+![Einstellungen-Screen - Data Logger](docs/images/screen6-settings-Datalogger.png)
+*Data Logger Konfiguration mit 25+ Diagnosefeldern*
+
+![Einstellungen-Screen - NAS](docs/images/screen6-settings-NAS.png)
+*NAS-Synchronisation, System-Steuerung (Neustart/Herunterfahren)*
+
 ---
 
 ![Dashboard Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
@@ -71,7 +81,8 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 
 - Touch-optimierte Buttons (mindestens 80px Höhe)
 - Modernes Flat-Design mit klarer Farbcodierung
-- Status-Bar auf allen Screens mit Datum, Uhrzeit, Außentemperatur
+- Status-Bar auf allen Screens mit Datum, Uhrzeit, Außentemperatur, **WLAN & Trace Replay Status**
+- **[Repl] Indikator**: Orange Status-Anzeige wenn Trace Replay aktiv ist
 - **Frostwarnung**: Außentemperatur <3°C wird rot markiert
 
 ### 🚨 **Intelligentes Warnsystem**
@@ -105,6 +116,10 @@ Kritische Batteriezustände lösen visuelle Warnungen aus:
 ### 💾 **Datenlogging & Performance**
 
 - SQLite-Datenbank auf SSD mit Auto-Mount-Check
+- **Persistentes SOH-Tracking**: Gesundheitszustand wie Durchschnittsverbrauch getrackt (Exponentielle Glättung)
+- **SOH zurücksetzen Button**: SOH auf 100% zurücksetzen nach Batteriewechsel (Einstellungen > Bordcomputer)
+- **Umfassendes Datenlogging**: 25+ Felder inkl. Zellspannungen, Modulspannungen, Temperaturen, Fehlerflags
+- **Konfigurierbares Logging**: Auswahl welche Felder geloggt werden (Einstellungen > Data Logger)
 - Trip-Tracking (Start/Stop-Erkennung)
 - Selektives UI-Update (nur geänderte Werte)
 - Optimiertes Rendering für geringe CPU-Last
@@ -222,8 +237,9 @@ Momentanverbrauch = (Leistung_kW / Geschwindigkeit_km_h) × 1000
 
 - Erkennt automatisch Fahrtbeginn/-ende (Zündschlüssel-Zustand)
 - Erfasst Gesamtstrecke, Gesamtenergie, Durchschnittsverbrauch
+- **SOH-Tracking**: Persistenter Gesundheitszustand mit exponentieller Glättung (alpha=0.001)
 - In Datenbank gespeichert (überlebt harten Shutdown)
-- Manueller Reset über Einstellungsmenü
+- Manueller Reset über Einstellungsmenü (separate Resets für Bordcomputer und SOH)
 
 ---
 
@@ -264,18 +280,20 @@ thinkcity-dashboard-v3/
 ├── dashboard.py                # Hauptanwendung
 ├── main_screen.py              # Hauptbildschirm
 ├── battery_screen.py           # Batterie-Übersicht
-├── cells_screen.py             # Zellspannungen
+├── cell_voltages_screen.py     # Zellspannungen
 ├── charge_screen.py            # Ladestatus
-├── raw_screen.py               # CAN-Rohdaten
+├── raw_data_screen.py          # CAN-Rohdaten
 ├── settings_screen.py          # Einstellungsmenü
 ├── widgets.py                  # Custom Widgets
 ├── translations.py             # Übersetzungssystem
 ├── db_manager.py               # Datenbank-Interface
 ├── trip_computer.py            # Bordcomputer-Berechnungen
+├── soh_tracker.py              # SOH-Tracking mit exponentieller Glättung
 ├── trace_parser.py             # PCAN Trace Parser
 ├── trace_player.py             # CAN Trace Replay
 ├── test_trace_replay.py        # Trace Replay Tests
 ├── can_decoder.py              # CAN-Message Decoder
+├── can_interface.py            # CAN-Bus Interface
 ├── crypto_utils.py             # Passwort-Verschlüsselung
 ├── requirements.txt            # Python-Abhängigkeiten
 ├── config.json                 # Benutzer-Einstellungen
@@ -284,11 +302,13 @@ thinkcity-dashboard-v3/
 ├── systemd/                    # Service-Dateien
 │   ├── thinkcity-dashboard.service
 │   ├── can-interface.service
+│   ├── can-setup.service
 │   └── can-trace-replay.service
 ├── docs/                       # Dokumentation
 │   └── images/                 # Screenshots
 └── tools/                      # Hilfsprogramme
-    └── setup_vcan0.sh          # Virtual CAN Setup
+    ├── setup_vcan0.sh          # Virtual CAN Setup
+    └── capture_screenshots.sh  # Screenshot-Tool
 ```
 
 ---

@@ -36,6 +36,16 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 ![Raw Data Screen](docs/images/screen5-rawdata.png)
 *Live CAN traffic with ID reference table*
 
+### Settings Screen
+![Settings Screen - Language/Trace](docs/images/screen6-settings-Language-reset-trace.png)
+*Language selection, Trace Replay control, Trip Computer reset*
+
+![Settings Screen - Data Logger](docs/images/screen6-settings-Datalogger.png)
+*Data Logger configuration with 25+ diagnostic fields*
+
+![Settings Screen - NAS](docs/images/screen6-settings-NAS.png)
+*NAS synchronization, System control (Reboot/Shutdown)*
+
 ---
 
 ![Dashboard Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
@@ -71,7 +81,8 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 
 - Touch-optimized buttons (minimum 80px height)
 - Modern flat design with clear color coding
-- Status bar on all screens with date, time, ambient temperature
+- Status bar on all screens with date, time, ambient temperature, **WiFi & Trace Replay status**
+- **[Repl] indicator**: Orange status indicator when trace replay is active
 - **Frost warning**: Ambient temperature <3°C highlighted in red
 
 ### 🚨 **Intelligent Warning System**
@@ -105,6 +116,10 @@ Critical battery conditions trigger visual warnings:
 ### 💾 **Data Logging & Performance**
 
 - SQLite database on SSD with auto-mount check
+- **Persistent SOH tracking**: State of Health tracked like average consumption (exponential smoothing)
+- **SOH reset button**: Reset SOH to 100% after battery replacement (Settings > Trip Computer)
+- **Comprehensive data logging**: 25+ fields including cell voltages, module voltages, temperatures, error flags
+- **Configurable logging**: Select which fields to log (Settings > Data Logger)
 - Trip tracking (start/stop detection)
 - Selective UI update (only changed values)
 - Optimized rendering for low CPU usage
@@ -222,8 +237,9 @@ Instant_Consumption = (Power_kW / Speed_km_h) × 1000
 
 - Automatically detects trip start/stop (ignition key state)
 - Tracks total distance, total energy, average consumption
+- **SOH tracking**: Persistent State of Health with exponential smoothing (alpha=0.001)
 - Persisted in database (survives hard shutdown)
-- Manual reset via Settings menu
+- Manual reset via Settings menu (separate reset for Trip Computer and SOH)
 
 ---
 
@@ -264,18 +280,20 @@ thinkcity-dashboard-v3/
 ├── dashboard.py                # Main application
 ├── main_screen.py              # Main screen
 ├── battery_screen.py           # Battery overview
-├── cells_screen.py             # Cell voltages
+├── cell_voltages_screen.py     # Cell voltages
 ├── charge_screen.py            # Charging status
-├── raw_screen.py               # CAN raw data
+├── raw_data_screen.py          # CAN raw data
 ├── settings_screen.py          # Settings menu
 ├── widgets.py                  # Custom widgets
 ├── translations.py             # Translation system
 ├── db_manager.py               # Database interface
 ├── trip_computer.py            # Trip calculations
+├── soh_tracker.py              # SOH tracking with exponential smoothing
 ├── trace_parser.py             # PCAN trace parser
 ├── trace_player.py             # CAN trace replay
 ├── test_trace_replay.py        # Trace replay tests
 ├── can_decoder.py              # CAN message decoder
+├── can_interface.py            # CAN bus interface
 ├── crypto_utils.py             # Password encryption
 ├── requirements.txt            # Python dependencies
 ├── config.json                 # User settings
@@ -284,11 +302,13 @@ thinkcity-dashboard-v3/
 ├── systemd/                    # Service files
 │   ├── thinkcity-dashboard.service
 │   ├── can-interface.service
+│   ├── can-setup.service
 │   └── can-trace-replay.service
 ├── docs/                       # Documentation
 │   └── images/                 # Screenshots
 └── tools/                      # Utilities
-    └── setup_vcan0.sh          # Virtual CAN setup
+    ├── setup_vcan0.sh          # Virtual CAN setup
+    └── capture_screenshots.sh  # Screenshot capture tool
 ```
 
 ---
