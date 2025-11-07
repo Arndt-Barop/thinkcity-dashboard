@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from widgets import StatusBar
 from translations import get_translator
+from trace_player import TracePlayer
 import json
 import os
 
@@ -799,7 +800,11 @@ class SettingsScreen(QWidget):
         layout.addWidget(self.trace_pause_btn)
         layout.addWidget(self.trace_stop_btn)
         layout.addWidget(self.trace_status_label)
-        
+
+        self.trace_start_btn.clicked.connect(self.on_trace_start)
+        self.trace_pause_btn.clicked.connect(self.on_trace_pause)
+        self.trace_stop_btn.clicked.connect(self.on_trace_stop)
+
         # Info text
         info_label = QLabel(t("trace_info"))
         info_label.setWordWrap(True)
@@ -808,7 +813,29 @@ class SettingsScreen(QWidget):
         
         group.setLayout(layout)
         return group
-    
+
+    def on_trace_start(self):
+        trace_file = self.trace_combo.currentData()
+        if not trace_file:
+            self.trace_status_label.setText("Status: No trace selected")
+            return
+        self.trace_player = TracePlayer(interface='vcan0')
+        self.trace_player.load_trace(trace_file)
+        self.trace_player.connect()
+        self.trace_player.start(loop=self.loop_checkbox.isChecked())
+        self.trace_status_label.setText("Status: Playing")
+
+    def on_trace_pause(self):
+        if self.trace_player and self.trace_player.is_playing:
+            self.trace_player.pause()
+            self.trace_status_label.setText("Status: Paused")
+
+    def on_trace_stop(self):
+        if self.trace_player:
+            self.trace_player.stop()
+            self.trace_player.disconnect()
+            self.trace_status_label.setText("Status: Stopped")
+            
     def _scan_trace_files(self):
         """Scan traces/ directory nach .trc Dateien."""
         import os
