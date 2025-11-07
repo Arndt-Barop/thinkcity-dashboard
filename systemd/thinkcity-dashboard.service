@@ -7,13 +7,13 @@ Wants=can-setup.service
 Type=simple
 User=pi
 Group=pi
+SupplementaryGroups=tty video
 WorkingDirectory=/home/pi/thinkcity-dashboard-v3
-Environment="QT_QPA_PLATFORM=xcb"
-Environment="DISPLAY=:0"
+Environment="QT_QPA_PLATFORM=linuxfb"
 Environment="TC_FULLSCREEN=1"
 Environment="TC_HIDE_CURSOR=1"
 Environment="TC_CAN_CHANNEL=vcan0"
-Environment="TC_DB_PATH=/mnt/usbssd/thinkcity.db"
+Environment="TC_DB_PATH=/home/pi/thinkcity-dashboard-v3/thinkcity.db"
 Environment="TC_BATTERY_CAPACITY_KWH=24.0"
 ExecStartPre=/bin/sleep 2
 ExecStart=/usr/bin/python3 /home/pi/thinkcity-dashboard-v3/dashboard.py
