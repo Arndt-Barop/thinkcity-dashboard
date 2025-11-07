@@ -786,6 +786,18 @@ TRANSLATIONS = {
     },
     
     # === CAN Trace Recording ===
+    "can_trace": {
+        "DE": "CAN Trace",
+        "EN": "CAN Trace"
+    },
+    "trace_recording_section": {
+        "DE": "Aufzeichnung",
+        "EN": "Recording"
+    },
+    "trace_replay_section": {
+        "DE": "Wiedergabe",
+        "EN": "Replay"
+    },
     "can_trace_recording": {
         "DE": "CAN Trace Aufzeichnung",
         "EN": "CAN Trace Recording"
@@ -805,6 +817,22 @@ TRANSLATIONS = {
     "stop_recording": {
         "DE": "Aufnahme Stoppen",
         "EN": "Stop Recording"
+    },
+    "start_replay": {
+        "DE": "Wiedergabe Starten",
+        "EN": "Start Replay"
+    },
+    "stop_replay": {
+        "DE": "Wiedergabe Stoppen",
+        "EN": "Stop Replay"
+    },
+    "replay_status_stopped": {
+        "DE": "Status: Gestoppt",
+        "EN": "Status: Stopped"
+    },
+    "replay_status_playing": {
+        "DE": "Status: Läuft",
+        "EN": "Status: Playing"
     },
     "duration": {
         "DE": "Dauer",

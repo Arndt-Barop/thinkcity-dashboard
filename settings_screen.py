@@ -157,13 +157,9 @@ class SettingsScreen(QWidget):
         trip_group = self.create_trip_computer_group()
         scroll_layout.addWidget(trip_group)
         
-        # === Trace Replay ===
-        trace_group = self.create_trace_replay_group()
+        # === CAN Trace (Recording + Replay) ===
+        trace_group = self.create_can_trace_group()
         scroll_layout.addWidget(trace_group)
-        
-        # === Trace Recording ===
-        recording_group = self.create_trace_recording_group()
-        scroll_layout.addWidget(recording_group)
         
         scroll_layout.addStretch()
         scroll.setWidget(scroll_content)
@@ -844,6 +840,200 @@ class SettingsScreen(QWidget):
         group.setLayout(layout)
         return group
     
+    def create_can_trace_group(self):
+        """Unified CAN Trace section with Recording and Replay."""
+        t = self.translator.get
+        
+        group = QGroupBox(t("can_trace"))
+        main_layout = QVBoxLayout()
+        
+        # === Recording Section ===
+        recording_label = QLabel(t("trace_recording_section"))
+        recording_label.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 5px; color: #3498db;")
+        main_layout.addWidget(recording_label)
+        
+        recording_layout = QVBoxLayout()
+        recording_layout.setContentsMargins(15, 5, 5, 10)
+        
+        # Status display
+        self.recording_status_label = QLabel(t("not_recording"))
+        self.recording_status_label.setStyleSheet("font-size: 14px; font-weight: bold; padding: 10px;")
+        recording_layout.addWidget(self.recording_status_label)
+        
+        # Statistics (während Aufnahme)
+        self.recording_stats_widget = QWidget()
+        stats_layout = QVBoxLayout(self.recording_stats_widget)
+        stats_layout.setContentsMargins(10, 5, 10, 5)
+        stats_layout.setSpacing(5)
+        
+        self.recording_duration_label = QLabel(f"{t('duration')}: 00:00:00")
+        self.recording_duration_label.setStyleSheet("font-size: 12px; color: #888;")
+        stats_layout.addWidget(self.recording_duration_label)
+        
+        self.recording_messages_label = QLabel(f"{t('messages')}: 0")
+        self.recording_messages_label.setStyleSheet("font-size: 12px; color: #888;")
+        stats_layout.addWidget(self.recording_messages_label)
+        
+        self.recording_filesize_label = QLabel(f"{t('file_size')}: 0 KB")
+        self.recording_filesize_label.setStyleSheet("font-size: 12px; color: #888;")
+        stats_layout.addWidget(self.recording_filesize_label)
+        
+        self.recording_stats_widget.setVisible(False)
+        recording_layout.addWidget(self.recording_stats_widget)
+        
+        # Control buttons
+        buttons_layout = QHBoxLayout()
+        
+        self.record_start_btn = QPushButton(t("start_recording"))
+        self.record_start_btn.setMinimumHeight(50)
+        self.record_start_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #27ae60;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #229954;
+            }
+            QPushButton:disabled {
+                background-color: #555;
+                color: #888;
+            }
+        """)
+        self.record_start_btn.clicked.connect(self.on_start_recording)
+        buttons_layout.addWidget(self.record_start_btn)
+        
+        self.record_stop_btn = QPushButton(t("stop_recording"))
+        self.record_stop_btn.setMinimumHeight(50)
+        self.record_stop_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #c0392b;
+            }
+            QPushButton:disabled {
+                background-color: #555;
+                color: #888;
+            }
+        """)
+        self.record_stop_btn.clicked.connect(self.on_stop_recording)
+        self.record_stop_btn.setEnabled(False)
+        buttons_layout.addWidget(self.record_stop_btn)
+        
+        recording_layout.addLayout(buttons_layout)
+        
+        # Filename preview
+        self.recording_filename_label = QLabel()
+        self.recording_filename_label.setStyleSheet("font-size: 11px; color: #888; margin-top: 10px;")
+        self.recording_filename_label.setWordWrap(True)
+        self._update_recording_filename_preview()
+        recording_layout.addWidget(self.recording_filename_label)
+        
+        # Storage info
+        self.recording_storage_label = QLabel()
+        self.recording_storage_label.setStyleSheet("font-size: 11px; color: #888;")
+        self._update_storage_info()
+        recording_layout.addWidget(self.recording_storage_label)
+        
+        main_layout.addLayout(recording_layout)
+        
+        # === Separator ===
+        separator = QLabel()
+        separator.setFixedHeight(2)
+        separator.setStyleSheet("background-color: #3498db; margin: 10px 0;")
+        main_layout.addWidget(separator)
+        
+        # === Replay Section ===
+        replay_label = QLabel(t("trace_replay_section"))
+        replay_label.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 5px; color: #3498db;")
+        main_layout.addWidget(replay_label)
+        
+        replay_layout = QVBoxLayout()
+        replay_layout.setContentsMargins(15, 5, 5, 5)
+        
+        # Trace File Selection
+        trace_file_layout = QHBoxLayout()
+        trace_label = QLabel(t("select_trace") + ":")
+        trace_label.setMinimumWidth(150)
+        trace_file_layout.addWidget(trace_label)
+        
+        self.trace_combo = QComboBox()
+        self.trace_combo.setMinimumHeight(40)
+        self._scan_trace_files()
+        trace_file_layout.addWidget(self.trace_combo, stretch=1)
+        replay_layout.addLayout(trace_file_layout)
+        
+        # Loop Playback Checkbox
+        self.loop_checkbox = QCheckBox(t("loop_playback"))
+        self.loop_checkbox.setChecked(self.settings.get("trace_loop", False))
+        replay_layout.addWidget(self.loop_checkbox)
+        
+        # Replay Control Buttons
+        replay_buttons_layout = QHBoxLayout()
+        
+        self.trace_start_btn = QPushButton(t("start_replay"))
+        self.trace_start_btn.setMinimumHeight(50)
+        self.trace_start_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #27ae60;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #229954;
+            }
+        """)
+        self.trace_start_btn.clicked.connect(self.on_trace_start)
+        replay_buttons_layout.addWidget(self.trace_start_btn)
+        
+        self.trace_stop_btn = QPushButton(t("stop_replay"))
+        self.trace_stop_btn.setMinimumHeight(50)
+        self.trace_stop_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:pressed {
+                background-color: #c0392b;
+            }
+        """)
+        self.trace_stop_btn.clicked.connect(self.on_trace_stop)
+        replay_buttons_layout.addWidget(self.trace_stop_btn)
+        
+        replay_layout.addLayout(replay_buttons_layout)
+        
+        # Replay Status
+        self.trace_status_label = QLabel(t("replay_status_stopped"))
+        self.trace_status_label.setStyleSheet("font-size: 12px; color: #888; margin-top: 5px;")
+        replay_layout.addWidget(self.trace_status_label)
+        
+        # Info text
+        info_label = QLabel(t("trace_info"))
+        info_label.setWordWrap(True)
+        info_label.setStyleSheet("color: #888888; font-size: 11px; margin-top: 10px;")
+        replay_layout.addWidget(info_label)
+        
+        main_layout.addLayout(replay_layout)
+        
+        group.setLayout(main_layout)
+        return group
+    
     def create_trace_replay_group(self):
         """Trace Replay Settings."""
         t = self.translator.get
@@ -891,26 +1081,29 @@ class SettingsScreen(QWidget):
         return group
 
     def on_trace_start(self):
+        t = self.translator.get
         trace_file = self.trace_combo.currentData()
         if not trace_file:
-            self.trace_status_label.setText("Status: No trace selected")
+            self.trace_status_label.setText(t("replay_status_stopped"))
             return
         self.trace_player = TracePlayer(interface='vcan0')
         self.trace_player.load_trace(trace_file)
         self.trace_player.connect()
         self.trace_player.start(loop=self.loop_checkbox.isChecked())
-        self.trace_status_label.setText("Status: Playing")
+        self.trace_status_label.setText(t("replay_status_playing"))
 
     def on_trace_pause(self):
+        t = self.translator.get
         if self.trace_player and self.trace_player.is_playing:
             self.trace_player.pause()
-            self.trace_status_label.setText("Status: Paused")
+            self.trace_status_label.setText(t("replay_status_stopped"))
 
     def on_trace_stop(self):
+        t = self.translator.get
         if self.trace_player:
             self.trace_player.stop()
             self.trace_player.disconnect()
-            self.trace_status_label.setText("Status: Stopped")
+            self.trace_status_label.setText(t("replay_status_stopped"))
             
     def _scan_trace_files(self):
         """Scan traces/ directory nach .trc Dateien."""
@@ -945,105 +1138,6 @@ class SettingsScreen(QWidget):
             index = self.trace_combo.findData(saved_trace)
             if index >= 0:
                 self.trace_combo.setCurrentIndex(index)
-    
-    def create_trace_recording_group(self):
-        """Trace Recording Controls."""
-        t = self.translator.get
-        
-        group = QGroupBox(t("can_trace_recording"))
-        layout = QVBoxLayout()
-        
-        # Status display
-        self.recording_status_label = QLabel(t("not_recording"))
-        self.recording_status_label.setStyleSheet("font-size: 14px; font-weight: bold; padding: 10px;")
-        layout.addWidget(self.recording_status_label)
-        
-        # Statistics (während Aufnahme)
-        self.recording_stats_widget = QWidget()
-        stats_layout = QVBoxLayout(self.recording_stats_widget)
-        stats_layout.setContentsMargins(10, 5, 10, 5)
-        stats_layout.setSpacing(5)
-        
-        self.recording_duration_label = QLabel(f"{t('duration')}: 00:00:00")
-        self.recording_duration_label.setStyleSheet("font-size: 12px; color: #888;")
-        stats_layout.addWidget(self.recording_duration_label)
-        
-        self.recording_messages_label = QLabel(f"{t('messages')}: 0")
-        self.recording_messages_label.setStyleSheet("font-size: 12px; color: #888;")
-        stats_layout.addWidget(self.recording_messages_label)
-        
-        self.recording_filesize_label = QLabel(f"{t('file_size')}: 0 KB")
-        self.recording_filesize_label.setStyleSheet("font-size: 12px; color: #888;")
-        stats_layout.addWidget(self.recording_filesize_label)
-        
-        self.recording_stats_widget.setVisible(False)  # Hidden until recording starts
-        layout.addWidget(self.recording_stats_widget)
-        
-        # Control buttons
-        buttons_layout = QHBoxLayout()
-        
-        self.record_start_btn = QPushButton(t("start_recording"))
-        self.record_start_btn.setMinimumHeight(50)
-        self.record_start_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #27ae60;
-                color: white;
-                border-radius: 5px;
-                padding: 10px;
-                font-size: 14px;
-                font-weight: bold;
-            }
-            QPushButton:pressed {
-                background-color: #229954;
-            }
-            QPushButton:disabled {
-                background-color: #555;
-                color: #888;
-            }
-        """)
-        self.record_start_btn.clicked.connect(self.on_start_recording)
-        buttons_layout.addWidget(self.record_start_btn)
-        
-        self.record_stop_btn = QPushButton(t("stop_recording"))
-        self.record_stop_btn.setMinimumHeight(50)
-        self.record_stop_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #e74c3c;
-                color: white;
-                border-radius: 5px;
-                padding: 10px;
-                font-size: 14px;
-                font-weight: bold;
-            }
-            QPushButton:pressed {
-                background-color: #c0392b;
-            }
-            QPushButton:disabled {
-                background-color: #555;
-                color: #888;
-            }
-        """)
-        self.record_stop_btn.clicked.connect(self.on_stop_recording)
-        self.record_stop_btn.setEnabled(False)  # Disabled until recording starts
-        buttons_layout.addWidget(self.record_stop_btn)
-        
-        layout.addLayout(buttons_layout)
-        
-        # Filename preview
-        self.recording_filename_label = QLabel()
-        self.recording_filename_label.setStyleSheet("font-size: 11px; color: #888; margin-top: 10px;")
-        self.recording_filename_label.setWordWrap(True)
-        self._update_recording_filename_preview()
-        layout.addWidget(self.recording_filename_label)
-        
-        # Storage info
-        self.recording_storage_label = QLabel()
-        self.recording_storage_label.setStyleSheet("font-size: 11px; color: #888;")
-        self._update_storage_info()
-        layout.addWidget(self.recording_storage_label)
-        
-        group.setLayout(layout)
-        return group
     
     def _update_recording_filename_preview(self):
         """Update filename preview with next expected filename."""
