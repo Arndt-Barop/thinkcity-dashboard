@@ -320,8 +320,8 @@ sudo systemctl restart thinkcity-dashboard
    # Dashboard:
    journalctl -u thinkcity-dashboard -f
    
-   # Trace-Replay:
-   journalctl -u can-simulation -f
+   # CAN Interface Setup:
+   journalctl -u can-setup -f
    
    # NAS Sync:
    tail -f ~/thinkcity-dashboard-v3/nas_sync.log

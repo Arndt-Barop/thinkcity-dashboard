@@ -87,8 +87,9 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 
 - Touch-optimized buttons (minimum 80px height)
 - Modern flat design with clear color coding
-- Status bar on all screens with date, time, ambient temperature, **WiFi & Trace Replay status**
+- **Status bar on all screens** with date, time, ambient temperature, **WiFi, Trace Replay & Recording status**
 - **[Repl] indicator**: Orange status indicator when trace replay is active
+- **[REC] indicator**: Blinking red indicator when recording CAN traffic
 - **Frost warning**: Ambient temperature <3°C highlighted in red
 
 ### 🚨 **Intelligent Warning System**
@@ -117,7 +118,10 @@ Critical battery conditions trigger visual warnings:
 - Reliable initialization with retry logic
 - Automatic recovery from CAN bus errors
 - Complete decoding of all known ThinkCity CAN IDs
-- PCAN trace replay for development/testing (vcan0)
+- **PCAN trace replay** for development/testing (vcan0)
+- **PCAN trace recording** - Record live CAN traffic to industry-standard .trc format
+- **Live recording statistics** - Real-time display of duration, message count, file size
+- **Professional analysis** - Recorded traces compatible with PCANview
 
 ### 💾 **Data Logging & Performance**
 

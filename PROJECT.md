@@ -17,8 +17,10 @@ thinkcity-dashboard-v3/
 ├── db_manager.py                 # SQLite Manager (auto-trips, SOH)
 ├── trip_computer.py              # Range/Consumption Calculator
 ├── soh_tracker.py                # SOH Tracking (exponential smoothing)
+├── trace_recorder.py             # PCAN Trace Recorder (CAN → .trc)
 ├── trace_player.py               # PCAN Trace Replay Engine
 ├── trace_parser.py               # PCAN .trc File Parser
+├── crypto_utils.py               # Password Encryption (WiFi/NAS)
 │
 ├── widgets.py                    # UI-Widgets (Gauge, Display, Battery, StatusBar)
 ├── main_screen.py                # Hauptbildschirm (Speed, Power, Range)
@@ -284,15 +286,19 @@ Logging-Loop:
 - ✅ Trip-Computer mit Auto-Detection
 - ✅ Auto-Logging (SQLite)
 - ✅ **Trace Replay System (PCAN .trc)**
+- ✅ **Trace Recording System (PCAN .trc)** - NEW!
 - ✅ **[Repl] Status Indicator in StatusBar**
+- ✅ **[REC] Recording Indicator (blinking red)** - NEW!
 - ✅ **100% CAN Decoder Coverage (37 IDs)**
 - ✅ **Module Voltages (0x4B0)**
 - ✅ **Bilingual UI (DE/EN)**
-- ✅ **Settings Screen mit Trace Controls**
+- ✅ **Settings Screen mit Trace Controls (Unified Section)** - NEW!
 - ✅ **SOH Tracking mit exponentieller Glättung**
 - ✅ **SOH Reset Button (nach Batteriewechsel)**
 - ✅ **Comprehensive Data Logger (25+ Fields)**
 - ✅ **can-setup.service für vcan0 Auto-Setup**
+- ✅ **WiFi/NAS Password Encryption** - NEW!
+- ✅ **Live Recording Statistics (Duration/Messages/Size)** - NEW!
 
 ### Phase 2 - Connectivity (IN PROGRESS)
 - ⏳ WLAN-Sync zu InfluxDB/MQTT
