@@ -14,17 +14,26 @@ thinkcity-dashboard-v3/
 ├── dashboard.py                   # 🎯 Haupt-Anwendung
 ├── can_interface.py              # CAN-Bus Manager (retry-logic)
 ├── can_decoder.py                # CAN Frame Decoder (alle IDs)
-├── db_manager.py                 # SQLite Manager (auto-trips)
+├── db_manager.py                 # SQLite Manager (auto-trips, SOH)
 ├── trip_computer.py              # Range/Consumption Calculator
+├── soh_tracker.py                # SOH Tracking (exponential smoothing)
+├── trace_player.py               # PCAN Trace Replay Engine
+├── trace_parser.py               # PCAN .trc File Parser
 │
-├── widgets.py                    # UI-Widgets (Gauge, Display, Battery)
+├── widgets.py                    # UI-Widgets (Gauge, Display, Battery, StatusBar)
 ├── main_screen.py                # Hauptbildschirm (Speed, Power, Range)
 ├── battery_screen.py             # Batterie-Details
+├── cell_voltages_screen.py       # Zellspannungen (88 Zellen)
 ├── charge_screen.py              # Lade-Ansicht
+├── raw_data_screen.py            # CAN Raw Data Terminal
+├── settings_screen.py            # Settings (Trace Replay, Data Logger, SOH)
+├── translations.py               # Bilingual UI (DE/EN)
 │
 └── systemd/
     ├── thinkcity-dashboard.service    # Dashboard Service
-    └── can-interface.service          # CAN Setup Service
+    ├── can-interface.service          # CAN Setup Service (can0)
+    ├── can-setup.service              # vcan0 Setup Service
+    └── can-trace-replay.service       # Trace Replay Service
 ```
 
 ---
@@ -240,7 +249,10 @@ Logging-Loop:
 | **CAN Init** | Race Condition ❌ | Retry-Logic ✅ |
 | **Trip-Computer** | Fehlt ❌ | Komplett ✅ |
 | **Auto-Trip-Detection** | Fehlt ❌ | 5min Idle ✅ |
-| **SOH-Berechnung** | Fehlt ❌ | Zell-Delta ✅ |
+| **SOH-Berechnung** | Fehlt ❌ | **Persistent Tracking ✅** |
+| **SOH-Reset** | Fehlt ❌ | **Reset Button ✅** |
+| **Data Logger** | Basic ❌ | **25+ Fields ✅** |
+| **Replay Indicator** | Fehlt ❌ | **[Repl] Status ✅** |
 | **Zebra-Unterstützung** | Nein ❌ | Ja ✅ |
 | **DB-Pfad** | Hardcoded ❌ | Env-Variable ✅ |
 | **Fehler-Handling** | Crash ❌ | Fallbacks ✅ |
@@ -272,10 +284,15 @@ Logging-Loop:
 - ✅ Trip-Computer mit Auto-Detection
 - ✅ Auto-Logging (SQLite)
 - ✅ **Trace Replay System (PCAN .trc)**
+- ✅ **[Repl] Status Indicator in StatusBar**
 - ✅ **100% CAN Decoder Coverage (37 IDs)**
 - ✅ **Module Voltages (0x4B0)**
 - ✅ **Bilingual UI (DE/EN)**
 - ✅ **Settings Screen mit Trace Controls**
+- ✅ **SOH Tracking mit exponentieller Glättung**
+- ✅ **SOH Reset Button (nach Batteriewechsel)**
+- ✅ **Comprehensive Data Logger (25+ Fields)**
+- ✅ **can-setup.service für vcan0 Auto-Setup**
 
 ### Phase 2 - Connectivity (IN PROGRESS)
 - ⏳ WLAN-Sync zu InfluxDB/MQTT

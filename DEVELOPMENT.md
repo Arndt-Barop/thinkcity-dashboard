@@ -28,16 +28,22 @@ Das Dashboard enthält einen **Settings-Screen** (⚙️ Button in der Navigatio
 - **Log-Intervall**: 1-60 Sekunden (Slider)
   - 1s = hohe Genauigkeit, viele Daten, großer Speicher
   - 60s = grobe Übersicht, wenig Daten, kleiner Speicher
-- **Datenpunkt-Auswahl**: Wähle welche Werte geloggt werden sollen:
-  - 🚗 Geschwindigkeit
-  - 🔋 Ladezustand (SOC)
-  - ⚡ Spannung, Strom, Leistung
-  - 🌡️ Akku-Temperatur, Außentemperatur
-  - 📊 Verbrauch Wh/km
-  - 📏 Reichweite
-  - 🛣️ Kilometerstand
-  - 🌍 GPS Breitengrad, Längengrad
+- **Datenpunkt-Auswahl**: Wähle welche Werte geloggt werden sollen (25+ Felder):
+  - **Grunddaten**: 🚗 Geschwindigkeit, 🔋 SOC, ⚡ Spannung, Strom, Leistung
+  - **Temperaturen**: 🌡️ Akku max/min/Durchschnitt, Außentemperatur
+  - **Zellspannungen**: max/min/avg/delta
+  - **Modulspannungen**: 4 Module + Gesamt
+  - **Fehlerflags**: ISO-Fehler, Notfall, System-Fehler
+  - **Berechnet**: 📊 Verbrauch Wh/km, 📏 Reichweite, 🛣️ Kilometerstand
+- **Permanent geloggt**: Durchschnittsverbrauch, **SOH (State of Health)**
 - **Alle/Keine** Buttons zum schnellen Auswählen
+
+**🔧 Bordcomputer:**
+- **Trip Computer zurücksetzen**: Strecke/Energie/Verbrauch auf 0
+- **SOH zurücksetzen**: State of Health auf 100% (z.B. nach Batteriewechsel)
+  - SOH wird mit exponentieller Glättung (alpha=0.001) getrackt
+  - Persistiert in Datenbank (überlebt harten Shutdown)
+  - Separater Reset-Button (orange) für SOH
 
 **🔧 System-Steuerung:**
 - **🔄 Neustart**: System neu starten (mit Bestätigung)
