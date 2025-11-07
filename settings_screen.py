@@ -351,6 +351,17 @@ class SettingsScreen(QWidget):
         self.wifi_password = QLineEdit()
         self.wifi_password.setEchoMode(QLineEdit.Password)
         self.wifi_password.setPlaceholderText(t("password_placeholder"))
+        
+        # Load encrypted WiFi password
+        from crypto_utils import get_crypto
+        encrypted_wifi_pwd = self.settings.get("wifi_password_encrypted", "")
+        if encrypted_wifi_pwd:
+            try:
+                decrypted_pwd = get_crypto().decrypt(encrypted_wifi_pwd)
+                self.wifi_password.setText(decrypted_pwd)
+            except Exception as e:
+                print(f"Warning: Could not decrypt WiFi password: {e}")
+        
         pwd_layout.addWidget(self.wifi_password)
         
         # Show/Hide Password Button
@@ -936,6 +947,15 @@ class SettingsScreen(QWidget):
         self.settings["can_interface"] = self.can_combo.currentText()
         self.settings["simulation_mode"] = self.sim_checkbox.isChecked()
         self.settings["wifi_ssid"] = self.wifi_ssid.text()
+        
+        # Encrypt and save WiFi password
+        from crypto_utils import get_crypto
+        wifi_pwd = self.wifi_password.text().strip()
+        if wifi_pwd:
+            self.settings["wifi_password_encrypted"] = get_crypto().encrypt(wifi_pwd)
+        else:
+            self.settings["wifi_password_encrypted"] = ""
+        
         self.settings["sync_on_wifi_only"] = self.wifi_only_checkbox.isChecked()
         
         # WLAN IP Configuration
@@ -1135,6 +1155,10 @@ class SettingsScreen(QWidget):
     
     def reload_ui(self):
         """Reload UI with new language."""
+        # Save current status bar states before reload
+        wifi_status = self.status_bar.wifi_connected if hasattr(self, 'status_bar') else False
+        replay_status = self.status_bar.replay_active if hasattr(self, 'status_bar') else False
+        
         # Clear current layout
         while self.layout().count():
             child = self.layout().takeAt(0)
@@ -1143,6 +1167,11 @@ class SettingsScreen(QWidget):
         
         # Recreate UI
         self.init_ui()
+        
+        # Restore status bar states
+        if hasattr(self, 'status_bar'):
+            self.status_bar.set_wifi_status(wifi_status)
+            self.status_bar.set_replay_status(replay_status)
     
     def on_reset_consumption(self):
         """Reset average consumption with confirmation."""
