@@ -16,6 +16,7 @@ from can_decoder import CANDecoder
 from db_manager import DBManager
 from trip_computer import TripComputer
 from soh_tracker import SOHTracker
+from trace_recorder import TraceRecorder
 from main_screen import MainScreen
 from battery_screen import BatteryScreen
 from charge_screen import ChargeScreen
@@ -63,6 +64,10 @@ class ThinkCityDashboard(QWidget):
         self.db_manager = DBManager()
         self.trip_computer = TripComputer(db_manager=self.db_manager)
         self.soh_tracker = SOHTracker(db_manager=self.db_manager)
+        self.trace_recorder = TraceRecorder(
+            can_interface=self.config.get("can_interface", "can0"),
+            output_dir=os.path.expanduser("~/thinkcity-dashboard-v3/traces")
+        )
         
         # Odometer (wird aus Geschwindigkeit integriert)
         self.odo_km = 0.0
@@ -242,6 +247,10 @@ class ThinkCityDashboard(QWidget):
             msg = self.can_interface.receive(timeout=0.01)
             
             if msg:
+                # Forward to trace recorder (if recording)
+                if hasattr(self, 'trace_recorder') and self.trace_recorder.is_recording():
+                    self.trace_recorder.record_message(msg)
+                
                 # Rohdaten an Raw-Data-Screen weiterleiten
                 self.raw_data_screen.add_can_frame(
                     msg.arbitration_id,
@@ -293,6 +302,9 @@ class ThinkCityDashboard(QWidget):
         # Trace-Replay-Status ermitteln
         replay_active = self._is_replay_active()
         
+        # Trace-Recording-Status ermitteln
+        recording_active = hasattr(self, 'trace_recorder') and self.trace_recorder.is_recording()
+        
         # Status an alle StatusBars weitergeben (nur aktueller Screen wird gerendert)
         screens_with_statusbar = [
             self.main_screen,
@@ -307,6 +319,7 @@ class ThinkCityDashboard(QWidget):
             if hasattr(screen, 'status_bar'):
                 screen.status_bar.set_wifi_status(wifi_status)
                 screen.status_bar.set_replay_status(replay_active)
+                screen.status_bar.set_recording_status(recording_active)
         
         # Screen-spezifische Updates
         if current_idx == 0:
@@ -418,6 +431,11 @@ class ThinkCityDashboard(QWidget):
     def closeEvent(self, event):
         """Cleanup beim Schließen."""
         logger.info("Shutting down...")
+        
+        # Stop recording if active
+        if hasattr(self, 'trace_recorder') and self.trace_recorder.is_recording():
+            logger.info("Stopping active trace recording...")
+            self.trace_recorder.stop_recording()
         
         # Trip-Computer Statistiken speichern
         self.trip_computer.shutdown()
