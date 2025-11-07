@@ -15,6 +15,7 @@ from can_interface import CANInterface
 from can_decoder import CANDecoder
 from db_manager import DBManager
 from trip_computer import TripComputer
+from soh_tracker import SOHTracker
 from main_screen import MainScreen
 from battery_screen import BatteryScreen
 from charge_screen import ChargeScreen
@@ -61,6 +62,7 @@ class ThinkCityDashboard(QWidget):
         self.can_decoder = CANDecoder()
         self.db_manager = DBManager()
         self.trip_computer = TripComputer(db_manager=self.db_manager)
+        self.soh_tracker = SOHTracker(db_manager=self.db_manager)
         
         # Odometer (wird aus Geschwindigkeit integriert)
         self.odo_km = 0.0
@@ -240,6 +242,10 @@ class ThinkCityDashboard(QWidget):
                     
                     # Trip-Computer update - benutzt Return-Value
                     self.state = self.trip_computer.update(self.state)
+                    
+                    # SOH-Tracker update - benutzt Return-Value
+                    self.state = self.soh_tracker.update(self.state)
+                    
                     self.last_update_time = datetime.now()
         
         # UI Updates (nur aktiver Screen)
@@ -392,6 +398,9 @@ class ThinkCityDashboard(QWidget):
         
         # Trip-Computer Statistiken speichern
         self.trip_computer.shutdown()
+        
+        # SOH-Tracker shutdown
+        self.soh_tracker.shutdown()
         
         # Close CAN bus
         if self.can_interface:
