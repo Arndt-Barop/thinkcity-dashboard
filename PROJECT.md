@@ -267,27 +267,34 @@ Logging-Loop:
 ## 🚀 Next Steps / Future Features
 
 ### Phase 1 - Core (DONE ✅)
-- ✅ CAN-Bus Integration
-- ✅ Haupt-Screens (3x)
-- ✅ Trip-Computer
-- ✅ Auto-Logging
+- ✅ CAN-Bus Integration mit Retry-Logik
+- ✅ 5 Haupt-Screens (Main, Battery, Cells, Charge, Raw Data)
+- ✅ Trip-Computer mit Auto-Detection
+- ✅ Auto-Logging (SQLite)
+- ✅ **Trace Replay System (PCAN .trc)**
+- ✅ **100% CAN Decoder Coverage (37 IDs)**
+- ✅ **Module Voltages (0x4B0)**
+- ✅ **Bilingual UI (DE/EN)**
+- ✅ **Settings Screen mit Trace Controls**
 
-### Phase 2 - Connectivity (TODO)
+### Phase 2 - Connectivity (IN PROGRESS)
 - ⏳ WLAN-Sync zu InfluxDB/MQTT
 - ⏳ GPS-Integration (USB-Dongle)
 - ⏳ Mobile App (View-Only)
+- 💡 Remote Configuration
 
 ### Phase 3 - Advanced (TODO)
-- ⏳ Settings-Screen (Kalibrierung)
 - ⏳ History-Screen (vergangene Trips)
 - ⏳ OTA-Updates
 - ⏳ Diagnose-Codes (DTCs)
+- 💡 Further unknown CAN-IDs (0x460, 0x495, etc.)
 
 ### Phase 4 - Optional (IDEAS)
 - 💡 Video-Dashcam
 - 💡 Navigation (OpenStreetMap)
 - 💡 Audio-Player
 - 💡 Rear-View-Camera
+- 💡 Battery Health Prediction (ML)
 
 ---
 
