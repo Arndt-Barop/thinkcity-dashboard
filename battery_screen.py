@@ -137,6 +137,41 @@ class BatteryScreen(QWidget):
         cell_group.addLayout(cell_grid)
         main_layout.addLayout(cell_group)
         
+        # ====== Modulspannungen ======
+        module_group = QVBoxLayout()
+        
+        module_title = QLabel(t("module_voltages"))
+        module_title.setFont(QFont("Arial", 14, QFont.Bold))
+        module_title.setStyleSheet("color: #aaaaaa;")
+        module_group.addWidget(module_title)
+        
+        module_grid = QGridLayout()
+        module_grid.setSpacing(8)
+        
+        # Module 1-4
+        self.module_labels = []
+        self.module_values = []
+        
+        for i in range(4):
+            row = i // 2
+            col = (i % 2) * 2
+            
+            label = QLabel(f"{t('module')} {i+1}:")
+            label.setFont(QFont("Arial", 12))
+            label.setStyleSheet("color: #888888;")
+            module_grid.addWidget(label, row, col)
+            
+            value = QLabel("--- V")
+            value.setFont(QFont("Arial", 14, QFont.Bold))
+            value.setStyleSheet("color: #00ccff;")
+            module_grid.addWidget(value, row, col + 1)
+            
+            self.module_labels.append(label)
+            self.module_values.append(value)
+        
+        module_group.addLayout(module_grid)
+        main_layout.addLayout(module_group)
+        
         # ====== Status-Flags ======
         status_group = QVBoxLayout()
         
@@ -229,6 +264,31 @@ class BatteryScreen(QWidget):
                 else:
                     color = "#ff6666"
                 self.cell_delta_value.setStyleSheet(f"color: {color};")
+        
+        # Module voltages
+        module_voltages = [
+            state.get("module1_voltage_V"),
+            state.get("module2_voltage_V"),
+            state.get("module3_voltage_V"),
+            state.get("module4_voltage_V"),
+        ]
+        
+        for i, (voltage, value_label) in enumerate(zip(module_voltages, self.module_values)):
+            if voltage is not None and voltage > 0:
+                value_label.setText(f"{voltage:.3f} V")
+                
+                # Color coding based on voltage level
+                # Normal: 20-50V (module with ~6 cells @ 3.3-4.2V each)
+                if 24 <= voltage <= 26:
+                    color = "#66ff66"  # Green: Good voltage
+                elif 20 <= voltage < 24 or 26 < voltage <= 30:
+                    color = "#ffcc00"  # Yellow: Warning
+                else:
+                    color = "#ff6666"  # Red: Out of range
+                value_label.setStyleSheet(f"color: {color};")
+            else:
+                value_label.setText("--- V")
+                value_label.setStyleSheet("color: #00ccff;")
         
         # Status-Flags
         flags_map = {

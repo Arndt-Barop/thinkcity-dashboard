@@ -228,6 +228,14 @@ TRANSLATIONS = {
         "DE": "Zellspannungen (EnerDel)",
         "EN": "Cell Voltages (EnerDel)"
     },
+    "module_voltages": {
+        "DE": "Modul-Spannungen",
+        "EN": "Module Voltages"
+    },
+    "module": {
+        "DE": "Modul",
+        "EN": "Module"
+    },
     "min": {
         "DE": "Min",
         "EN": "Min"
