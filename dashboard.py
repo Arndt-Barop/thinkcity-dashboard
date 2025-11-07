@@ -94,9 +94,16 @@ class ThinkCityDashboard(QWidget):
             "logging_enabled": True,
             "logging_interval_sec": 1,
             "logging_fields": [
+                # Basic (commonly used)
                 "speed_kmh", "soc_pct", "voltage_V", "current_A", "power_kW",
-                "pack_temp_C", "ambient_temp_C", "consumption_wh_km", "range_km",
-                "odo_km", "latitude", "longitude"
+                "pack_temp_C", "ambient_temp_C", "consumption_wh_km", "range_km", "odo_km",
+                # EnerDel battery health
+                "e_pack_max_cell_V", "e_pack_min_cell_V", "e_pack_avg_cell_V", "e_pack_delta_cell_V",
+                "e_pack_max_temp_C", "e_pack_min_temp_C",
+                # Module voltages
+                "module1_voltage_V", "module2_voltage_V", "module3_voltage_V", "module4_voltage_V",
+                # Error flags (always useful for diagnostics)
+                "iso_error", "emergency", "sys_int_iso_error", "sys_ext_iso_error", "sys_thermal_iso_error"
             ]
         }
         

@@ -49,9 +49,16 @@ class SettingsScreen(QWidget):
             "logging_enabled": True,
             "logging_interval_sec": 1,
             "logging_fields": [
+                # Basic (commonly used)
                 "speed_kmh", "soc_pct", "voltage_V", "current_A", "power_kW",
-                "pack_temp_C", "ambient_temp_C", "consumption_wh_km", "range_km",
-                "odo_km", "latitude", "longitude"
+                "pack_temp_C", "ambient_temp_C", "consumption_wh_km", "range_km", "odo_km",
+                # EnerDel battery health
+                "e_pack_max_cell_V", "e_pack_min_cell_V", "e_pack_avg_cell_V", "e_pack_delta_cell_V",
+                "e_pack_max_temp_C", "e_pack_min_temp_C",
+                # Module voltages
+                "module1_voltage_V", "module2_voltage_V", "module3_voltage_V", "module4_voltage_V",
+                # Error flags (always useful for diagnostics)
+                "iso_error", "emergency", "sys_int_iso_error", "sys_ext_iso_error", "sys_thermal_iso_error"
             ]
         }
         
@@ -646,24 +653,49 @@ class SettingsScreen(QWidget):
         layout.addWidget(fields_label)
         
         # Permanently active fields (not deselectable)
-        permanent_label = QLabel(t("avg_consumption_permanent"))
+        permanent_label = QLabel(t("avg_consumption_permanent") + " + SOH")
         permanent_label.setStyleSheet("font-size: 12px; color: #95a5a6; font-style: italic; margin-left: 5px;")
         layout.addWidget(permanent_label)
         
-        # All available fields
+        # All available fields (organized by category)
         available_fields = {
+            # Basic driving data
             "speed_kmh": t("field_speed"),
             "soc_pct": t("field_soc"),
+            "range_km": t("field_range"),
+            "odo_km": t("field_odo"),
+            
+            # Power & Energy
             "voltage_V": t("field_voltage"),
             "current_A": t("field_current"),
             "power_kW": t("field_power"),
+            "consumption_wh_km": t("field_consumption"),
+            
+            # Temperatures
             "pack_temp_C": t("field_pack_temp"),
             "ambient_temp_C": t("field_ambient_temp"),
-            "consumption_wh_km": t("field_consumption"),
-            "range_km": t("field_range"),
-            "odo_km": t("field_odo"),
-            "latitude": t("field_latitude"),
-            "longitude": t("field_longitude")
+            "e_pack_max_temp_C": "EnerDel Max Temp (°C)",
+            "e_pack_min_temp_C": "EnerDel Min Temp (°C)",
+            
+            # Cell Voltages (EnerDel)
+            "e_pack_max_cell_V": "Zellspannung Max (V)",
+            "e_pack_min_cell_V": "Zellspannung Min (V)",
+            "e_pack_avg_cell_V": "Zellspannung Avg (V)",
+            "e_pack_delta_cell_V": "Zellspannung Delta (V)",
+            
+            # Module Voltages
+            "module1_voltage_V": "Modul 1 Spannung (V)",
+            "module2_voltage_V": "Modul 2 Spannung (V)",
+            "module3_voltage_V": "Modul 3 Spannung (V)",
+            "module4_voltage_V": "Modul 4 Spannung (V)",
+            "modules_total_V": "Module Gesamt (V)",
+            
+            # Error Flags
+            "iso_error": "ISO-Fehler",
+            "emergency": "Notfall",
+            "sys_int_iso_error": "System Int ISO-Fehler",
+            "sys_ext_iso_error": "System Ext ISO-Fehler",
+            "sys_thermal_iso_error": "System Thermal ISO-Fehler",
         }
         
         # Grid for checkboxes (2 columns)

@@ -567,6 +567,10 @@ class CANDecoder:
         """
         state.update(update)
         
+        # Aliases for compatibility
+        if "pcu_ambient_temp_C" in state:
+            state["ambient_temp_C"] = state["pcu_ambient_temp_C"]
+        
         # SOC: Prefer EnerDel when available
         if "e_pack_soc_pct" in state and state.get("is_enerdel"):
             state["soc_pct"] = max(0.0, min(100.0, float(state["e_pack_soc_pct"])))
