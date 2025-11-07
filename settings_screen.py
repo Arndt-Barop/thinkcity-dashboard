@@ -950,11 +950,11 @@ class SettingsScreen(QWidget):
         """Trace Recording Controls."""
         t = self.translator.get
         
-        group = QGroupBox("🎥 CAN Trace Recording" if t("language") == "EN" else "🎥 CAN Trace Aufzeichnung")
+        group = QGroupBox(t("can_trace_recording"))
         layout = QVBoxLayout()
         
         # Status display
-        self.recording_status_label = QLabel(t("not_recording") if hasattr(self.translator, 'translations') else "⭕ Not Recording")
+        self.recording_status_label = QLabel(t("not_recording"))
         self.recording_status_label.setStyleSheet("font-size: 14px; font-weight: bold; padding: 10px;")
         layout.addWidget(self.recording_status_label)
         
@@ -964,15 +964,15 @@ class SettingsScreen(QWidget):
         stats_layout.setContentsMargins(10, 5, 10, 5)
         stats_layout.setSpacing(5)
         
-        self.recording_duration_label = QLabel("Duration: 00:00:00")
+        self.recording_duration_label = QLabel(f"{t('duration')}: 00:00:00")
         self.recording_duration_label.setStyleSheet("font-size: 12px; color: #888;")
         stats_layout.addWidget(self.recording_duration_label)
         
-        self.recording_messages_label = QLabel("Messages: 0")
+        self.recording_messages_label = QLabel(f"{t('messages')}: 0")
         self.recording_messages_label.setStyleSheet("font-size: 12px; color: #888;")
         stats_layout.addWidget(self.recording_messages_label)
         
-        self.recording_filesize_label = QLabel("File Size: 0 KB")
+        self.recording_filesize_label = QLabel(f"{t('file_size')}: 0 KB")
         self.recording_filesize_label.setStyleSheet("font-size: 12px; color: #888;")
         stats_layout.addWidget(self.recording_filesize_label)
         
@@ -982,7 +982,7 @@ class SettingsScreen(QWidget):
         # Control buttons
         buttons_layout = QHBoxLayout()
         
-        self.record_start_btn = QPushButton("▶ " + ("Start Recording" if t("language") == "EN" else "Aufnahme Starten"))
+        self.record_start_btn = QPushButton(t("start_recording"))
         self.record_start_btn.setMinimumHeight(50)
         self.record_start_btn.setStyleSheet("""
             QPushButton {
@@ -1004,7 +1004,7 @@ class SettingsScreen(QWidget):
         self.record_start_btn.clicked.connect(self.on_start_recording)
         buttons_layout.addWidget(self.record_start_btn)
         
-        self.record_stop_btn = QPushButton("⏹ " + ("Stop Recording" if t("language") == "EN" else "Aufnahme Stoppen"))
+        self.record_stop_btn = QPushButton(t("stop_recording"))
         self.record_stop_btn.setMinimumHeight(50)
         self.record_stop_btn.setStyleSheet("""
             QPushButton {
@@ -1051,9 +1051,7 @@ class SettingsScreen(QWidget):
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"ThinkCity_{timestamp}.trc"
         t = self.translator.get
-        self.recording_filename_label.setText(
-            f"Filename: {filename}" if t("language") == "EN" else f"Dateiname: {filename}"
-        )
+        self.recording_filename_label.setText(f"{t('filename')}: {filename}")
     
     def _update_storage_info(self):
         """Update storage space information."""
@@ -1063,21 +1061,43 @@ class SettingsScreen(QWidget):
             st = os.statvfs(traces_dir)
             free_gb = (st.f_bavail * st.f_frsize) / (1024**3)
             t = self.translator.get
-            self.recording_storage_label.setText(
-                f"Storage: {free_gb:.1f} GB free (traces/)" if t("language") == "EN" 
-                else f"Speicher: {free_gb:.1f} GB frei (traces/)"
-            )
+            self.recording_storage_label.setText(f"{t('storage_location')}: {free_gb:.1f} GB free (traces/)")
         except Exception as e:
             self.recording_storage_label.setText(f"Storage: Unknown ({e})")
     
     def on_start_recording(self):
         """Start trace recording."""
-        parent = self.parent()
-        if parent and hasattr(parent, 'trace_recorder'):
-            if parent.trace_recorder.start_recording():
+        print("[DEBUG] on_start_recording() called")
+        
+        # Navigate from SettingsScreen -> QStackedWidget -> Dashboard
+        stacked_widget = self.parent()
+        print(f"[DEBUG] stacked_widget = {stacked_widget}")
+        
+        if stacked_widget is None:
+            print("[ERROR] parent() returned None!")
+            return
+        
+        dashboard = stacked_widget.parent()
+        print(f"[DEBUG] dashboard = {dashboard}")
+        
+        if dashboard is None:
+            print("[ERROR] dashboard (grandparent) is None!")
+            return
+            
+        if not hasattr(dashboard, 'trace_recorder'):
+            print(f"[ERROR] dashboard has no attribute 'trace_recorder'. Type: {type(dashboard)}")
+            return
+            
+        print(f"[DEBUG] trace_recorder = {dashboard.trace_recorder}")
+        
+        try:
+            result = dashboard.trace_recorder.start_recording()
+            print(f"[DEBUG] start_recording() returned: {result}")
+            
+            if result:
                 # Update UI
                 t = self.translator.get
-                self.recording_status_label.setText("🔴 " + ("RECORDING" if t("language") == "EN" else "AUFNAHME LÄUFT"))
+                self.recording_status_label.setText(f"[REC] {t('recording_active')}")
                 self.recording_status_label.setStyleSheet("font-size: 14px; font-weight: bold; padding: 10px; color: #e74c3c;")
                 self.recording_stats_widget.setVisible(True)
                 self.record_start_btn.setEnabled(False)
@@ -1088,16 +1108,28 @@ class SettingsScreen(QWidget):
                 self.recording_stats_timer = QTimer(self)
                 self.recording_stats_timer.timeout.connect(self._update_recording_stats)
                 self.recording_stats_timer.start(1000)  # Update every second
+                print("[SUCCESS] Recording started successfully")
             else:
+                print("[ERROR] start_recording() returned False")
+                t = self.translator.get
                 self.show_message("Failed to start recording" if t("language") == "EN" else "Aufnahme konnte nicht gestartet werden")
-        else:
-            print("Warning: Could not access trace_recorder from parent")
+        except Exception as e:
+            print(f"[ERROR] Exception in on_start_recording: {e}")
+            import traceback
+            traceback.print_exc()
+
     
     def on_stop_recording(self):
         """Stop trace recording."""
-        parent = self.parent()
-        if parent and hasattr(parent, 'trace_recorder'):
-            stats = parent.trace_recorder.stop_recording()
+        # Navigate from SettingsScreen -> QStackedWidget -> Dashboard
+        stacked_widget = self.parent()
+        if stacked_widget is None:
+            print("Warning: Could not access parent")
+            return
+            
+        dashboard = stacked_widget.parent()
+        if dashboard and hasattr(dashboard, 'trace_recorder'):
+            stats = dashboard.trace_recorder.stop_recording()
             
             # Stop stats timer
             if hasattr(self, 'recording_stats_timer'):
@@ -1105,7 +1137,7 @@ class SettingsScreen(QWidget):
             
             # Update UI
             t = self.translator.get
-            self.recording_status_label.setText("⭕ " + ("Not Recording" if t("language") == "EN" else "Keine Aufnahme"))
+            self.recording_status_label.setText(t("not_recording"))
             self.recording_status_label.setStyleSheet("font-size: 14px; font-weight: bold; padding: 10px;")
             self.recording_stats_widget.setVisible(False)
             self.record_start_btn.setEnabled(True)
@@ -1118,17 +1150,11 @@ class SettingsScreen(QWidget):
             # Show completion message with stats
             if stats:
                 message = (
-                    f"Recording complete!\n\n"
-                    f"File: {stats.get('filename', 'N/A')}\n"
-                    f"Duration: {stats.get('duration_seconds', 0):.1f}s\n"
-                    f"Messages: {stats.get('message_count', 0)}\n"
-                    f"File size: {stats.get('file_size_mb', 0):.2f} MB"
-                ) if t("language") == "EN" else (
-                    f"Aufnahme abgeschlossen!\n\n"
-                    f"Datei: {stats.get('filename', 'N/A')}\n"
-                    f"Dauer: {stats.get('duration_seconds', 0):.1f}s\n"
-                    f"Nachrichten: {stats.get('message_count', 0)}\n"
-                    f"Dateigröße: {stats.get('file_size_mb', 0):.2f} MB"
+                    f"{t('recording_stopped')}\n\n"
+                    f"{t('filename')}: {stats.get('filename', 'N/A')}\n"
+                    f"{t('duration')}: {stats.get('duration_seconds', 0):.1f}s\n"
+                    f"{t('messages')}: {stats.get('message_count', 0)}\n"
+                    f"{t('file_size')}: {stats.get('file_size_mb', 0):.2f} MB"
                 )
                 self.show_message(message)
         else:
@@ -1136,9 +1162,14 @@ class SettingsScreen(QWidget):
     
     def _update_recording_stats(self):
         """Update recording statistics display (called by timer)."""
-        parent = self.parent()
-        if parent and hasattr(parent, 'trace_recorder'):
-            stats = parent.trace_recorder.get_stats()
+        # Navigate from SettingsScreen -> QStackedWidget -> Dashboard
+        stacked_widget = self.parent()
+        if stacked_widget is None:
+            return
+            
+        dashboard = stacked_widget.parent()
+        if dashboard and hasattr(dashboard, 'trace_recorder'):
+            stats = dashboard.trace_recorder.get_stats()
             if stats:
                 # Duration
                 duration_sec = stats.get('duration_seconds', 0)
@@ -1148,15 +1179,11 @@ class SettingsScreen(QWidget):
                 duration_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
                 
                 t = self.translator.get
-                self.recording_duration_label.setText(
-                    f"Duration: {duration_str}" if t("language") == "EN" else f"Dauer: {duration_str}"
-                )
+                self.recording_duration_label.setText(f"{t('duration')}: {duration_str}")
                 
                 # Messages
                 msg_count = stats.get('message_count', 0)
-                self.recording_messages_label.setText(
-                    f"Messages: {msg_count:,}" if t("language") == "EN" else f"Nachrichten: {msg_count:,}"
-                )
+                self.recording_messages_label.setText(f"{t('messages')}: {msg_count:,}")
                 
                 # File size
                 file_size_mb = stats.get('file_size_mb', 0)
@@ -1164,9 +1191,7 @@ class SettingsScreen(QWidget):
                     size_str = f"{file_size_mb * 1024:.1f} KB"
                 else:
                     size_str = f"{file_size_mb:.2f} MB"
-                self.recording_filesize_label.setText(
-                    f"File Size: {size_str}" if t("language") == "EN" else f"Dateigröße: {size_str}"
-                )
+                self.recording_filesize_label.setText(f"{t('file_size')}: {size_str}")
     
     def on_save(self):
         """Save settings."""
