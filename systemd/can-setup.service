@@ -1,0 +1,14 @@
+[Unit]
+Description=CAN Interface Setup (dynamic: can0 or vcan0)
+After=network.target
+Before=thinkcity-dashboard.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/pi/thinkcity-dashboard-v3/tools/setup_can_interface.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
