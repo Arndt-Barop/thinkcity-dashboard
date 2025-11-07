@@ -99,6 +99,7 @@ class DBManager:
                     total_energy_kwh REAL,
                     total_count INTEGER,
                     range_km REAL,
+                    soh_pct REAL,
                     synced INTEGER DEFAULT 0,
                     FOREIGN KEY (trip_id) REFERENCES trips (trip_id)
                 )
@@ -123,6 +124,10 @@ class DBManager:
             if "total_count" not in columns:
                 cursor.execute("ALTER TABLE samples ADD COLUMN total_count INTEGER")
                 logger.info("Added total_count column to samples table")
+            
+            if "soh_pct" not in columns:
+                cursor.execute("ALTER TABLE samples ADD COLUMN soh_pct REAL")
+                logger.info("Added soh_pct column to samples table")
             
             # Index for faster queries
             cursor.execute("""
@@ -275,8 +280,8 @@ class DBManager:
                         ambient_temp_C, latitude, longitude,
                         consumption_wh_km, consumption_total_wh_km,
                         total_distance_km, total_energy_kwh, total_count,
-                        range_km
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        range_km, soh_pct
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     self.current_trip_id,
                     now.isoformat(),
@@ -294,7 +299,8 @@ class DBManager:
                     data.get("total_distance_km", 0.0),
                     data.get("total_energy_kwh", 0.0),
                     data.get("total_count", 0),
-                    data.get("range_km", 0.0)
+                    data.get("range_km", 0.0),
+                    data.get("soh_pct")
                 ))
             
             self.last_sample_time = now
@@ -363,6 +369,26 @@ class DBManager:
                     'total_energy_kwh': row[2] or 0.0,
                     'total_count': row[3] or 0
                 }
+            return None
+    
+    def get_latest_soh(self) -> Optional[float]:
+        """
+        Holt den neuesten SOH-Wert aus der DB.
+        Wird beim Start verwendet um Remanenz zu gewährleisten.
+        """
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT soh_pct
+                FROM samples 
+                WHERE soh_pct IS NOT NULL 
+                ORDER BY timestamp DESC 
+                LIMIT 1
+            """)
+            
+            row = cursor.fetchone()
+            if row:
+                return row[0]
             return None
     
     def get_lifetime_stats(self) -> Dict[str, Any]:
