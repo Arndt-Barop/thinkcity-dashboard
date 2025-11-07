@@ -274,6 +274,7 @@ class StatusBar(QWidget):
         self.state = {}  # Stores current state for error checking
         self.wifi_connected = False  # WLAN-Status
         self.replay_active = False  # Trace-Replay aktiv
+        self.recording_active = False  # Trace-Recording aktiv
         self.setFixedHeight(30)  # Schmaler!
         self.setMinimumWidth(400)
     
@@ -295,6 +296,11 @@ class StatusBar(QWidget):
     def set_replay_status(self, active: bool):
         """Setzt Trace-Replay Status."""
         self.replay_active = active
+        self.update()
+    
+    def set_recording_status(self, active: bool):
+        """Setzt Trace-Recording Status."""
+        self.recording_active = active
         self.update()
     
     def _get_critical_warning(self):
@@ -394,10 +400,21 @@ class StatusBar(QWidget):
         painter.setFont(font_time)
         painter.drawText(0, 0, w, h, Qt.AlignCenter, time_str)
         
-        # RECHTS-MITTE: Status-Icons (WLAN, Replay)
-        icon_x = w - 240  # Startposition for Icons
+        # RECHTS-MITTE: Status-Icons (Recording, Replay, WLAN)
+        icon_x = w - 280  # Startposition for Icons (mehr Platz für [REC])
         font_icon = QFont("Arial", 11, QFont.Bold)
         painter.setFont(font_icon)
+        
+        # Recording-Icon (wenn aktiv) - BLINKT!
+        if self.recording_active:
+            import time
+            blink = int(time.time() * 2) % 2 == 0  # 2x pro Sekunde blinken
+            if blink:
+                painter.setPen(QColor(230, 50, 50))  # Bright Red
+            else:
+                painter.setPen(QColor(180, 30, 30))  # Dark Red
+            painter.drawText(icon_x, 0, 45, h, Qt.AlignCenter, "[REC]")
+            icon_x += 55
         
         # Trace-Replay-Icon (wenn aktiv)
         if self.replay_active:
