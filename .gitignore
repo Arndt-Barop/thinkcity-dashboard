@@ -61,3 +61,6 @@ PRIVATE.md
 analyze_unknown_ids.py
 reverse_engineer_*.py
 commtool_analysis.py
+
+# Local legacy folder
+legacy/
