@@ -273,6 +273,7 @@ class StatusBar(QWidget):
         self.ambient_temp = None
         self.state = {}  # Stores current state for error checking
         self.wifi_connected = False  # WLAN-Status
+        self.replay_active = False  # Trace-Replay aktiv
         self.setFixedHeight(30)  # Schmaler!
         self.setMinimumWidth(400)
     
@@ -289,6 +290,11 @@ class StatusBar(QWidget):
     def set_wifi_status(self, connected: bool):
         """Setzt WLAN-Verbindungsstatus."""
         self.wifi_connected = connected
+        self.update()
+    
+    def set_replay_status(self, active: bool):
+        """Setzt Trace-Replay Status."""
+        self.replay_active = active
         self.update()
     
     def _get_critical_warning(self):
@@ -388,10 +394,16 @@ class StatusBar(QWidget):
         painter.setFont(font_time)
         painter.drawText(0, 0, w, h, Qt.AlignCenter, time_str)
         
-        # RECHTS-MITTE: Status-Icons (WLAN)
+        # RECHTS-MITTE: Status-Icons (WLAN, Replay)
         icon_x = w - 240  # Startposition for Icons
         font_icon = QFont("Arial", 11, QFont.Bold)
         painter.setFont(font_icon)
+        
+        # Trace-Replay-Icon (wenn aktiv)
+        if self.replay_active:
+            painter.setPen(QColor(255, 200, 0))  # Orange/Yellow
+            painter.drawText(icon_x, 0, 50, h, Qt.AlignCenter, "[Repl]")
+            icon_x += 60
         
         # WLAN-Icon (wenn verbunden)
         if self.wifi_connected:

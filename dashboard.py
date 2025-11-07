@@ -216,6 +216,18 @@ class ThinkCityDashboard(QWidget):
         except Exception:
             return False
     
+    def _is_replay_active(self):
+        """Prüft ob Trace-Replay aktiv ist."""
+        try:
+            # Check if SettingsScreen hat einen aktiven TracePlayer
+            if hasattr(self.settings_screen, 'trace_player'):
+                player = self.settings_screen.trace_player
+                if player and hasattr(player, 'is_playing'):
+                    return player.is_playing and not player.is_paused
+            return False
+        except Exception:
+            return False
+    
     def _update_loop(self):
         """Haupt-Update-Loop (10 Hz)."""
         if self.can_interface:
@@ -271,6 +283,9 @@ class ThinkCityDashboard(QWidget):
         # WLAN-Status ermitteln
         wifi_status = self._is_wifi_connected()
         
+        # Trace-Replay-Status ermitteln
+        replay_active = self._is_replay_active()
+        
         # Status an alle StatusBars weitergeben (nur aktueller Screen wird gerendert)
         screens_with_statusbar = [
             self.main_screen,
@@ -284,6 +299,7 @@ class ThinkCityDashboard(QWidget):
         for screen in screens_with_statusbar:
             if hasattr(screen, 'status_bar'):
                 screen.status_bar.set_wifi_status(wifi_status)
+                screen.status_bar.set_replay_status(replay_active)
         
         # Screen-spezifische Updates
         if current_idx == 0:
