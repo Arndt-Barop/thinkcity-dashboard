@@ -198,9 +198,6 @@ class CANDecoder:
             else:
                 return None  # Unbekannte ID
             
-            # Calculate derived values (SOH, etc.) after parsing
-            out = self.merge_state({}, out)
-            
             # Cache for diagnostics
             self.last_values[arbid] = out
             
@@ -347,14 +344,26 @@ class CANDecoder:
     
     def _parse_enerdel2(self, d: list) -> Dict[str, Any]:
         """0x611: EnerDel SOC."""
+        delta_v = _u16(d[2], d[3]) * 0.00244140625
+        
+        # Calculate SOH directly from delta
+        if delta_v < 0.05:
+            soh = 100.0
+        elif delta_v > 0.15:
+            soh = max(70.0, 100.0 - (delta_v - 0.05) * 200.0)
+        else:
+            soh = 100.0 - (delta_v - 0.05) * 200.0
+        soh = max(70.0, min(100.0, soh))
+        
         return {
             "is_enerdel": True,
             "e_pack_avg_cell_V": _u16(d[0], d[1]) * 0.00244140625,
-            "e_pack_delta_cell_V": _u16(d[2], d[3]) * 0.00244140625,
+            "e_pack_delta_cell_V": delta_v,
             "e_cell_v_soc_pct": d[4] * 0.4,
             "e_pack_soc_pct": d[5] * 0.4,
             "e_pack_soc1_pct": d[6] * 0.4,
             "e_pack_soc2_pct": d[7] * 0.4,
+            "soh_pct": soh,  # Calculate SOH directly from delta
         }
     
     def _parse_module_voltages(self, d: list) -> Dict[str, Any]:
