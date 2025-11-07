@@ -37,11 +37,17 @@ A complete CAN bus dashboard for Raspberry Pi with SunFounder 10" HDMI touchscre
 *Live CAN traffic with ID reference table*
 
 ### Settings Screen
-![Settings Screen - Language/Trace](docs/images/screen6-settings-Language-reset-trace.png)
-*Language selection, Trace Replay control, Trip Computer reset*
+![Settings Screen - Main](docs/images/screen6-settings.png)
+*CAN Interface, Network/WLAN configuration*
+
+![Settings Screen - CAN Trace](docs/images/screen6-settings-CanTrace.png)
+*CAN Trace Recording & Replay control*
 
 ![Settings Screen - Data Logger](docs/images/screen6-settings-Datalogger.png)
 *Data Logger configuration with 25+ diagnostic fields*
+
+![Settings Screen - Language/Reset](docs/images/screen6-settings-Language-reset.png)
+*Language selection, Trip Computer & SOH reset*
 
 ![Settings Screen - NAS](docs/images/screen6-settings-NAS.png)
 *NAS synchronization, System control (Reboot/Shutdown)*

@@ -36,15 +36,21 @@ Ein vollwertiges CAN-Bus Dashboard für den Raspberry Pi mit SunFounder 10" HDMI
 ![Rohdaten-Screen](docs/images/screen5-rawdata.png)
 *Live CAN-Traffic mit ID-Referenztabelle*
 
-### Einstellungen-Screen
-![Einstellungen-Screen - Sprache/Trace](docs/images/screen6-settings-Language-reset-trace.png)
-*Sprachauswahl, Trace Replay Steuerung, Bordcomputer zurücksetzen*
+### Settings Screen
+![Settings Screen - Main](docs/images/screen6-settings.png)
+*CAN Interface, Netzwerk/WLAN Konfiguration*
 
-![Einstellungen-Screen - Data Logger](docs/images/screen6-settings-Datalogger.png)
-*Data Logger Konfiguration mit 25+ Diagnosefeldern*
+![Settings Screen - CAN Trace](docs/images/screen6-settings-CanTrace.png)
+*CAN Trace Aufzeichnung & Wiedergabe Steuerung*
 
-![Einstellungen-Screen - NAS](docs/images/screen6-settings-NAS.png)
-*NAS-Synchronisation, System-Steuerung (Neustart/Herunterfahren)*
+![Settings Screen - Data Logger](docs/images/screen6-settings-Datalogger.png)
+*Datenlogger Konfiguration mit 25+ Diagnose-Feldern*
+
+![Settings Screen - Language/Reset](docs/images/screen6-settings-Language-reset.png)
+*Sprachauswahl, Bordcomputer & SOH zurücksetzen*
+
+![Settings Screen - NAS](docs/images/screen6-settings-NAS.png)
+*NAS Synchronisation, System-Steuerung (Neustart/Herunterfahren)*
 
 ---
 
