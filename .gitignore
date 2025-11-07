@@ -56,3 +56,8 @@ config-backup/
 NOTES.md
 TODO.md
 PRIVATE.md
+
+# Reverse Engineering Tools (lokal, nicht für Repo)
+analyze_unknown_ids.py
+reverse_engineer_*.py
+commtool_analysis.py
